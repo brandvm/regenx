@@ -1,153 +1,145 @@
-# Brand Vision — Webflow custom code template
+# RegenX — Webflow custom code
 
-TypeScript + esbuild toolchain for Webflow client sites — JS **and** CSS.
-Dev = localhost live reload · Staging = auto-deploy on push · Prod = pinned jsDelivr tag.
+CodeSandbox migration for **RegenX**, Webflow SiteID `6a343f4bd4c8ed2f7270a980`.
+Webflow owns the pages, CMS, layout, native interactions, and form submission.
+This repo builds the site's custom JavaScript and CSS.
 
-Source files: `src/index.ts` (bundled to `dist/index.js`) and `src/styles.css`
-(minified to `dist/styles.css`). Both ship together under one version tag.
+**Current phase: development/staging.** Production is intentionally unconfigured.
 
-The Webflow Designer owns layout and classes. Nothing in this repo generates
-markup.
+## Install and run
 
-## Requirements
+Use Node 22+ and pnpm 11 (`packageManager` pins the pnpm version).
 
-- [Node](https://nodejs.org) 22 (the version CI builds with)
-- [pnpm](https://pnpm.io/installation) 11 — `corepack enable`
-
-```bash
+```sh
 pnpm install
+pnpm dev
 ```
 
-## Commands
+Open **https://regen-x.webflow.io/?bv-dev=1** after installing the snippets below.
+Allow the browser's local-network access prompt if it appears. The page stays on
+Webflow; its custom assets come from `http://localhost:3000`. Saving source files
+reloads that page. The local server serves JS/CSS, not a copy of the Webflow site.
 
-```bash
-pnpm dev      # esbuild watch + server on :3000 (unminified, sourcemaps)
-pnpm build    # minified -> dist/
-pnpm check    # tsc --noEmit
+- `?bv-dev=1` enables local assets and persists on the staging origin.
+- `?bv-dev=0` returns to staging assets.
+- An explicit URL flag works even if localStorage is blocked.
+- If local CSS or JS fails to load, both assets switch to staging.
+- If neither source is available, the page unlocks and the console reports why.
+- A separate head watchdog unlocks the page after eight seconds even if a request hangs.
+- For another device, deploy to staging; that device's localhost is not this machine.
+
+## Install in Webflow — once
+
+[`loader.html`](loader.html) contains **three marked pieces** with RegenX URLs
+already filled in. Copy the content of each piece into its stated location.
+
+1. **HEAD → Site settings / Custom code / Head code.** Replace the current global
+   head block. It preserves the supplied viewport/theme metadata, Ahrefs, and
+   Finsweet Mirror Click, and adds environment configuration and scroll-lock recovery.
+2. **EMBED → the shared global-code component on the Designer canvas.** Replace
+   the existing CodeSandbox CSS/icon-font embed with this piece. Ensure that
+   component appears on every page. Keep other embeds, such as video markup.
+3. **FOOTER → Site settings / Custom code / Footer code.** Replace the old Lenis
+   CDN tag, inline Lenis setup, and both CodeSandbox script tags with this piece.
+4. Keep Webflow's native **GSAP, ScrollTrigger, SplitText, and CustomEase** settings
+   enabled; Webflow interactions use them. The bundle shares the existing GSAP
+   instance and has packaged fallbacks for standalone local fixtures.
+5. Publish the Webflow site to **the `.webflow.io` staging domain**.
+
+The three old CodeSandbox references should be gone: `regenx-main.css`,
+`regenx-wave.js`, and `regenx-main.js`. Keeping the old JS alongside the new loader
+would register duplicate listeners and animations.
+
+The Embed keeps Remix Icon 4.9.0 available in the Designer. Its static staging and
+local CSS links also support canvas styling where scripts do not execute. In the
+Designer, the two stylesheets are additive: test deleted rules on the published
+page with `?bv-dev=1`. The published page uses a single selected stylesheet.
+If the Embed is missing, the footer can still supply site CSS and JS, but the
+Designer preview and icon font require the Embed.
+
+## Deploy staging assets
+
+The staging asset URL is **https://brandvm.github.io/regenx/**.
+GitHub Pages is enabled with **GitHub Actions** as its source (2026-09-15).
+Pushes to `master` trigger the `staging` workflow to deploy the current build.
+
+1. GitHub `brandvm/regenx` uses **Settings → Pages → Source → GitHub Actions**.
+2. Push changes to `master`. The `staging` workflow installs dependencies,
+   checks TypeScript, builds `dist/`, and deploys it to GitHub Pages. It can also
+   be run manually using **Actions → staging → Run workflow** after it is pushed.
+3. Check the workflow succeeds and `/regenx/index.js` and `/regenx/styles.css`
+   return 200. Then open **https://regen-x.webflow.io/?bv-dev=0**.
+
+Later source edits only need a push; another Webflow publish is needed only when
+changing Webflow content or one of the snippets. The loader cache-busts staging
+assets each page load. The dev server binds to loopback and permits cross-origin
+requests from the published Webflow page.
+
+## Commands and verification
+
+```sh
+pnpm dev                  # watch + assets on localhost:3000
+pnpm check                # strict TypeScript checks for the new integration code
+pnpm build                # minified dist/index.js and dist/styles.css
+pnpm exec playwright install chromium  # first browser-test setup
+pnpm test                 # build + isolated browser regression tests
+pnpm test:webflow          # build + read-only checks against published Webflow HTML
+node scripts/check-webflow.mjs --local /  # verify a running pnpm dev server
 ```
 
-## New project checklist
+The migrated main and WaveGrid files remain JavaScript (`allowJs` enabled,
+`checkJs` disabled) to preserve the supplied code without a broad type conversion.
+Browser tests cover those files' runtime integration. `pnpm check` does not type
+check every inherited JavaScript function.
 
-1. Use this template → create repo `wf-<client>` (public)
-2. `package.json` → change `"name"`
-3. Repo Settings → Pages → Source: **GitHub Actions**
-4. Repo → Settings → Collaborators and teams → add the `developers` team (Write)
-5. Paste the three snippets from `loader.html` into Webflow, replacing `REPO`
-   with this repo's name in each — head code, an **Embed on the canvas**, and
-   footer code. Piece 2 must be an Embed inside a component that appears on
-   every page; site custom code does not render in the Designer.
-6. Publish to staging and confirm the canvas picks up `styles.css`
+The isolated tests cover environment routing, storage persistence, missing CSS
+Embed, local CSS/JS fallback, unavailable assets, watchdog recovery, duplicate
+loaders, editor bypass, mobile footer/compare controls, form-step validation,
+carousel navigation, and video mute controls.
 
-## Daily
+The Webflow check intercepts published HTML in its own browser, replaces the old
+snippets, and serves the local build as staging assets. It checks seven real pages
+at desktop/mobile widths, including GSAP instance reuse, Lenis, WaveGrid, and
+runtime errors. It writes reports/screenshots to ignored `test-results/webflow/`.
+Media downloads are skipped, so this is not a full video-playback check.
+It does **not** update or publish Webflow, submit forms, or deploy GitHub Pages.
+It checks the pre-migration markup and needs updating after the live snippets change.
 
-- `pnpm dev`, then on the `.webflow.io` site append `?bv-dev=1` to the URL →
-  your browser loads localhost with live reload. `?bv-dev=0` to exit.
-- `git push` → client-facing staging bundle updates in ~1 min (no Webflow publish)
-- Live reload works in the browser. It does **not** work on the Designer canvas,
-  which never runs scripts — reload the Designer tab instead.
+## Source map
 
-## Release (launch / retainer updates)
+| File | Purpose |
+| --- | --- |
+| `src/index.ts` | Wait for DOM/Webflow, boot once, release the loading state |
+| `src/modules/animation.ts` | Share Webflow GSAP/plugins with packaged fallbacks |
+| `src/modules/smooth-scroll.ts` | Original vertical + responsive horizontal Lenis setup |
+| `src/modules/main.js` | Supplied main features, with explicit imports and isolated initialization |
+| `src/modules/wave-grid.js` | Supplied shader/options and public `window.WaveGrid` API |
+| `src/styles/site.css` | Existing site CSS fetched from its CodeSandbox link on 2026-09-15 |
+| `src/styles.css` | Site CSS, Swiper/Lenis CSS, and migrated document-state rules |
+| `loader.html` | The three Webflow snippets |
+| `build.mjs` | esbuild bundle + development live reload |
 
-```
-pnpm build
-git add -f dist && git commit -m "release: vX.Y.Z"
-git tag vX.Y.Z && git push && git push --tags
-git rm -r --cached dist && git commit -m "chore: untrack dist after vX.Y.Z"
-git push
-```
+The existing 1680px desktop sizing system replaces the template's 1440px defaults.
+Swiper 11.2.10 and Lenis 1.3.24 are pinned to the versions used by the old code;
+GSAP 3.15.0 matches the published site's native scripts. Swiper now loads from the
+bundle instead of injecting CDN scripts/styles asynchronously. The shadowed first
+`linkControllers` definition was removed; the effective second implementation is
+preserved. A single feature initialization error is logged without preventing the
+remaining features from initializing.
 
-`dist/` is gitignored for day-to-day work, so the `-f` is required — without
-it the release commit is empty, the tag carries no build, and jsDelivr serves
-a 404 to the live site.
+`TabDeepLink.init()` and `Anchors.init()` were commented out in the supplied main
+script and remain disabled. The supplied code has no preloader animation; startup
+releases its loading state and hides any `.preloader` overlay. `?debug=1` retains
+the original on-screen diagnostics and `window.__RGX` helpers.
 
-The un-track at the end is not optional tidying. `.gitignore` only governs
-files git is not already *tracking*, so the release commit permanently
-cancels the ignore rule for `dist/`: from that point on every rebuild shows
-as a modification and `git add .` sweeps a minified bundle into whatever
-commit you are writing. `--cached` un-tracks it but leaves the files on
-disk, so the ignore rule applies again. The tag is untouched — it still
-points at the commit that contains the build, and jsDelivr serves that
-forever.
+## Production — later
 
-Then bump `VER` in BOTH Webflow snippets (the CSS/config Embed and the footer
-loader) → publish staging → verify → publish prod.
-Rollback = revert the version strings. Never use `@latest` or branch URLs in prod.
+There is no production release in this migration. When ready, build and commit
+`dist/` into a release tag before pointing `RELEASE` in the **HEAD** snippet to it.
+For example, `RELEASE = "1.0.0"` uses
+`https://cdn.jsdelivr.net/gh/brandvm/regenx@1.0.0/dist/`.
 
-**Tag rules (learned the hard way):**
-
-- `dist/` must be committed *before* the tag is pushed
-- A pushed tag must **never** be moved (`tag -f`) — jsDelivr snapshots a
-  version once and keeps it forever, so a half-baked snapshot is permanent.
-  Botched release? Cut the next patch version instead
-- Un-track `dist/` again once the tag is pushed, or the ignore rule stays
-  dead for every commit after the first release
-
-**Before attaching a custom domain,** confirm the repo actually has the tag
-`VER` points at. A site running on `.webflow.io` never touches the prod URLs,
-so a placeholder `VER = "X.Y.Z"` stays invisible until the moment the domain
-goes live — and then both CSS and JS 404 at once.
-
-## How the files reach the page
-
-Three snippets, documented in [`loader.html`](loader.html) — read that file
-before touching any of them.
-
-| Environment    | Source                  |
-| -------------- | ----------------------- |
-| Production     | pinned jsDelivr tag     |
-| `*.webflow.io` | GitHub Pages staging    |
-| `?bv-dev=1`    | `http://localhost:3000` |
-
-Dev mode is localhost-only by design: `http://localhost` is a
-potentially-trustworthy origin so an https page may load it, but a LAN IP is
-not and gets blocked as mixed content. To check work on another device, push
-and use the staging bundle.
-
-Pushing to `master` triggers
-[`.github/workflows/staging.yml`](.github/workflows/staging.yml), which runs
-`pnpm build` and publishes `dist/` to GitHub Pages. Production is pinned to a
-tag, so a staging deploy never touches the live site.
-
-## Project structure
-
-```
-src/
-  index.ts            entry point; a manifest of module imports and calls
-  styles.css          the whole stylesheet, in numbered sections
-  modules/            one file per feature, each exporting an init function
-build.mjs             esbuild config and dev server
-loader.html           the three Webflow snippets, documented
-```
-
-`src/styles.css` opens with cascade notes and a numbered table of contents.
-Section order is the tiebreaker for same-specificity rules — add to the
-section a rule belongs to, never to the end of the file.
-
-
-The stylesheet includes the shared CSS foundation: fluid root sizing, element
-resets, Webflow default overrides, opt-in effects and utilities, rich-text
-spacing, keyboard focus styles, and reduced-motion support. Tune the sizing
-tokens, wire the accent and container width to the site's Webflow variables,
-and set `--nav-h` when adding a fixed header. Marquees need duplicated tracks;
-read-more controls need their own JavaScript toggle.
-
-TypeScript runs `strict`, targets ES2019, and defines no path aliases —
-imports are relative.
-
-## Webflow MCP
-
-`.mcp.json` carries the Webflow MCP server definition. Approve the project
-server on first launch, then run `/mcp` to authorise Webflow — OAuth is
-per-machine, so this is repeated on each new machine.
-
-## Auditing before launch
-
-Before shipping, check every JS module and CSS block against the live markup —
-modules whose selectors/attributes appear on no page are dead weight
-(the TeraWulf migration dropped 5 of 7 inherited modules this way).
-
-## Handoff (site leaving the agency)
-
-Build → paste `dist/index.js` inline into Site footer, CSS inline into the
-canvas Embed → remove loader + external tags → publish → zip `src/` for the
-client → archive repo.
+Never move a published tag. After tagging a commit containing the build, untrack
+`dist/` with `git rm -r --cached dist` in a subsequent commit so daily builds stay
+ignored. Validate the pinned JS and CSS URLs, update the head snippet, and verify
+before publishing to a custom domain. Rollback uses the prior release value.

@@ -1,13 +1,38 @@
-// Entry point. Keep this file a manifest: one import and one call per
-// module, so what runs on the site is readable at a glance. Feature code
-// lives in src/modules/<name>.ts and exports a single init function that
-// no-ops when its selector is absent from the page.
+import { initAnimation } from './modules/animation';
+import { initSmoothScroll, resizeSmoothScroll } from './modules/smooth-scroll';
+import { initWaveGrid } from './modules/wave-grid';
+import { initMain } from './modules/main';
 
-// import { initExample } from './modules/example';
+async function boot() {
+  if (window.__RGX_BOOTED) return;
+  window.__RGX_BOOTED = true;
+  try {
+    if (window.Webflow?.env?.('editor') || window.Webflow?.env?.('design')) return;
+    await initAnimation();
+    initSmoothScroll();
+    try { initWaveGrid(); } catch (error) {
+      console.warn('[RegenX] WaveGrid could not initialize', error);
+    }
+    initMain();
+  } catch (error) {
+    console.error("[RegenX] Initialization failed", error);
+  } finally {
+    document.documentElement.classList.remove('is-loading');
+    document.documentElement.classList.add('rgx-ready');
+    window.BV?.release?.();
+    resizeSmoothScroll();
+    window.ScrollTrigger?.refresh();
+  }
+}
 
-// initExample();
+function onDOMReady() {
+  // Webflow must wire tabs/dropdowns before our observers and click handlers.
+  if (window.Webflow?.push) window.Webflow.push(boot);
+  else boot();
+}
 
-// Release the pre-paint scroll lock set by the head bootstrap (loader.html).
-// Must stay last, and must stay unconditional — an early return above it
-// leaves the page permanently locked until the snippet's 3s timeout fires.
-document.documentElement.classList.remove('is-loading');
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', onDOMReady, { once: true });
+} else {
+  onDOMReady();
+}

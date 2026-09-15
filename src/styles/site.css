@@ -1,0 +1,671 @@
+/* ================================================
+Blankboard Studio - Global Styles
+================================================ */
+
+/* ------------------------------------------------
+00. Webflow Reset
+Place here so it loads after Webflow CSS when added in Head code
+------------------------------------------------ */
+.w-container::before,
+.w-container::after {
+  display: none;
+}
+
+.w-tabs::before,
+.w-tabs::after {
+  display: none;
+}
+
+.w-radio::before,
+.w-radio::after {
+  display: none;
+}
+
+.w--redirected-checked~* {
+  color: var(--_colors---text-color--light);
+}
+
+.form-check.w--redirected-checked~* {
+  color: inherit;
+}
+
+/* ------------------------------------------------
+01. Token Hub
+------------------------------------------------ */
+:root {
+  /* Scaling System */
+  --size-unit: 16;
+  /* Body font-size in design units (no px) */
+  --size-container-ideal: 1680;
+  --size-container-min: 1280px;
+  --size-container-max: 1680px;
+
+  --size-container: clamp(var(--size-container-min),
+      100vw,
+      var(--size-container-max));
+
+  --size-font: calc(var(--size-container) / (var(--size-container-ideal) / var(--size-unit)));
+
+  font-size: var(--size-font);
+
+  /* Color aliases (still uses your existing --_colors---* vars) */
+  --color-accent: var(--_colors---accent, #83a800);
+  --color-bg-dark: var(--_colors---bg--dark, #0b0e14);
+  --color-text-light: var(--_colors---text-color--light, #f2f5ff);
+
+  /* Existing tokens (kept as-is) */
+  --base---box-opacity: 50%;
+  --shadow-blur: 3em;
+  --address-icon-fill: var(--color-accent);
+
+  /* Motion + timing */
+  --ease-bbs: cubic-bezier(0.65, 0.05, 0, 1);
+  --dur-bbs: 735ms;
+
+  /* Underline effect */
+  --underline-top: 96%;
+  --underline-height: 1px;
+
+  /* Loops */
+  --loop-x-duration: 60s;
+  --loop-y-duration: 32s;
+
+  /* SVG dash */
+  --svg-dash-duration: 8s;
+  --svg-dash-offset: 600;
+
+  /* Zoom */
+  --image-zoom-scale: 1.12;
+
+  /* Icons */
+  --icon-peptides: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='9.8457' y='2' width='4.15414' height='4.15414' rx='2.07707' fill='white'/%3E%3Crect x='9.8457' y='9.8457' width='4.15414' height='4.15414' rx='2.07707' fill='white'/%3E%3Cpath d='M4.21068 2C5.43161 2 6.42136 2.98976 6.42136 4.21068C6.42136 4.28732 6.41745 4.36304 6.40982 4.43766C6.37525 4.77588 6.41999 5.13233 6.63652 5.39445L6.74768 5.529C6.89757 5.71046 7.13343 5.78974 7.3688 5.78974C8.58973 5.78974 9.57948 6.7795 9.57948 8.00042C9.57948 9.22135 8.58973 10.2111 7.3688 10.2111C7.09359 10.2111 6.81513 10.2986 6.63977 10.5107L6.59185 10.5686C6.38869 10.8144 6.35052 11.1501 6.39741 11.4654C6.41316 11.5714 6.42136 11.6798 6.42136 11.7902C6.42136 13.0111 5.43161 14.0008 4.21068 14.0008C2.98976 14.0008 2 13.0111 2 11.7902C2 10.5692 2.98976 9.57948 4.21068 9.57948C4.29249 9.57948 4.37329 9.58387 4.45282 9.59245C4.70909 9.62011 4.97672 9.54899 5.14092 9.35029C5.30381 9.15319 5.3241 8.87967 5.25071 8.63473C5.19052 8.43382 5.15812 8.22092 5.15812 8.00042C5.15812 7.74996 5.19994 7.50931 5.27682 7.28492C5.35493 7.05693 5.33866 6.79791 5.18502 6.61224C5.03038 6.42537 4.77691 6.36137 4.53702 6.39718C4.43054 6.41308 4.32159 6.42136 4.21068 6.42136C2.98976 6.42136 2 5.43161 2 4.21068C2 2.98976 2.98976 2 4.21068 2Z' fill='white'/%3E%3C/svg%3E");
+}
+
+/* Tablet */
+@media screen and (max-width: 991px) {
+  :root {
+    --size-container-ideal: 834;
+    --size-container-min: 768px;
+    --size-container-max: 991px;
+  }
+}
+
+/* Mobile Landscape */
+@media screen and (max-width: 767px) {
+  :root {
+    --size-container-ideal: 430;
+    --size-container-min: 480px;
+    --size-container-max: 767px;
+  }
+}
+
+/* Mobile Portrait */
+@media screen and (max-width: 479px) {
+  :root {
+    --size-container-ideal: 430;
+    --size-container-min: 320px;
+    --size-container-max: 428px;
+  }
+}
+
+/* ------------------------------------------------
+  02. Color System: OKLCH and Display-P3 Fallback
+  ------------------------------------------------ */
+@supports (color: oklch(50% 0.2 280)) {
+  :root {
+    /* Add OKLCH tokens here if needed */
+  }
+}
+
+@supports (color: color(display-p3 1 0 0)) {
+  :root {
+    /* Add Display-P3 tokens here if needed */
+  }
+}
+
+/* ------------------------------------------------
+  03. Reset & Box Model
+  ------------------------------------------------ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeSpeed;
+  text-size-adjust: 100%;
+  text-decoration-skip-ink: auto;
+  text-decoration-thickness: 8%;
+  text-underline-offset: -8%;
+  text-underline-position: from-font;
+}
+
+html {
+  scroll-behavior: initial;
+  scrollbar-width: none;
+  /* Firefox */
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  width: 100vw;
+
+  /* IMPORTANT: one declaration only (second line was overriding the first) */
+  font-feature-settings: "liga" 1, "calt" 1, "ss03" on;
+
+  -ms-overflow-style: none;
+  /* IE & Edge */
+}
+
+/* Hide scrollbars universally */
+body::-webkit-scrollbar,
+body ::-webkit-scrollbar {
+  display: none;
+}
+
+svg {
+  max-width: none;
+  height: auto;
+  box-sizing: border-box;
+  vertical-align: middle;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ------------------------------------------------
+  04. Typography Utilities
+  ------------------------------------------------ */
+/* Same behavior, lower specificity so Webflow overrides stay easy */
+:where(.w-richtext > :first-child,
+  .w-richtext > div:first-child > :first-child) {
+  margin-top: 0 !important;
+}
+
+:where(.w-richtext > :last-child, .w-richtext > div:last-child > :last-child) {
+  margin-bottom: 0 !important;
+}
+
+.w-richtext::after,
+.w-richtext::before {
+  display: none;
+}
+
+/* ------------------------------------------------
+  05. Utility Attributes
+  ------------------------------------------------ */
+[scroll-show="false"] {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+[scroll-show="false"]::-webkit-scrollbar {
+  display: none;
+}
+
+/* Truncate Text Utility (single core rule + variable override) */
+[data-truncate] {
+  --truncate-lines: 1;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  -webkit-line-clamp: var(--truncate-lines);
+}
+
+[data-truncate="1"] {
+  --truncate-lines: 1;
+}
+
+[data-truncate="2"] {
+  --truncate-lines: 2;
+}
+
+/* Selection Highlight */
+@supports (background-color: color-mix(in srgb, black 10%, transparent)) {
+  ::selection {
+    background-color: color-mix(in srgb, currentColor 12%, transparent);
+    color: var(--color-accent);
+    text-shadow: none;
+  }
+
+  ::-moz-selection {
+    background-color: color-mix(in srgb, currentColor 12%, transparent);
+    color: var(--color-accent);
+    text-shadow: none;
+  }
+}
+
+[data-theme="dark"] {
+  background-color: var(--_colors---bg--dark);
+  color: var(--_colors---text--light);
+}
+
+[data-theme="dark-transparent"] {
+  color: var(--_colors---text--light) !important;
+  background-color: transparent;
+}
+
+[data-gradient] {}
+
+[data-gradient-text] {
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-repeat: repeat-x;
+  -webkit-text-fill-color: transparent;
+  color: inherit;
+}
+
+/* ------------------------------------------------
+  06. Interactive Link Effects
+  ------------------------------------------------ */
+.link-underline {
+  position: relative;
+}
+
+.link-underline::after {
+  content: "";
+  position: absolute;
+  top: var(--underline-top);
+  left: 0%;
+  height: var(--underline-height);
+  width: 0%;
+  background: currentColor;
+  transition: width var(--dur-bbs) var(--ease-bbs);
+  pointer-events: none;
+}
+
+.link-underline:hover::after {
+  width: 100%;
+}
+
+.link-underline:not(:hover)::after {
+  left: auto;
+  right: 0%;
+  width: 0%;
+}
+
+
+
+/* ------------------------------------------------
+  07. Animations
+  ------------------------------------------------ */
+@keyframes loopX {
+  from {
+    transform: translateX(0%);
+  }
+
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes loopY {
+  from {
+    transform: translateY(0%);
+  }
+
+  to {
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes sweep {
+  from {
+    background-position: 0% 0;
+  }
+
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.loop-animate-x {
+  animation: loopX var(--loop-x-duration) linear infinite;
+  will-change: transform;
+}
+
+.loop-animate-y {
+  animation: loopY var(--loop-y-duration) linear infinite;
+  will-change: transform;
+}
+
+.loop-animate-x.reverse {
+  animation: loopX var(--loop-x-duration) linear infinite reverse;
+  will-change: transform;
+}
+
+.loop-animate-y.reverse {
+  animation: loopY var(--loop-y-duration) linear infinite reverse;
+  will-change: transform;
+}
+
+.svg-animate-line {
+  stroke-dasharray: 10 10 !important;
+  animation: svgDash var(--svg-dash-duration) linear infinite;
+}
+
+.svg-animate-line.reverse {
+  animation: svgDash var(--svg-dash-duration) linear infinite reverse;
+}
+
+@keyframes svgDash {
+  to {
+    stroke-dashoffset: var(--svg-dash-offset);
+  }
+}
+
+/* Motion respect */
+@media (prefers-reduced-motion: reduce) {
+
+  .loop-animate-x,
+  .loop-animate-y,
+  .svg-animate-line {
+    animation: none !important;
+  }
+
+  .image-w img,
+  .link-underline {
+    transition-duration: 1ms !important;
+  }
+}
+
+/* ------------------------------------------------
+  08. Components / Patterns
+  ------------------------------------------------ */
+.image-w img {
+  transition: transform var(--dur-bbs) var(--ease-bbs);
+}
+
+.image-w:hover img {
+  transform: scale(var(--image-zoom-scale));
+}
+
+.filter-radio-button.w--redirected-checked~.label-filter-menu {}
+
+.faqs-cta {
+  background-image: linear-gradient(90deg, #fff 0%, #d9ff54 50%, #fff 100%);
+  background-size: 200% 100%;
+  background-repeat: repeat;
+  animation: sweep 4s var(--ease-bbs) infinite;
+}
+
+.faqs-cta:hover .gf-cta-line-vert {
+  height: 2.5em;
+}
+
+.faqs-cta:hover .gf-cta-line-horz {
+  width: 2.5em;
+}
+
+.g-footer-cta {
+  background-image: linear-gradient(90deg, #fff 0%, #d9ff54 50%, #fff 100%);
+  background-size: 200% 100%;
+  background-repeat: repeat;
+  animation: sweep 4s var(--ease-bbs) infinite;
+}
+
+.g-footer-cta:hover .gf-cta-line-vert {
+  height: 2.5em;
+}
+
+.g-footer-cta:hover .gf-cta-line-horz {
+  width: 2.5em;
+}
+
+@media screen and (max-width: 767px) {
+  .g-footer-cta:hover .gf-cta-line-vert {
+    height: 1.5em;
+  }
+
+  .g-footer-cta:hover .gf-cta-line-horz {
+    width: 1.5em;
+  }
+
+  .faqs-cta:hover .gf-cta-line-vert {
+    height: 1.5em;
+  }
+
+  .faqs-cta:hover .gf-cta-line-horz {
+    width: 1.5em;
+  }
+}
+
+.g-footer-nav-label *,
+.button-label * {
+  will-change: transform;
+}
+
+.g-footer-nav-item.is-open .g-footer-nav-list-wrap {
+  grid-template-rows: 1fr;
+}
+
+.g-footer-nav-item.is-open .g-footer-nav-toggle-icon {
+  transform: rotate(180deg);
+}
+
+/* ======== SCIENTIFIC INSIGHTS AT HOMEPAGE ======== */
+
+.blog-card::after,
+.blog-feature::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid var(--_colors---utility--u-muted-12);
+  z-index: 3;
+  pointer-events: none !important;
+}
+
+/* Mobile Landscape */
+@media screen and (max-width: 767px) {
+  .blog-feature::after {
+    display: none;
+  }
+
+  .blog-feature-panel::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 1px solid var(--_colors---utility--u-muted-12);
+    z-index: 3;
+    pointer-events: none !important;
+  }
+}
+
+/* ======== COMPARE TABLE AT HOMEPAGE ======== */
+
+.compare-row+.compare-row {
+  border-top: 1px solid var(--_colors---utility--u-muted-10);
+}
+
+.compare-label {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 767px) {
+  .compare-row.is-open .compare-chevron {
+    transform: rotate(180deg);
+  }
+
+  .compare-row.is-open .compare-val-w {
+    grid-template-rows: 1fr 1fr;
+  }
+
+  .compare-row.is-open .compare-label {
+    border-bottom: 1px solid rgba(10, 10, 11, 0.1);
+  }
+
+  .compare-row.is-open .compare-val.is-them {
+    border-top: 1px solid rgba(10, 10, 11, 0.1);
+  }
+}
+
+/* ======== HOW TO SECTION AT HOMEPAGE ======== */
+
+@keyframes tabGfxIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.985);
+    filter: blur(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+.is-tab-in {
+  animation: tabGfxIn 0.6s cubic-bezier(0.2, 0.6, 0, 1) both;
+}
+
+.process-step.w--current .process-step-panel-w {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+/* ======== PRODUCTS SECTION AT HOMEPAGE ======== */
+
+.product-coursel-image
+
+/*.swiper-slide-active*/
+.pci-w {
+  box-shadow: 0 4px 80px 0 rgba(0, 0, 0, 0.08);
+}
+
+/* image carousel: show only active + immediate prev/next, hide the rest */
+.swiper.product-coursel-image .swiper-slide .pci-w {
+  transform: scale(0.8);
+  filter: brightness(90%);
+  pointer-events: none;
+  transition: transform 0.735s var(--ease-bbs) 0s, filter 0.735s var(--ease-bbs) 0s, z-index 0.735s var(--ease-bbs) 0s;
+}
+
+.swiper.product-coursel-image .swiper-slide-active .pci-w
+
+/*, .swiper.product-coursel-image .swiper-slide-prev .pci-w,
+.swiper.product-coursel-image .swiper-slide-next .pci-w */
+  {
+  transform: scale(1);
+  filter: brightness(100%);
+  pointer-events: auto;
+  z-index: 9999;
+  /* transition-delay: 0s;  fade IN immediately */
+}
+
+.swiper.product-coursel-image .swiper-slide {
+  cursor: pointer;
+}
+
+.swiper.product-coursel-image .swiper-slide-active {
+  cursor: default;
+}
+
+@media (max-width: 1200px) {
+  .g-nav-block.is-center {
+    overflow: scroll;
+  }
+}
+
+.form-pane[hidden] {
+  display: none;
+}
+
+.button-link:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+
+.mask-top,
+.mask-bottom,
+.mask-left,
+.mask-right {
+  --mask-fade: 14%;
+
+  -webkit-mask-image: linear-gradient(to bottom,
+      transparent 0,
+      #000 var(--mask-t, 0%),
+      #000 calc(100% - var(--mask-b, 0%)),
+      transparent 100%),
+    linear-gradient(to right,
+      transparent 0,
+      #000 var(--mask-l, 0%),
+      #000 calc(100% - var(--mask-r, 0%)),
+      transparent 100%);
+  mask-image: linear-gradient(to bottom,
+      transparent 0,
+      #000 var(--mask-t, 0%),
+      #000 calc(100% - var(--mask-b, 0%)),
+      transparent 100%),
+    linear-gradient(to right,
+      transparent 0,
+      #000 var(--mask-l, 0%),
+      #000 calc(100% - var(--mask-r, 0%)),
+      transparent 100%);
+
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+.mask-top {
+  --mask-t: var(--mask-top-size, var(--mask-fade));
+}
+
+.mask-bottom {
+  --mask-b: var(--mask-bottom-size, var(--mask-fade));
+}
+
+.mask-left {
+  --mask-l: var(--mask-left-size, var(--mask-fade));
+}
+
+.mask-right {
+  --mask-r: var(--mask-right-size, var(--mask-fade));
+}
+
+
+.product-variant-item:not(:last-child) .body-sm::after {
+  content: ", "
+}
+
+
+.sd-media {
+  display: grid;
+}
+
+.sd-media>[data-sd-media] {
+  grid-area: 1 / 1;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .45s ease, visibility 0s linear .45s;
+}
+
+.sd-media>[data-sd-media].is-active {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.vt-media {}
+
+[data-pseudo-border] {
+  position: relative;
+}
+
+[data-pseudo-border]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+
+  border-radius: inherit;
+  border: 1px solid color-mix(in srgb, white 10%, transparent);
+}

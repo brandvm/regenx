@@ -1,6 +1,12 @@
 name: staging
-on: { push: { branches: [master] } }
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
 permissions: { pages: write, id-token: write, contents: read }
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -10,7 +16,9 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
-      - run: pnpm install --frozen-lockfile && pnpm build
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check && pnpm build
+      - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with: { path: dist }
       - uses: actions/deploy-pages@v4

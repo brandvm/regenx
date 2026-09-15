@@ -5,6 +5,8 @@ const dev = process.argv.includes('--dev');
 const config = {
   entryPoints: ['src/index.ts', 'src/styles.css'],
   bundle: true,
+  format: 'iife',
+  platform: 'browser',
   outdir: 'dist',
   minify: !dev,
   sourcemap: dev,
@@ -18,7 +20,7 @@ const config = {
 if (dev) {
   const ctx = await esbuild.context(config);
   await ctx.watch();
-  await ctx.serve({ servedir: 'dist', port: 3000, cors: { origin: '*' } });
+  await ctx.serve({ servedir: 'dist', host: '127.0.0.1', port: 3000, cors: { origin: '*' } });
   for (const e of config.entryPoints) {
     console.log('dev → http://localhost:3000/' + e.split('/').pop().replace(/\.ts$/, '.js'));
   }

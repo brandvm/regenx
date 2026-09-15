@@ -9,3 +9,7 @@ node_modules/
 # `git rm -r --cached dist` — this rule does nothing while it stays tracked.
 # See the Release section of the README.
 dist
+
+# Browser verification artifacts
+test-results/
+playwright-report/
