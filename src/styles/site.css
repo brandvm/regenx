@@ -577,6 +577,20 @@ a {
   display: none;
 }
 
+[data-form-steps] [data-step-back][hidden] {
+  display: none !important;
+}
+
+[data-form-steps] [data-step-next] {
+  margin-inline-start: auto;
+}
+
+/* Keep the button in its existing flex/grid layout while independently
+   disabling it for incomplete fields. Webflow still owns button.disabled. */
+[data-step-submit-gate] {
+  display: contents;
+}
+
 .button-link:disabled {
   opacity: 0.4;
   pointer-events: none;

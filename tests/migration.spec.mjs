@@ -142,8 +142,7 @@ test('mobile interactions and responsive Lenis remain working',async({page})=>{
   await page.locator('.compare-label').nth(1).click();
   await expect(page.locator('.compare-row').nth(1)).toHaveClass(/is-open/);
   await expect(page.locator('.compare-row').nth(0)).not.toHaveClass(/is-open/);
-  await page.locator('[data-step-next]').click();
-  await expect(page.locator('[data-step-err]')).toBeVisible();
+  await expect(page.locator('[data-step-next]')).toBeDisabled();
   await page.locator('input[type=checkbox]').check();
   await page.locator('[data-step-next]').click();
   await expect(page.locator('[data-step-label]')).toHaveText('Step 2 of 2');

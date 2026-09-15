@@ -85,6 +85,19 @@ changing Webflow content or one of the snippets. The loader cache-busts staging
 assets each page load. The dev server binds to loopback and permits cross-origin
 requests from the published Webflow page.
 
+## Contact form
+
+The Contact page uses one Webflow form inside `[data-form-steps]`, with one
+`[data-step]` per pane. Next uses `type="button" data-step-next`; Back uses
+`type="button" data-step-back`; Submit uses only `type="submit"`.
+
+Back is hidden on the first step. Next stays disabled until the current pane's
+required fields and each `[data-step-required]` choice group are valid. Submit
+stays disabled until the final step and all panes are valid; clearing a required
+field disables it again. Location/State is required in Webflow, matching its label.
+The runtime wraps Submit in a fieldset to keep field validation separate from
+Webflow's own disabled state for spam protection and pending submissions.
+
 ## Commands and verification
 
 ```sh
