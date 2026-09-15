@@ -2,12 +2,14 @@ import { initAnimation } from './modules/animation';
 import { initSmoothScroll, resizeSmoothScroll } from './modules/smooth-scroll';
 import { initWaveGrid } from './modules/wave-grid';
 import { initMain } from './modules/main';
+import { initEnvironmentSwitcher } from './modules/environment-switcher';
 
 async function boot() {
   if (window.__RGX_BOOTED) return;
   window.__RGX_BOOTED = true;
   try {
     if (window.Webflow?.env?.('editor') || window.Webflow?.env?.('design')) return;
+    initEnvironmentSwitcher();
     await initAnimation();
     initSmoothScroll();
     try { initWaveGrid(); } catch (error) {

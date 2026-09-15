@@ -9,6 +9,11 @@ declare global {
     ScrollTrigger?: typeof ScrollTrigger;
     SplitText?: typeof SplitText;
     Webflow?: { env?: (mode: string) => boolean; push?: (callback: () => void) => unknown };
-    BV?: { release?: (failed?: boolean) => void };
+    BV?: {
+      dev?: boolean;
+      devBase?: string;
+      source?: string;
+      release?: (failed?: boolean) => void;
+    };
   }
 }
