@@ -279,6 +279,24 @@ export function initWaveGrid() {
       ? global.matchMedia("(prefers-reduced-motion: reduce)").matches
       : false;
 
+    // Options and colors are fixed for this instance. Uniform values persist
+    // on its private program, including when the drawing buffer is resized.
+    gl.useProgram(program);
+    gl.uniform1f(U.cell, opts.cell);
+    gl.uniform1f(U.gap, opts.gap);
+    gl.uniform1f(U.waves, opts.ripples);
+    gl.uniform1f(U.twist, opts.twist);
+    gl.uniform1f(U.speed, opts.speed);
+    gl.uniform1f(U.falloff, opts.poleStiffness);
+    gl.uniform1f(U.waveHeight, opts.waveHeight);
+    gl.uniform1f(U.contrast, opts.contrast);
+    gl.uniform1i(U.anchor, anchor);
+    gl.uniform1i(U.shape, shape);
+    gl.uniform1i(U.transparent, transparent ? 1 : 0);
+    gl.uniform3fv(U.shadow, shadow);
+    gl.uniform3fv(U.highlight, highlight);
+    gl.uniform3fv(U.bg, bg);
+
     function frame() {
       if (transparent) gl.clear(gl.COLOR_BUFFER_BIT);
       gl.viewport(0, 0, canvas.width, canvas.height);
@@ -287,20 +305,6 @@ export function initWaveGrid() {
       gl.uniform2f(U.res, canvas.width, canvas.height);
       gl.uniform1f(U.dpr, dpr);
       gl.uniform1f(U.time, simTime);
-      gl.uniform1f(U.cell, opts.cell);
-      gl.uniform1f(U.gap, opts.gap);
-      gl.uniform1f(U.waves, opts.ripples);
-      gl.uniform1f(U.twist, opts.twist);
-      gl.uniform1f(U.speed, opts.speed);
-      gl.uniform1f(U.falloff, opts.poleStiffness);
-      gl.uniform1f(U.waveHeight, opts.waveHeight);
-      gl.uniform1f(U.contrast, opts.contrast);
-      gl.uniform1i(U.anchor, anchor);
-      gl.uniform1i(U.shape, shape);
-      gl.uniform1i(U.transparent, transparent ? 1 : 0);
-      gl.uniform3fv(U.shadow, shadow);
-      gl.uniform3fv(U.highlight, highlight);
-      gl.uniform3fv(U.bg, bg);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     }
 

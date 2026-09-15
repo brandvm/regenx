@@ -1,5 +1,12 @@
 import { gsap, ScrollTrigger, SplitText } from "./animation";
-import Swiper from "swiper/bundle";
+import Swiper from "swiper";
+import {
+  Navigation, Pagination, A11y, Autoplay, Thumbs, EffectFade, EffectCoverflow,
+} from "swiper/modules";
+
+// Keep the modules used by CONFIGS, its data-attribute overrides, and the
+// pagination/thumbs helpers. Preserve the bundle's module registration order.
+Swiper.use([Navigation, Pagination, A11y, Autoplay, Thumbs, EffectFade, EffectCoverflow]);
 
 // ============================================
 // Debug — add ?debug=1 to the URL (or #debug). Logs to console + on-screen panel.
@@ -1254,12 +1261,12 @@ var SmartSwiper = (function () {
     }
   }
 
+  var sliderSelector = CONFIGS.map(function (c) {
+    return c.selector;
+  }).join(", ");
+
   function scan() {
-    var sels = CONFIGS.map(function (c) {
-      return c.selector;
-    }).join(", ");
-    if (!sels) return [];
-    return Array.from(document.querySelectorAll(sels));
+    return sliderSelector ? Array.from(document.querySelectorAll(sliderSelector)) : [];
   }
 
   // ---- Tab-pane awareness (NEW) ----
@@ -1290,6 +1297,8 @@ var SmartSwiper = (function () {
     }).observe(pane, { attributes: true, attributeFilter: ["class"] });
   }
 
+  var visibilityObserver = null;
+
   function observeAndInit(els) {
     if (!els.length) return;
 
@@ -1299,19 +1308,23 @@ var SmartSwiper = (function () {
     });
 
     if (!hasIO) return;
-    var io = new IntersectionObserver(
-      function (entries, obs) {
-        entries.forEach(function (e) {
-          if (e.isIntersecting) {
-            initOne(e.target);
-            obs.unobserve(e.target);
-          }
-        });
-      },
-      { rootMargin: "200px 0px" }
-    );
+    // Refresh runs on resize and tab changes. Keep one observer for sliders
+    // still awaiting visibility instead of adding another observer each time.
+    if (!visibilityObserver) {
+      visibilityObserver = new IntersectionObserver(
+        function (entries, obs) {
+          entries.forEach(function (e) {
+            if (e.isIntersecting) {
+              initOne(e.target);
+              obs.unobserve(e.target);
+            }
+          });
+        },
+        { rootMargin: "200px 0px" }
+      );
+    }
     els.forEach(function (el) {
-      io.observe(el);
+      visibilityObserver.observe(el);
     });
   }
 

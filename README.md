@@ -128,6 +128,17 @@ Media downloads are skipped, so this is not a full video-playback check.
 It does **not** update or publish Webflow, submit forms, or deploy GitHub Pages.
 It checks the pre-migration markup and needs updating after the live snippets change.
 
+## Runtime optimizations
+
+Runtime optimizations keep WaveGrid's fixed shader values on its private WebGL
+program and reuse a single carousel visibility observer across refreshes.
+Swiper imports Navigation, Pagination, A11y, Autoplay, Thumbs, EffectFade, and
+EffectCoverflow. Add the matching module import when introducing another Swiper
+feature in `CONFIGS`; the full Swiper stylesheet is retained.
+
+Browser regression tests also cover WaveGrid animation/visibility/resizing and
+carousel observer reuse, including sliders added after initialization.
+
 ## Source map
 
 | File | Purpose |

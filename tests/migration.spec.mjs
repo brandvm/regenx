@@ -23,13 +23,13 @@ const fixture = `
 <div data-video-wrapper><video data-video muted></video><button data-mute-unmute><i class="video-control-icon"></i><i class="video-control-icon"></i></button></div>
 `;
 
-async function setup(page, { url='https://regen-x.webflow.io/', embed=true, fail=()=>false, blockedStorage=false, editor=false, duplicate=false }={}) {
+async function setup(page, { url='https://regen-x.webflow.io/', embed=true, fail=()=>false, blockedStorage=false, editor=false, duplicate=false, markup=fixture }={}) {
   const requests=[];
   const errors=[];
   page.on('pageerror', e=>errors.push(e.message));
   page.on('console', m=>{ if(m.type()==='error' && /\[RegenX\].*failed/.test(m.text())) errors.push(m.text()); });
   if(blockedStorage) await page.addInitScript(()=>Object.defineProperty(window,'localStorage',{get(){throw new Error('blocked');}}));
-  const html=`<!doctype html><html><head>${part('HEAD')}</head><body>${embed?part('EMBED'):''}${fixture}<script>window.Webflow={env:()=>${editor},push:fn=>fn()};</script>${part('FOOTER')}${duplicate?part('FOOTER'):''}</body></html>`;
+  const html=`<!doctype html><html><head>${part('HEAD')}</head><body>${embed?part('EMBED'):''}${markup}<script>window.Webflow={env:()=>${editor},push:fn=>fn()};</script>${part('FOOTER')}${duplicate?part('FOOTER'):''}</body></html>`;
   await page.route('**/*', async route=>{
     const req=route.request(); const u=req.url();
     requests.push(u);
@@ -171,6 +171,58 @@ test('existing Webflow GSAP and plugins retain their identity',async({page})=>{
     splitText:window.SplitText===window.__nativeSplit,
     instances:window.gsapVersions.length,
   }))).toEqual({gsap:true,scrollTrigger:true,splitText:true,instances:1});
+  expect(errors).toEqual([]);
+});
+
+test('carousel refreshes reuse one visibility observer and discover added sliders', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.__sliderObservers = 0;
+    const NativeObserver = window.IntersectionObserver;
+    window.IntersectionObserver = class extends NativeObserver {
+      constructor(callback, options) {
+        super(callback, options);
+        if (options?.rootMargin === '200px 0px') window.__sliderObservers++;
+      }
+    };
+  });
+  const { errors } = await setup(page);
+  await expect(page.locator('html')).toHaveClass(/rgx-ready/);
+  await page.evaluate(() => {
+    window.__sliderUpdates = 0;
+    document.querySelector('.card-row-slider').swiper.on('update', () => window.__sliderUpdates++);
+  });
+  for (let i = 0; i < 6; i++) {
+    const before = await page.evaluate(() => window.__sliderUpdates);
+    await page.evaluate(() => window.onyxSwiper.refresh());
+    await expect.poll(() => page.evaluate(() => window.__sliderUpdates)).toBeGreaterThan(before);
+  }
+  expect(await page.evaluate(() => window.__sliderObservers)).toBe(1);
+  await page.evaluate(() => {
+    const copy = document.querySelector('.card-row-carousel').cloneNode(true);
+    copy.id = 'added-carousel';
+    copy.querySelector('.swiper').removeAttribute('data-swiper-inited');
+    copy.querySelector('.swiper').removeAttribute('data-edge-nav-bound');
+    document.body.appendChild(copy);
+    window.onyxSwiper.refresh();
+  });
+  await expect.poll(() => page.evaluate(() => !!document.querySelector('#added-carousel .swiper').swiper)).toBe(true);
+  expect(await page.evaluate(() => window.__sliderObservers)).toBe(1);
+  expect(errors).toEqual([]);
+});
+
+for (const reduced of [false, true]) test(`carousel autoplay override respects reduced motion: ${reduced}`, async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: reduced ? 'reduce' : 'no-preference' });
+  const markup = fixture.replace('class="swiper card-row-slider"', 'class="swiper card-row-slider" data-swiper-autoplay="100" data-swiper-speed="20"');
+  const { errors } = await setup(page, { markup });
+  await expect(page.locator('html')).toHaveClass(/rgx-ready/);
+  await expect(page.locator('.card-row-slider .swiper-slide').first()).toHaveAttribute('role', 'group');
+  if (reduced) {
+    expect(await page.evaluate(() => document.querySelector('.card-row-slider').swiper.autoplay.running)).toBe(false);
+  } else {
+    await expect.poll(() => page.evaluate(() => document.querySelector('.card-row-slider').swiper.activeIndex)).toBeGreaterThan(0);
+    await page.locator('.card-row-carousel .swiper-next').click();
+    expect(await page.evaluate(() => document.querySelector('.card-row-slider').swiper.autoplay.running)).toBe(false);
+  }
   expect(errors).toEqual([]);
 });
 
