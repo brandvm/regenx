@@ -1,0 +1,115 @@
+/* Layout, colors, type and spacing are authored in Webflow. These rules cover
+   generated ruler marks and interaction states only. */
+[data-therapy-timeline] .therapy-timeline-track,
+[data-therapy-timeline] [data-timeline-ruler-track] {
+  transition-timing-function: cubic-bezier(0.64, 0.05, 0, 1);
+}
+
+[data-therapy-timeline] [data-timeline-ruler-track] {
+  will-change: transform;
+}
+
+/* Fade the scrolling layers, not the panel or its controls. Extend into the
+   panel's empty side space so resting text remains fully opaque. Swiper and
+   the ruler measure the inner content width, excluding this extra padding. */
+[data-therapy-timeline] .therapy-timeline-slider,
+[data-therapy-timeline] [data-timeline-ruler] {
+  --timeline-edge-fade: 6em;
+  box-sizing: border-box;
+  width: calc(100% + var(--timeline-edge-fade) * 2);
+  margin-left: calc(-1 * var(--timeline-edge-fade));
+  padding-left: var(--timeline-edge-fade);
+  padding-right: var(--timeline-edge-fade);
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 var(--timeline-edge-fade), #000 calc(100% - var(--timeline-edge-fade)), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 var(--timeline-edge-fade), #000 calc(100% - var(--timeline-edge-fade)), transparent);
+}
+
+@media (max-width: 991px) {
+  [data-therapy-timeline] .therapy-timeline-slider,
+  [data-therapy-timeline] [data-timeline-ruler] {
+    --timeline-edge-fade: 4em;
+  }
+
+  /* The wider tablet fade passes behind the inset controls. Match the native
+     panel surface so moving copy cannot show through the arrow buttons. */
+  [data-therapy-timeline] .therapy-timeline-side-navs button {
+    background-color: var(--_colors---neutral--200, #f7f7f7);
+  }
+}
+
+@media (max-width: 767px) {
+  [data-therapy-timeline] .therapy-timeline-slider,
+  [data-therapy-timeline] [data-timeline-ruler] {
+    --timeline-edge-fade: 1.5em;
+  }
+}
+
+/* Preserve the native column layout when Swiper's generic display:block rule
+   loads after Webflow CSS, so its editable badge/copy gap still applies. */
+[data-therapy-timeline] .therapy-timeline-stage {
+  display: flex;
+}
+
+/* Webflow's static preview uses flex-basis so the generic Swiper stylesheet
+   cannot expand each stage to full width. Runtime widths use the week scale. */
+[data-therapy-timeline][data-timeline-ready] .therapy-timeline-stage {
+  flex-basis: auto;
+}
+
+[data-therapy-timeline] .therapy-timeline-tick {
+  position: absolute;
+  bottom: 0;
+  width: 1px;
+  height: .55em;
+  background: currentColor;
+  opacity: .4;
+}
+
+[data-therapy-timeline] .therapy-timeline-tick.is-major {
+  height: 1.75em;
+  opacity: .85;
+}
+
+[data-therapy-timeline] .therapy-timeline-tick-label {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + .5em);
+  transform: translateX(-50%);
+  font-size: .875em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+[data-therapy-timeline] [data-timeline-prev],
+[data-therapy-timeline] [data-timeline-next] {
+  color: inherit;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* Swiper normally hides locked controls. Retain the reference layout when
+   the initial two desktop milestones fit without overflowing. */
+[data-therapy-timeline] .swiper-button-lock {
+  display: flex;
+}
+
+[data-therapy-timeline] button:disabled,
+[data-therapy-timeline] [aria-disabled="true"] {
+  cursor: default;
+  opacity: .2;
+}
+
+[data-therapy-timeline] button:focus-visible,
+[data-therapy-timeline] .therapy-timeline-slider:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-therapy-timeline] .therapy-timeline-track,
+  [data-therapy-timeline] [data-timeline-ruler-track],
+  [data-therapy-timeline] button {
+    transition-duration: 0ms !important;
+  }
+}

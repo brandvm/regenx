@@ -1,5 +1,6 @@
 import { gsap, ScrollTrigger, SplitText } from "./animation";
 import Swiper from "swiper";
+import { createTherapyTimeline, THERAPY_TIMELINE_SPEED } from "./therapy-timeline";
 import {
   Navigation, Pagination, A11y, Autoplay, Thumbs, EffectFade, EffectCoverflow,
 } from "swiper/modules";
@@ -830,6 +831,37 @@ var SmartSwiper = (function () {
   // CONFIGS
   // ---------------------------------------------------------------------------
   var CONFIGS = [
+    {
+      selector: "[data-therapy-timeline] .swiper.therapy-timeline-slider",
+      wrapper: "[data-therapy-timeline]",
+      navPrev: "[data-timeline-prev]",
+      navNext: "[data-timeline-next]",
+      navAll: true,
+      timeline: true,
+      opts: {
+        slidesPerView: "auto",
+        spaceBetween: 0,
+        grabCursor: true,
+        speed: THERAPY_TIMELINE_SPEED,
+        loop: false,
+        autoplay: false,
+        watchOverflow: true,
+        watchSlidesProgress: true,
+        // The timeline observes only editable week ranges and slide content.
+        observer: false,
+        observeParents: false,
+        observeSlideChildren: false,
+        a11y: {
+          containerRole: "region",
+          containerMessage: "Peptide therapy results timeline",
+          containerRoleDescriptionMessage: "carousel",
+          itemRoleDescriptionMessage: "timeline phase",
+          slideLabelMessage: null,
+          prevSlideMessage: "Previous timeline phase",
+          nextSlideMessage: "Next timeline phase",
+        },
+      },
+    },
     // ---- Services: image carousel (MAIN) + info carousel (SYNCED) ----
     {
       selector: ".swiper.product-coursel-image",
@@ -971,6 +1003,13 @@ var SmartSwiper = (function () {
 
   function resolveNav(el, cfg) {
     var scope = getRoot(el, cfg);
+    if (cfg.navAll) {
+      return {
+        scope: scope,
+        prev: Array.from(scope.querySelectorAll(cfg.navPrev)),
+        next: Array.from(scope.querySelectorAll(cfg.navNext)),
+      };
+    }
     var prev = cfg.navPrev
       ? scope.querySelector(cfg.navPrev)
       : scope.querySelector(".swiper-prev");
@@ -1025,6 +1064,10 @@ var SmartSwiper = (function () {
     if (!swiper || el.dataset.edgeNavBound) return;
     el.dataset.edgeNavBound = "1";
     var setHidden = function (btn, hidden) {
+      if (Array.isArray(btn)) {
+        btn.forEach(function (item) { setHidden(item, hidden); });
+        return;
+      }
       if (btn) btn.style.opacity = hidden ? "0.2" : "";
     };
     var update = function () {
@@ -1175,7 +1218,8 @@ var SmartSwiper = (function () {
 
     if (isDisplayed(el)) {
       try {
-        inst.update();
+        if (el._therapyTimeline) el._therapyTimeline.refresh();
+        else inst.update();
         if (inst.navigation && isFn(inst.navigation.update))
           inst.navigation.update();
         if (inst.pagination) {
@@ -1207,6 +1251,13 @@ var SmartSwiper = (function () {
       cfg,
       withNav(el, cfg, normalizeOpts(readDataOverrides(el, cfg.opts)))
     );
+    // A chronological rail never loops or autoplays, even if a copied Webflow
+    // element carries generic carousel data attributes.
+    if (cfg.timeline) {
+      opts.loop = false;
+      opts.autoplay = false;
+      opts.speed = reduceMotion ? 0 : THERAPY_TIMELINE_SPEED;
+    }
 
     // Loop needs slides on BOTH sides of the fan at all times. The Enclomiphene
     // and Peptide tabs only carry 6 products — fewer than the fan shows — so
@@ -1238,9 +1289,15 @@ var SmartSwiper = (function () {
 
     el.dataset.swiperInited = "1";
 
+    var timeline = cfg.timeline ? createTherapyTimeline(el) : null;
     try {
       var swiper = new Swiper(el, opts);
       el._smartSwiperInstance = swiper;
+      if (timeline) {
+        el._therapyTimeline = timeline;
+        timeline.attach(swiper);
+        swiper.on("destroy", function () { delete el.dataset.edgeNavBound; });
+      }
 
       bindEdgeNavHiding(el, swiper, nav.prev, nav.next);
       if (thumbsSwiper) syncThumbs(swiper, thumbsSwiper);
@@ -1256,6 +1313,7 @@ var SmartSwiper = (function () {
         if (syncSwiper) syncSwiper.update();
       } catch (_) {}
     } catch (err) {
+      if (timeline) timeline.destroy();
       delete el.dataset.swiperInited;
       throw err;
     }

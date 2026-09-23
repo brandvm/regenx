@@ -128,6 +128,39 @@ Media downloads are skipped, so this is not a full video-playback check.
 It does **not** update or publish Webflow, submit forms, or deploy GitHub Pages.
 It checks the pre-migration markup and needs updating after the live snippets change.
 
+## Peptide therapy timeline
+
+The Peptide Therapy page contains an editable **Peptide Therapy Results Timeline**
+section between the catalog and stacks sections. Webflow owns its panel, heading,
+buttons, milestone copy, and responsive layout; this repo adds the slider and
+synchronized ruler. Both arrow pairs control the same slider. There is no autoplay
+or looping, and keyboard navigation and reduced motion are supported.
+
+The two initial stages cover weeks **1–4** and **6–12**. Both fit on desktop, so
+the arrows are disabled there until more stages are added. On mobile, each stage
+can be swiped or reached with the header arrows.
+
+Staging currently includes two explicitly labeled **preview** stages, **12–18**
+and **18–24**, to demonstrate scrolling. Their copy is for layout testing, not
+approved treatment information; replace or remove it before a production release.
+Transitions take one second with `cubic-bezier(0.64, 0.05, 0, 1)`. Responsive edge
+masks fade the slides and ruler without fading the navigation controls.
+
+To add an approved stage in Webflow:
+
+1. Duplicate a **Therapy Timeline | Stage** inside **Therapy Timeline | Track**.
+2. Edit its week badge and paragraph.
+3. Set its `data-week-start` and `data-week-end` custom attributes to numeric week
+   values, and keep the stages in chronological order. Do not remove `swiper-slide`.
+4. Publish the Webflow changes and check the page in Dev or with deployed assets.
+
+The section's `data-timeline-origin="0"` and `data-timeline-weeks="12"` define the
+origin and desktop visible range. Mobile defaults to six visible weeks; an optional
+`data-timeline-mobile-weeks` attribute overrides that value. Stage spacing and
+ruler marks are calculated from these week values, so later stages need no new
+JavaScript. The Designer has a static 0–12 ruler preview because custom JavaScript
+does not execute there; the published runtime generates the complete ruler.
+
 ## Runtime optimizations
 
 Runtime optimizations keep WaveGrid's fixed shader values on its private WebGL
@@ -148,8 +181,10 @@ carousel observer reuse, including sliders added after initialization.
 | `src/modules/smooth-scroll.ts` | Original vertical + responsive horizontal Lenis setup |
 | `src/modules/environment-switcher.ts` | Compact staging-only Dev / Staging control |
 | `src/modules/main.js` | Supplied main features, with explicit imports and isolated initialization |
+| `src/modules/therapy-timeline.js` | Week-scaled timeline sizing, ruler synchronization, and accessibility |
 | `src/modules/wave-grid.js` | Supplied shader/options and public `window.WaveGrid` API |
 | `src/styles/site.css` | Existing site CSS fetched from its CodeSandbox link on 2026-09-15 |
+| `src/styles/therapy-timeline.css` | Generated ruler marks and timeline interaction states |
 | `src/styles.css` | Site CSS, Swiper/Lenis CSS, and migrated document-state rules |
 | `loader.html` | The three Webflow snippets |
 | `build.mjs` | esbuild bundle + development live reload |
