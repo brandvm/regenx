@@ -161,6 +161,38 @@ ruler marks are calculated from these week values, so later stages need no new
 JavaScript. The Designer has a static 0–12 ruler preview because custom JavaScript
 does not execute there; the published runtime generates the complete ruler.
 
+## Enclomiphene benefits slider
+
+The Enclomiphene page's **Enclomiphene Benefits, Dosage, and Comparisons**
+section uses a centred card slider in each of its three tabs. Webflow owns the
+light panel, tabs, cards, slide widths, and responsive layout; this repo adds
+the looping Swiper, pagination bullets, edge fades, and the active-tab caret.
+There is no autoplay. Neighbouring cards can be clicked, dragged, or reached
+with the bullets, which are keyboard buttons.
+
+Each **SB Tab Pane** holds an **SB Benefit | Slider W** (`data-benefit-slider`)
+with the global **Swiper**, **Swiper Wrapper**, and **Swiper Slide** classes.
+Cards reuse **SB Benefit | Card** with an `is_slider` combo, so the TRT page's
+benefit cards are unchanged. Slide widths are 57% on desktop, 80% on tablet,
+and 88% on mobile; Swiper reads them from Webflow.
+
+A centred loop needs at least five slides. When a tab has fewer, the runtime
+appends hidden copies of its cards and still shows one bullet per authored
+card. The copies are removed if the slider is destroyed.
+
+Tabs 2 and 3 currently repeat tab 1, and every card uses a **Lorem Ipsum**
+label and an unlinked **Read More** button. Replace them before production.
+
+To add or edit a benefit in Webflow:
+
+1. Duplicate a **Swiper Slide** inside that tab's **Swiper Wrapper** and keep
+   its `SB Benefit | Slide` combo.
+2. Edit the card's image, label, heading, paragraph, and **Read More** link.
+3. Publish and check the page in Dev or with deployed assets.
+
+The Designer shows the slides stacked because Swiper runs only on the published
+page.
+
 ## Runtime optimizations
 
 Runtime optimizations keep WaveGrid's fixed shader values on its private WebGL
@@ -182,9 +214,11 @@ carousel observer reuse, including sliders added after initialization.
 | `src/modules/environment-switcher.ts` | Compact staging-only Dev / Staging control |
 | `src/modules/main.js` | Supplied main features, with explicit imports and isolated initialization |
 | `src/modules/therapy-timeline.js` | Week-scaled timeline sizing, ruler synchronization, and accessibility |
+| `src/modules/benefit-slider.js` | Benefit slider loop copies and per-card pagination |
 | `src/modules/wave-grid.js` | Supplied shader/options and public `window.WaveGrid` API |
 | `src/styles/site.css` | Existing site CSS fetched from its CodeSandbox link on 2026-09-15 |
 | `src/styles/therapy-timeline.css` | Generated ruler marks and timeline interaction states |
+| `src/styles/benefit-slider.css` | Benefit slider fades, bullets, and active-tab caret |
 | `src/styles.css` | Site CSS, Swiper/Lenis CSS, and migrated document-state rules |
 | `loader.html` | The three Webflow snippets |
 | `build.mjs` | esbuild bundle + development live reload |

@@ -6,6 +6,7 @@
 @import "swiper/css/bundle";
 @import "lenis/dist/lenis.css";
 @import "./styles/therapy-timeline.css";
+@import "./styles/benefit-slider.css";
 
 /* Former site-head rules. Designer helper embeds stay visible in the canvas. */
 html:not(.w-editor) .g-embed-code,

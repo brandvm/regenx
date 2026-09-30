@@ -1,6 +1,7 @@
 import { gsap, ScrollTrigger, SplitText } from "./animation";
 import Swiper from "swiper";
 import { createTherapyTimeline, THERAPY_TIMELINE_SPEED } from "./therapy-timeline";
+import { createBenefitSlider } from "./benefit-slider";
 import {
   Navigation, Pagination, A11y, Autoplay, Thumbs, EffectFade, EffectCoverflow,
 } from "swiper/modules";
@@ -862,6 +863,31 @@ var SmartSwiper = (function () {
         },
       },
     },
+    // ---- Enclomiphene benefits: centred card slider, one per tab pane ----
+    {
+      selector: "[data-benefit-slider] .swiper.sb-benefit-slider",
+      wrapper: "[data-benefit-slider]",
+      // Slide widths come from Webflow; benefit-slider.js adds loop copies
+      // and one pagination bullet per authored card.
+      benefit: true,
+      opts: {
+        slidesPerView: "auto",
+        centeredSlides: true,
+        spaceBetween: 16,
+        loop: true,
+        slideToClickedSlide: true,
+        grabCursor: true,
+        speed: 735,
+        breakpoints: {
+          768: { spaceBetween: 24 },
+        },
+        a11y: {
+          containerMessage: "Enclomiphene benefits",
+          itemRoleDescriptionMessage: "benefit",
+          slideLabelMessage: null,
+        },
+      },
+    },
     // ---- Services: image carousel (MAIN) + info carousel (SYNCED) ----
     {
       selector: ".swiper.product-coursel-image",
@@ -1290,6 +1316,8 @@ var SmartSwiper = (function () {
     el.dataset.swiperInited = "1";
 
     var timeline = cfg.timeline ? createTherapyTimeline(el) : null;
+    // Loop copies must exist before Swiper counts the slides.
+    var benefit = cfg.benefit ? createBenefitSlider(el) : null;
     try {
       var swiper = new Swiper(el, opts);
       el._smartSwiperInstance = swiper;
@@ -1297,6 +1325,10 @@ var SmartSwiper = (function () {
         el._therapyTimeline = timeline;
         timeline.attach(swiper);
         swiper.on("destroy", function () { delete el.dataset.edgeNavBound; });
+      }
+      if (benefit) {
+        el._benefitSlider = benefit;
+        benefit.attach(swiper);
       }
 
       bindEdgeNavHiding(el, swiper, nav.prev, nav.next);
@@ -1314,6 +1346,7 @@ var SmartSwiper = (function () {
       } catch (_) {}
     } catch (err) {
       if (timeline) timeline.destroy();
+      if (benefit) benefit.destroy();
       delete el.dataset.swiperInited;
       throw err;
     }

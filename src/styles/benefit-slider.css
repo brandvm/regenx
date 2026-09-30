@@ -1,0 +1,75 @@
+/* Enclomiphene benefits slider. Cards, slide widths, type and spacing are
+   authored in Webflow. These rules cover the active tab, edge fades, and the
+   generated pagination bullets only. */
+
+/* The caret is decorative and only marks the open tab. Keep the menu dots on
+   the right while the caret sits before the label. */
+[data-benefit-tabs] .sb-tab-link {
+  justify-content: flex-start;
+}
+
+[data-benefit-tabs] .sb-tab-link .service-tab-menu-icon {
+  margin-left: auto;
+}
+
+[data-benefit-tabs] .sb-tab-link.w--current {
+  background-color: var(--_colors---background--dark);
+}
+
+[data-benefit-tabs] .sb-tab-link.w--current .sb-tab-link-caret {
+  display: block;
+}
+
+/* Fade the neighbouring cards into the panel edges; the centred card stays
+   fully opaque at every breakpoint. */
+[data-benefit-slider] .sb-benefit-slider {
+  --benefit-edge-fade: 18%;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 var(--benefit-edge-fade), #000 calc(100% - var(--benefit-edge-fade)), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 var(--benefit-edge-fade), #000 calc(100% - var(--benefit-edge-fade)), transparent);
+}
+
+@media (max-width: 767px) {
+  [data-benefit-slider] .sb-benefit-slider {
+    --benefit-edge-fade: 6%;
+  }
+}
+
+[data-benefit-slider] .swiper-wrapper {
+  transition-timing-function: var(--ease-bbs);
+}
+
+[data-benefit-slider] .sb-benefit-slide {
+  opacity: .5;
+  transition: opacity var(--dur-bbs) var(--ease-bbs);
+}
+
+[data-benefit-slider] .sb-benefit-slide.swiper-slide-active {
+  opacity: 1;
+}
+
+[data-benefit-slider] .sb-benefit-pagination .swiper-pagination-bullet {
+  width: .5em;
+  height: .5em;
+  margin: 0;
+  border-radius: 1em;
+  background-color: currentColor;
+  opacity: .24;
+  transition: width var(--dur-bbs) var(--ease-bbs), opacity var(--dur-bbs) var(--ease-bbs);
+}
+
+[data-benefit-slider] .sb-benefit-pagination .swiper-pagination-bullet-active {
+  width: 2.25em;
+  opacity: 1;
+}
+
+[data-benefit-slider] .swiper-pagination-bullet:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-benefit-slider] .sb-benefit-slide,
+  [data-benefit-slider] .swiper-pagination-bullet {
+    transition-duration: 0ms !important;
+  }
+}
