@@ -7,18 +7,21 @@ Staging: https://regen-x.webflow.io → https://brandvm.github.io/regenx/
 Local:   https://regen-x.webflow.io/?bv-dev=1 → http://localhost:3000/
 Exit:    ?bv-dev=0 (the choice persists on the staging origin).
 
+Finsweet Attributes loads once from the site head with every attribute this site
+uses (fs-mirrorclick fs-list fs-socialshare fs-toc). Add new attributes there;
+do not paste page-level copies.
+
 Run pnpm dev before using local mode. The server serves assets, not Webflow HTML.
 Production is deliberately unconfigured during development. Set RELEASE to an
 existing immutable tag (e.g. "1.0.0") only when dist/ is in that release tag.
 -->
 
 <!-- START HEAD: Site settings → Custom code → Head code -->
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 <meta name="theme-color" content="#000000" />
 <link rel="preconnect" href="https://brandvm.github.io" crossorigin />
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
 <script src="https://analytics.ahrefs.com/analytics.js" data-key="PtqjupbG4bujq85ZdpJCOA" async></script>
-<script async type="module" src="https://cdn.jsdelivr.net/npm/@finsweet/attributes@2/attributes.js" fs-mirrorclick></script>
+<script async type="module" src="https://cdn.jsdelivr.net/npm/@finsweet/attributes@2/attributes.js" fs-mirrorclick fs-list fs-socialshare fs-toc></script>
 <style>
   html.is-loading, html.is-loading body { overflow: hidden; height: 100%; }
   html.is-loading .preloader { display: flex !important; }
@@ -59,28 +62,23 @@ existing immutable tag (e.g. "1.0.0") only when dist/ is in that release tag.
 </script>
 <!-- END HEAD -->
 
-<!-- START EMBED: replace the global CodeSandbox CSS embed on the Designer canvas.
-     Put this in the shared global-code/header component used on every page.
-     Static links support Designer preview (where scripts don't run). When both
-     stylesheets load in the Designer, they are additive; verify rule deletions
-     on the published staging page in dev mode. Keep the icon font link here. -->
+<!-- START EMBED: the shared global-code component (G | Components) used on every
+     page. Two HTML Embeds: the links, then the script. The static staging link
+     supports Designer preview (where scripts don't run). Local assets are only
+     requested in Dev mode, so public visitors never contact localhost. Keep the
+     icon font link here. -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.9.0/fonts/remixicon.css" />
 <link id="bv-css" rel="stylesheet" href="https://brandvm.github.io/regenx/styles.css?v=1" />
-<link id="bv-css-dev" rel="stylesheet" href="http://localhost:3000/styles.css" />
 <script>
   (function () {
     var C = window.BV;
-    if (!C) return;
     var base = document.getElementById("bv-css");
-    var dev = document.getElementById("bv-css-dev");
-    if (C.dev) {
-      if (base) base.remove();
-    } else {
-      if (dev) dev.remove();
-      if (base && C.staging) base.href = C.stag + "styles.css?v=" + C.stamp;
-      else if (base && C.prod) base.href = C.prod + "styles.css";
-      else if (base) base.remove();
-    }
+    if (!C || !base) return;
+    // Local assets are requested only in Dev mode, never by public visitors.
+    if (C.dev) base.href = C.devBase + "styles.css";
+    else if (C.staging) base.href = C.stag + "styles.css?v=" + C.stamp;
+    else if (C.prod) base.href = C.prod + "styles.css";
+    else base.remove();
   })();
 </script>
 <!-- END EMBED -->
@@ -102,7 +100,7 @@ existing immutable tag (e.g. "1.0.0") only when dist/ is in that release tag.
     var sources = C.dev ? [C.devBase, C.stag] : C.staging ? [C.stag] : C.prod ? [C.prod] : [];
     // One matching CSS/JS source at a time, including local → staging fallback.
     // This also supplies site CSS if a page is missing the shared Embed.
-    document.querySelectorAll("#bv-css, #bv-css-dev").forEach(function (el) { el.remove(); });
+    document.querySelectorAll("#bv-css").forEach(function (el) { el.remove(); });
     function next() {
       var base = sources.shift();
       if (!base) {
