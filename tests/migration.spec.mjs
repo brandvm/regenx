@@ -71,6 +71,21 @@ for(const asset of ['styles.css','index.js']) test(`local ${asset} failure falls
   expect(errors).toEqual([]);
 });
 
+for(const url of ['https://regen-x.webflow.io/','https://www.example.com/']) test(`public page never requests localhost at ${new URL(url).host}`,async({page})=>{
+  const {requests}=await setup(page,{url});
+  await page.waitForLoadState('load');
+  expect(requests.filter(u=>u.startsWith(dev))).toEqual([]);
+});
+
+test('email share links get a mailto with the page title and URL',async({page})=>{
+  await setup(page,{markup:`<link rel="canonical" href="https://regenx.example/product/a"><meta property="og:title" content="Product A">
+    <a data-share="email" href="#">Email</a><a data-share="email" data-share-title="Custom" href="#">Custom</a>`});
+  await expect(page.locator('html')).toHaveClass(/rgx-ready/);
+  const [first,custom]=await page.locator('[data-share="email"]').evaluateAll(els=>els.map(el=>el.getAttribute('href')));
+  expect(first).toBe('mailto:?subject=Product%20A&body=Thought%20you%20might%20find%20this%20useful%3A%0D%0A%0D%0AProduct%20A%0D%0Ahttps%3A%2F%2Fregenx.example%2Fproduct%2Fa');
+  expect(custom).toContain('subject=Custom&');
+});
+
 test('missing canvas embed still gets CSS and JS',async({page})=>{
   const {errors}=await setup(page,{embed:false});
   await expect(page.locator('html')).toHaveClass(/rgx-ready/);

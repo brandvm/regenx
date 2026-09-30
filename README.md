@@ -44,11 +44,12 @@ updating. It is hidden outside `.webflow.io`, in the editor, and when printing.
 already filled in. Copy the content of each piece into its stated location.
 
 1. **HEAD → Site settings / Custom code / Head code.** Replace the current global
-   head block. It preserves the supplied viewport/theme metadata, Ahrefs, and
-   Finsweet Mirror Click, and adds environment configuration and scroll-lock recovery.
-2. **EMBED → the shared global-code component on the Designer canvas.** Replace
-   the existing CodeSandbox CSS/icon-font embed with this piece. Ensure that
-   component appears on every page. Keep other embeds, such as video markup.
+   head block. It keeps the theme metadata, Ahrefs, and the site's single Finsweet
+   Attributes tag, and adds environment configuration and scroll-lock recovery.
+   Webflow already outputs the viewport tag; do not add another.
+2. **EMBED → the shared `G | Components` component on the Designer canvas.** Its
+   two HTML Embeds hold the links and the script. Place that component at the top
+   of every page's body. Keep other embeds, such as video markup.
 3. **FOOTER → Site settings / Custom code / Footer code.** Replace the old Lenis
    CDN tag, inline Lenis setup, and both CodeSandbox script tags with this piece.
 4. Keep Webflow's native **GSAP, ScrollTrigger, SplitText, and CustomEase** settings
@@ -60,12 +61,16 @@ The three old CodeSandbox references should be gone: `regenx-main.css`,
 `regenx-wave.js`, and `regenx-main.js`. Keeping the old JS alongside the new loader
 would register duplicate listeners and animations.
 
-The Embed keeps Remix Icon 4.9.0 available in the Designer. Its static staging and
-local CSS links also support canvas styling where scripts do not execute. In the
-Designer, the two stylesheets are additive: test deleted rules on the published
-page with `?bv-dev=1`. The published page uses a single selected stylesheet.
-If the Embed is missing, the footer can still supply site CSS and JS, but the
-Designer preview and icon font require the Embed.
+The Embed keeps Remix Icon 4.9.0 available in the Designer. Its static staging CSS
+link supports canvas styling where scripts do not execute. The embed script points
+that stylesheet at `localhost` only in Dev mode, so public visitors never contact
+the local network. If the Embed is missing, the footer can still supply site CSS
+and JS, but the Designer preview and icon font require the Embed.
+
+Finsweet Attributes loads once, from the head snippet, with every attribute the
+site uses: `fs-mirrorclick fs-list fs-socialshare fs-toc`. Add a new attribute to
+that tag instead of pasting page-level copies. `pnpm test:webflow` fails if the
+published snippets drift from `loader.html`.
 
 ## Deploy staging assets
 
@@ -74,8 +79,9 @@ GitHub Pages is enabled with **GitHub Actions** as its source (2026-09-15).
 Pushes to `master` trigger the `staging` workflow to deploy the current build.
 
 1. GitHub `brandvm/regenx` uses **Settings → Pages → Source → GitHub Actions**.
-2. Push changes to `master`. The `staging` workflow installs dependencies,
-   checks TypeScript, builds `dist/`, and deploys it to GitHub Pages. It can also
+2. Push changes to `master`. The `staging` workflow installs dependencies and
+   runs the type check and browser tests; only then does it build `dist/` and
+   deploy it to GitHub Pages. Failed test reports are kept as a workflow artifact. It can also
    be run manually using **Actions → staging → Run workflow** after it is pushed.
 3. Check the workflow succeeds and `/regenx/index.js` and `/regenx/styles.css`
    return 200. Then open **https://regen-x.webflow.io/?bv-dev=0**.
@@ -110,7 +116,7 @@ pnpm test:webflow          # build + read-only checks against published Webflow 
 node scripts/check-webflow.mjs --local /  # verify a running pnpm dev server
 ```
 
-The migrated main and WaveGrid files remain JavaScript (`allowJs` enabled,
+The migrated feature modules and WaveGrid remain JavaScript (`allowJs` enabled,
 `checkJs` disabled) to preserve the supplied code without a broad type conversion.
 Browser tests cover those files' runtime integration. `pnpm check` does not type
 check every inherited JavaScript function.
@@ -118,15 +124,17 @@ check every inherited JavaScript function.
 The isolated tests cover environment routing, storage persistence, missing CSS
 Embed, local CSS/JS fallback, unavailable assets, watchdog recovery, duplicate
 loaders, editor bypass, mobile footer/compare controls, form-step validation,
-carousel navigation, and video mute controls.
+carousel navigation, video mute controls, email share links, and that public
+pages never request `localhost`.
 
-The Webflow check intercepts published HTML in its own browser, replaces the old
-snippets, and serves the local build as staging assets. It checks seven real pages
-at desktop/mobile widths, including GSAP instance reuse, Lenis, WaveGrid, and
-runtime errors. It writes reports/screenshots to ignored `test-results/webflow/`.
-Media downloads are skipped, so this is not a full video-playback check.
-It does **not** update or publish Webflow, submit forms, or deploy GitHub Pages.
-It checks the pre-migration markup and needs updating after the live snippets change.
+The Webflow check opens nine published staging pages at desktop and mobile widths
+in its own browser and serves the local build in place of the staging assets. It
+fails if the installed head, footer, or embed snippets differ from `loader.html`,
+if a public page requests `localhost`, or if a page has more than one viewport or
+Finsweet Attributes tag. It also checks Lenis, GSAP, WaveGrid, and runtime errors,
+and writes reports/screenshots to ignored `test-results/webflow/`. Media downloads
+are skipped, so this is not a full video-playback check. It does **not** update or
+publish Webflow, submit forms, or deploy GitHub Pages.
 
 ## Peptide therapy timeline
 
@@ -212,7 +220,11 @@ carousel observer reuse, including sliders added after initialization.
 | `src/modules/animation.ts` | Share Webflow GSAP/plugins with packaged fallbacks |
 | `src/modules/smooth-scroll.ts` | Original vertical + responsive horizontal Lenis setup |
 | `src/modules/environment-switcher.ts` | Compact staging-only Dev / Staging control |
-| `src/modules/main.js` | Supplied main features, with explicit imports and isolated initialization |
+| `src/modules/main.js` | Imports the site features and initializes each in isolation |
+| `src/modules/debug.js`, `page-ready.js` | `?debug=1` diagnostics; the page-unlocked signal |
+| `src/modules/smart-swiper.js` | Config-driven Swiper manager (`CONFIGS`), tab-aware |
+| `src/modules/<feature>.js` | One supplied feature each: nav, reveals, videos, forms, footer, etc. |
+| `src/modules/share-links.js` | Email share links for `[data-share="email"]` |
 | `src/modules/therapy-timeline.js` | Week-scaled timeline sizing, ruler synchronization, and accessibility |
 | `src/modules/benefit-slider.js` | Benefit slider loop copies and per-card pagination |
 | `src/modules/wave-grid.js` | Supplied shader/options and public `window.WaveGrid` API |
@@ -232,7 +244,7 @@ preserved. A single feature initialization error is logged without preventing th
 remaining features from initializing.
 
 `TabDeepLink.init()` and `Anchors.init()` were commented out in the supplied main
-script and remain disabled. The supplied code has no preloader animation; startup
+script and remain disabled in `main.js`. The supplied code has no preloader animation; startup
 releases its loading state and hides any `.preloader` overlay. `?debug=1` retains
 the original on-screen diagnostics and `window.__RGX` helpers.
 
