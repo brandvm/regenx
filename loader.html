@@ -18,12 +18,10 @@ existing immutable tag (e.g. "1.0.0") only when dist/ is in that release tag.
 
 <!-- START HEAD: Site settings → Custom code → Head code -->
 <meta name="theme-color" content="#000000" />
-<link rel="preconnect" href="https://brandvm.github.io" crossorigin />
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
 <script src="https://analytics.ahrefs.com/analytics.js" data-key="PtqjupbG4bujq85ZdpJCOA" async></script>
 <script async type="module" src="https://cdn.jsdelivr.net/npm/@finsweet/attributes@2/attributes.js" fs-mirrorclick fs-list fs-socialshare fs-toc></script>
 <style>
-  html.is-loading, html.is-loading body { overflow: hidden; height: 100%; }
+  html.is-loading { overflow: hidden; }
   html.is-loading .preloader { display: flex !important; }
   html.rgx-ready .preloader, html.rgx-load-failed .preloader { display: none !important; }
 </style>
@@ -31,7 +29,11 @@ existing immutable tag (e.g. "1.0.0") only when dist/ is in that release tag.
   (function () {
     if (window.BV && window.BV.site === "regenx") return;
     var RELEASE = null;
-    var staging = /\.webflow\.io$/.test(location.hostname);
+    var STAG = "https://brandvm.github.io/regenx/";
+    var DEV = "http://localhost:3000/";
+    // *.canvas.webflow.com is the Designer's custom-code preview: a separate
+    // origin, with its own URL flag and localStorage.
+    var staging = /\.webflow\.io$|\.canvas\.webflow\.com$/.test(location.hostname);
     var local = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
     var q = new URLSearchParams(location.search);
     var flag = q.has("bv-dev") ? q.get("bv-dev") === "1" : false;
@@ -39,15 +41,27 @@ existing immutable tag (e.g. "1.0.0") only when dist/ is in that release tag.
       if (staging && q.has("bv-dev")) localStorage.setItem("bv-dev", flag ? "1" : "0");
       if (staging && !q.has("bv-dev")) flag = localStorage.getItem("bv-dev") === "1";
     } catch (e) { /* URL flags also work when browser storage is blocked. */ }
+    var dev = local || (staging && flag);
+    var prod = RELEASE ? "https://cdn.jsdelivr.net/gh/brandvm/regenx@" + RELEASE + "/dist/" : null;
+    // Warm the connection to wherever the bundle comes from. Two links on
+    // purpose: the stylesheet and its font fetches are CORS-different.
+    var from = dev ? DEV : staging ? STAG : prod;
+    if (from) [false, true].forEach(function (cors) {
+      var warm = document.createElement("link");
+      warm.rel = "preconnect";
+      warm.href = new URL(from).origin;
+      if (cors) warm.crossOrigin = "";
+      document.head.appendChild(warm);
+    });
     var root = document.documentElement;
     var timer;
     var C = window.BV = {
       site: "regenx",
       staging: staging,
-      dev: local || (staging && flag),
-      devBase: "http://localhost:3000/",
-      stag: "https://brandvm.github.io/regenx/",
-      prod: RELEASE ? "https://cdn.jsdelivr.net/gh/brandvm/regenx@" + RELEASE + "/dist/" : null,
+      dev: dev,
+      devBase: DEV,
+      stag: STAG,
+      prod: prod,
       stamp: Date.now(),
       release: function (failed) {
         clearTimeout(timer);
@@ -74,10 +88,45 @@ existing immutable tag (e.g. "1.0.0") only when dist/ is in that release tag.
     var C = window.BV;
     var base = document.getElementById("bv-css");
     if (!C || !base) return;
+    // Swap stylesheets without an unstyled gap: the target loads next to the
+    // current sheet, the old one goes only once the new one has loaded, and
+    // stays if the new one fails. The id moves at once, so the footer finds
+    // the target. Same URL = no-op. (Assigning a new href dropped the rules
+    // until the file arrived: a full-page layout shift.)
+    C.setCSS = function (href, done) {
+      var cur = document.getElementById("bv-css");
+      var url = new URL(href, location.href).href;
+      if (cur && cur.href === url) return cur;
+      var next = document.createElement("link");
+      next.rel = "stylesheet";
+      next.href = url;
+      if (cur) cur.removeAttribute("id");
+      next.id = "bv-css";
+      next.onload = function () {
+        if (cur && cur.parentNode) cur.parentNode.removeChild(cur);
+        if (done) done(true);
+      };
+      // On error, give the id back only if no newer swap has taken it.
+      next.onerror = function () {
+        if (next.parentNode) next.parentNode.removeChild(next);
+        if (cur && !document.getElementById("bv-css")) cur.id = "bv-css";
+        if (done) done(false);
+      };
+      if (cur) cur.parentNode.insertBefore(next, cur.nextSibling);
+      else document.body.appendChild(next);
+      return next;
+    };
     // Local assets are requested only in Dev mode, never by public visitors.
-    if (C.dev) base.href = C.devBase + "styles.css";
-    else if (C.staging) base.href = C.stag + "styles.css?v=" + C.stamp;
-    else if (C.prod) base.href = C.prod + "styles.css";
+    if (C.dev) C.setCSS(C.devBase + "styles.css");
+    else if (C.staging)
+      // Keep the sheet the parser already fetched: swapping before first
+      // paint fetched it a second time, render-blocking, and shifted the
+      // layout. GitHub Pages caches ~10 min, so a cache-busted copy follows
+      // after `load`, unless a fallback has taken the bundle elsewhere.
+      window.addEventListener("load", function () {
+        if (C.source === C.stag) C.setCSS(C.stag + "styles.css?v=" + C.stamp);
+      });
+    else if (C.prod) C.setCSS(C.prod + "styles.css");
     else base.remove();
   })();
 </script>
@@ -97,10 +146,26 @@ existing immutable tag (e.g. "1.0.0") only when dist/ is in that release tag.
     }
     if (C.loading) return;
     C.loading = true;
-    var sources = C.dev ? [C.devBase, C.stag] : C.staging ? [C.stag] : C.prod ? [C.prod] : [];
-    // One matching CSS/JS source at a time, including local → staging fallback.
-    // This also supplies site CSS if a page is missing the shared Embed.
-    document.querySelectorAll("#bv-css").forEach(function (el) { el.remove(); });
+    // Staging falls back to the pinned release once RELEASE is set.
+    var sources = C.dev ? [C.devBase, C.stag]
+      : C.staging ? [C.stag].concat(C.prod ? [C.prod] : [])
+      : C.prod ? [C.prod] : [];
+    // One matching CSS/JS source at a time, including local → staging and
+    // staging → release fallbacks. The stylesheet the Embed already loads is
+    // reused; this also supplies site CSS if a page is missing the Embed.
+    function swap(href, done) {
+      if (C.setCSS) return C.setCSS(href, done);
+      // An older Embed without setCSS: plain link, appended to <body>.
+      document.querySelectorAll("#bv-css").forEach(function (el) { el.remove(); });
+      var link = document.createElement("link");
+      link.id = "bv-css";
+      link.rel = "stylesheet";
+      link.href = href;
+      link.onload = function () { done(true); };
+      link.onerror = function () { link.remove(); done(false); };
+      document.body.appendChild(link);
+      return link;
+    }
     function next() {
       var base = sources.shift();
       if (!base) {
@@ -109,38 +174,38 @@ existing immutable tag (e.g. "1.0.0") only when dist/ is in that release tag.
         return;
       }
       var suffix = base === C.prod ? "" : "?v=" + C.stamp;
-      var css = document.createElement("link");
-      css.id = "bv-css";
-      css.rel = "stylesheet";
-      css.href = base + "styles.css" + suffix;
       var settled = false;
-      var timeout = setTimeout(failCSS, 5000);
-      function failCSS() {
+      var timeout = setTimeout(function () { onCSS(false); }, 5000);
+      function onCSS(ok) {
         if (settled) return;
         settled = true;
         clearTimeout(timeout);
-        css.remove();
-        console.warn("[RegenX] Styles unavailable at " + base);
-        next();
-      }
-      css.onerror = failCSS;
-      css.onload = function () {
-        if (settled) return;
-        settled = true;
-        clearTimeout(timeout);
+        if (!ok) {
+          var stale = document.getElementById("bv-css");
+          if (stale && stale.href.indexOf(base) === 0) stale.remove();
+          console.warn("[RegenX] Styles unavailable at " + base);
+          return next();
+        }
         C.source = base;
         var s = document.createElement("script");
         s.src = base + "index.js" + suffix;
         s.onerror = function () {
           s.remove();
-          css.remove();
           console.warn("[RegenX] Script unavailable at " + base);
           next();
         };
         // No script timeout race: a slow local script must not execute after a fallback.
         document.head.appendChild(s);
-      };
-      document.body.appendChild(css);
+      }
+      var cur = document.getElementById("bv-css");
+      if (cur && cur.href.indexOf(base) === 0) {
+        // Already this source (the Embed's sheet): reuse it, no second fetch.
+        if (cur.sheet) onCSS(true);
+        else {
+          cur.addEventListener("load", function () { onCSS(true); });
+          cur.addEventListener("error", function () { onCSS(false); });
+        }
+      } else swap(base + "styles.css" + suffix, onCSS);
     }
     next();
   })();

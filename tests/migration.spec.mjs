@@ -7,6 +7,7 @@ const css = readFileSync(new URL('../dist/styles.css', import.meta.url), 'utf8')
 const part = (name) => loader.match(new RegExp(`<!-- START ${name}:[\\s\\S]*?-->([\\s\\S]*?)<!-- END ${name} -->`))[1];
 const stag = 'https://brandvm.github.io/regenx/';
 const dev = 'http://localhost:3000/';
+const prod = 'https://cdn.jsdelivr.net/gh/brandvm/regenx@1.0.0/dist/';
 const fixture = `
 <style>body{min-height:3000px}.swiper{width:600px}.swiper-slide{width:200px}
 [data-h-scroll]{width:300px;overflow:auto}[data-h-scroll-track]{width:900px}
@@ -23,19 +24,20 @@ const fixture = `
 <div data-video-wrapper><video data-video muted></video><button data-mute-unmute><i class="video-control-icon"></i><i class="video-control-icon"></i></button></div>
 `;
 
-async function setup(page, { url='https://regen-x.webflow.io/', embed=true, fail=()=>false, blockedStorage=false, editor=false, duplicate=false, markup=fixture }={}) {
+async function setup(page, { url='https://regen-x.webflow.io/', release=null, embed=true, fail=()=>false, blockedStorage=false, editor=false, duplicate=false, markup=fixture }={}) {
   const requests=[];
   const errors=[];
   page.on('pageerror', e=>errors.push(e.message));
   page.on('console', m=>{ if(m.type()==='error' && /\[RegenX\].*failed/.test(m.text())) errors.push(m.text()); });
   if(blockedStorage) await page.addInitScript(()=>Object.defineProperty(window,'localStorage',{get(){throw new Error('blocked');}}));
-  const html=`<!doctype html><html><head>${part('HEAD')}</head><body>${embed?part('EMBED'):''}${markup}<script>window.Webflow={env:()=>${editor},push:fn=>fn()};</script>${part('FOOTER')}${duplicate?part('FOOTER'):''}</body></html>`;
+  const head=release?part('HEAD').replace('var RELEASE = null;',`var RELEASE = "${release}";`):part('HEAD');
+  const html=`<!doctype html><html><head>${head}</head><body>${embed?part('EMBED'):''}${markup}<script>window.Webflow={env:()=>${editor},push:fn=>fn()};</script>${part('FOOTER')}${duplicate?part('FOOTER'):''}</body></html>`;
   await page.route('**/*', async route=>{
     const req=route.request(); const u=req.url();
     requests.push(u);
     if(req.isNavigationRequest()) return route.fulfill({contentType:'text/html',body:html});
     if(fail(u)) return route.abort();
-    if(u.startsWith(stag)||u.startsWith(dev)) {
+    if(u.startsWith(stag)||u.startsWith(dev)||u.startsWith(prod)) {
       const asset = new URL(u).pathname;
       if(asset.endsWith('styles.css')) return route.fulfill({contentType:'text/css',body:css});
       if(asset.endsWith('index.js')) return route.fulfill({contentType:'text/javascript',body:js});
@@ -67,7 +69,7 @@ for(const asset of ['styles.css','index.js']) test(`local ${asset} failure falls
   await expect(page.locator('html')).toHaveClass(/rgx-ready/);
   expect(await page.evaluate(()=>window.BV.source)).toBe(stag);
   await expect(page.locator('#bv-css')).toHaveAttribute('href',new RegExp('^'+stag));
-  expect(await page.locator('link[href^="http://localhost"]').count()).toBe(0);
+  expect(await page.locator('link[rel=stylesheet][href^="http://localhost"]').count()).toBe(0);
   expect(errors).toEqual([]);
 });
 
@@ -302,4 +304,50 @@ for(const [label,url,editor] of [
   if(label==='production') await page.addScriptTag({content:js});
   await expect(page.locator('html')).toHaveClass(/rgx-ready/);
   await expect(page.locator('#rgx-environment')).toHaveCount(0);
+});
+
+test('staging reuses the Embed stylesheet, then refreshes it after load without a gap',async({page})=>{
+  const {requests,errors}=await setup(page);
+  await expect(page.locator('html')).toHaveClass(/rgx-ready/);
+  await page.waitForLoadState('load');
+  const sheets=()=>requests.filter(u=>u.startsWith(stag+'styles.css'));
+  // One fetch before first paint (the Embed's ?v=1 link), one cache-busted copy after load.
+  await expect.poll(()=>sheets().length).toBe(2);
+  expect(sheets()[0]).toBe(stag+'styles.css?v=1');
+  await expect(page.locator('#bv-css')).toHaveAttribute('href',/styles\.css\?v=\d{6,}/);
+  await expect(page.locator('link[rel=stylesheet][href^="'+stag+'"]')).toHaveCount(1);
+  expect(errors).toEqual([]);
+});
+
+test('the Designer custom-code preview is treated as staging',async({page})=>{
+  const {errors}=await setup(page,{url:'https://regen-x.canvas.webflow.com/'});
+  await expect(page.locator('html')).toHaveClass(/rgx-ready/);
+  expect(await page.evaluate(()=>window.BV.source)).toBe(stag);
+  expect(errors).toEqual([]);
+});
+
+test('preconnect warms the bundle origin only',async({page})=>{
+  await setup(page);
+  const hrefs=await page.locator('link[rel=preconnect]').evaluateAll(els=>els.map(e=>e.href));
+  expect(hrefs.length).toBe(2);
+  expect(hrefs.every(h=>h.startsWith('https://brandvm.github.io'))).toBe(true);
+});
+
+test('with a release set, staging falls back to the pinned release',async({page})=>{
+  const {errors}=await setup(page,{release:'1.0.0',fail:u=>u.startsWith(stag)});
+  await expect(page.locator('html')).toHaveClass(/rgx-ready/);
+  expect(await page.evaluate(()=>window.BV.source)).toBe(prod);
+  await expect(page.locator('#bv-css')).toHaveAttribute('href',prod+'styles.css');
+  await page.getByRole('button',{name:'Choose environment (Staging)'}).click();
+  await expect(page.getByRole('status')).toHaveText('Staging unavailable · using release');
+  expect(errors).toEqual([]);
+});
+
+test('with a release set, production loads the pinned CSS and JS',async({page})=>{
+  const {requests,errors}=await setup(page,{url:'https://regenx.example/',release:'1.0.0'});
+  await expect(page.locator('html')).toHaveClass(/rgx-ready/);
+  expect(await page.evaluate(()=>window.BV.source)).toBe(prod);
+  expect(requests.filter(u=>u.includes('index.js'))).toEqual([prod+'index.js']);
+  expect(requests.some(u=>u.startsWith(stag+'index.js'))).toBe(false);
+  expect(errors).toEqual([]);
 });
