@@ -64,8 +64,55 @@ export const FormSteps = (function () {
       submitGates.forEach(function (gate) { gate.disabled = !canSubmit; });
     }
 
+    // Later panes repeat what was chosen earlier, so the visitor keeps the
+    // context. Webflow can place [data-step-summary] in a pane; otherwise it
+    // goes after the pane header.
+    function choiceText(input) {
+      if (input.type === "radio" && input.value && input.value !== "on") return input.value;
+      var field = input.closest("label");
+      var text = field && field.querySelector(".form-check-label, .w-form-label");
+      return (text || field || input).textContent.replace(/\s+/g, " ").trim();
+    }
+
+    function renderSummary(n) {
+      var pane = panes[n];
+      var box = pane.querySelector("[data-step-summary]");
+      if (n === 0) return;
+      var picked = [];
+      panes.slice(0, n).forEach(function (p) {
+        p.querySelectorAll("input[type=checkbox]:checked, input[type=radio]:checked").forEach(function (input) {
+          var text = choiceText(input);
+          if (text) picked.push(text);
+        });
+      });
+      if (!box) {
+        if (!picked.length) return;
+        box = document.createElement("div");
+        box.setAttribute("data-step-summary", "");
+        var header = pane.querySelector(".form-pane-header");
+        if (header) header.after(box);
+        else pane.prepend(box);
+      }
+      box.textContent = "";
+      box.hidden = !picked.length;
+      if (!picked.length) return;
+      var title = document.createElement("p");
+      title.className = "form-step-summary-label";
+      title.textContent = "Your selections";
+      var list = document.createElement("ul");
+      list.className = "form-step-summary-list";
+      picked.forEach(function (text) {
+        var item = document.createElement("li");
+        item.className = "form-step-summary-item";
+        item.textContent = text;
+        list.appendChild(item);
+      });
+      box.append(title, list);
+    }
+
     function show(next, focus) {
       i = Math.max(0, Math.min(panes.length - 1, next));
+      renderSummary(i);
       panes.forEach(function (p, n) {
         p.hidden = n !== i;
         p.classList.toggle("is-active", n === i);

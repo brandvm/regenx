@@ -176,3 +176,20 @@ test('every required group is checked and stale submit attributes cannot unlock 
   await fillContact(page);
   await expect(page.locator('[type="submit"]')).toBeDisabled();
 });
+
+test('step 2 repeats the choices made in step 1 and follows changes', async ({ page }) => {
+  const errors = await setup(page);
+  const items = page.locator('[data-step="2"] [data-step-summary] .form-step-summary-item');
+  await page.getByLabel('TRT', { exact: true }).check();
+  await page.getByLabel('Other', { exact: true }).check();
+  await page.getByRole('button', { name: 'Next', exact: true }).click();
+  await expect(page.locator('[data-step="2"] .form-step-summary-label')).toHaveText('Your selections');
+  await expect(items).toHaveText(['TRT', 'other']);
+  await page.locator('[data-step="2"]').getByRole('button', { name: 'Back', exact: true }).click();
+  await page.getByLabel('TRT', { exact: true }).uncheck();
+  await page.getByLabel('Peptide', { exact: true }).check();
+  await page.getByRole('button', { name: 'Next', exact: true }).click();
+  await expect(items).toHaveText(['Peptide', 'other']);
+  await expect(page.locator('[data-step-summary]')).toHaveCount(1);
+  expect(errors).toEqual([]);
+});
