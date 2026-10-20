@@ -5,8 +5,10 @@ the start of every session and add to it when they hit something new (see
 the Session protocol in `AGENTS.md`). Never delete an entry — update its
 `Status` instead.
 
-Entries tagged `Scope: template-candidate` are harvested across all client
-repos to improve `brandvm/wf-template`.
+Lessons from earlier builds are in the skill, not here:
+`.claude/skills/webflow-build/lessons/` (one file per area). Read the file
+for the area you work in. Entries tagged `Scope: template-candidate` are
+harvested across all client repos to improve `brandvm/wf-template`.
 
 ## Entry format
 
@@ -24,6 +26,19 @@ repos to improve `brandvm/wf-template`.
 ## This project
 
 <!-- Add new entries here, newest first. -->
+
+### 2026-10-20 · update-skills re-adds the Phosphor seeds every run
+- Area: ci
+- Scope: template-candidate
+- Symptom: Each `pnpm update-skills` run added `src/phosphor.css`,
+  `src/phosphor/` and an `@import` in `src/styles.css`, though this site
+  uses Remix Icon and declined Phosphor.
+- Cause: the script seeds the icon font whenever `src/phosphor.css` is
+  missing; there is no way to record "not wanted".
+- Fix: remove the three seeds after each run (done for 0.5.1 and 0.7.1).
+  The template could skip seeds listed in `.wf-template.json`.
+- Status: open
+- Found by: claude
 
 ### 2026-09-30 · Public pages requested localhost
 - Area: loader
@@ -211,7 +226,7 @@ they are not rediscovered. Status refers to the template.
   v1.1.1 with a tree identical to v1.1.0.
 - Fix: brandvm, adaria and nexplan commit `dist/` permanently and fail CI on
   `git diff --exit-code -- dist`.
-- Status: open
+- Status: fixed in this repo bbd80da (dist/ committed, CI checks it)
 - Found by: human
 
 ### 2026-10-02 · One throwing module leaves the page scroll-locked
@@ -221,7 +236,7 @@ they are not rediscovered. Status refers to the template.
 - Cause: `src/index.ts` runs modules as a chain.
 - Fix: reformdd and brandvm wrap each init in `run(name, init)` with
   try/catch; the template only has `finally` around the lock release.
-- Status: partly fixed
+- Status: fixed in this repo fe89d80 (run() per boot module)
 - Found by: human
 
 ### 2026-10-02 · CDN `defer` scripts cannot be ordered against the bundle

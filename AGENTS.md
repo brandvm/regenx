@@ -87,28 +87,37 @@ neutralizers, sets the 1680px fluid `:root` font-size scale and reads
   slider), source map, production plan.
 - `loader.html` — three marked pieces (`START HEAD` / `START EMBED` /
   `START FOOTER`); paste each piece, never the whole file:
-  1. **HEAD → Site settings → Head code:** theme-color, preconnects, Ahrefs,
-     the single Finsweet Attributes tag
-     (`fs-mirrorclick fs-list fs-socialshare fs-toc`), `is-loading`/preloader
-     rules, and the config script that sets `window.BV` (incl. `RELEASE`) and
-     an 8-second unlock watchdog. Webflow already outputs the viewport tag —
-     do not add another. Not rendered on the canvas.
+  1. **HEAD → Site settings → Head code:** theme-color, Ahrefs, the single
+     Finsweet Attributes tag (`fs-mirrorclick fs-list fs-socialshare fs-toc`),
+     the `is-loading` lock (on `html` only) and preloader rules, and the
+     config script that sets `window.BV` (incl. `RELEASE`), preconnects to
+     the bundle's own origin and starts an 8-second unlock watchdog.
+     `*.canvas.webflow.com` (the Designer's custom-code preview) counts as
+     staging. Webflow already outputs the viewport tag — do not add another.
+     Not rendered on the canvas.
   2. **EMBED → the shared `G | Components` component** (top of every page's
      body), two HTML Embeds: the Remix Icon 4.9.0 link plus the static
-     staging `bv-css` link, then a script that repoints `bv-css`. Visible on
-     the canvas.
-  3. **FOOTER → Site settings → Footer code:** removes `#bv-css` and loads
-     one matching CSS + JS source at a time (dev → staging fallback, or
-     staging, or prod), appending the CSS to `<body>`. Supplies site CSS even
-     if a page lacks the Embed.
+     staging `bv-css` link, then a script that defines `BV.setCSS` (swaps a
+     stylesheet without an unstyled gap). On staging it keeps the sheet the
+     parser already fetched and swaps in a cache-busted copy after `load`;
+     in dev mode it swaps to localhost, in production to the release.
+     Visible on the canvas.
+  3. **FOOTER → Site settings → Footer code:** loads one matching CSS + JS
+     source at a time (dev → staging, staging → pinned release once
+     `RELEASE` is set, or the release), reusing the Embed's sheet when it
+     already matches. Supplies site CSS even if a page lacks the Embed.
+     With `RELEASE` null, production loads nothing — on purpose (the
+     template serves staging there instead).
   `pnpm test:webflow` fails when the published snippets drift from
   `loader.html`. Add new Finsweet attributes to the head tag; never paste
   page-level copies.
 - `src/index.ts` boots once (`__RGX_BOOTED`), skips the editor/design mode,
   waits for `Webflow.push` so Webflow wires tabs/dropdowns first, then runs
-  the environment switcher, `animation.ts` (shares Webflow's GSAP with
-  packaged fallbacks), Lenis, WaveGrid and `main.js`, and always releases the
-  loading state in `finally`.
+  each module through `run()` (one that throws is logged, the rest still
+  start): the environment switcher, `unique-form-ids` (CMS filter radios
+  publish the same id), `animation.ts` (shares Webflow's GSAP with packaged
+  fallbacks), Lenis, WaveGrid and `main.js`. It always releases the loading
+  state in `finally`.
 - `src/modules/main.js` is the ordered init list; each feature lives in its
   own `src/modules/<feature>.js` (moved verbatim from the supplied script)
   and is initialised in isolation. `TabDeepLink.init()` and `Anchors.init()`
@@ -152,8 +161,8 @@ or PR description, and keep `loader.html` identical to what is installed
 
 ```bash
 pnpm dev                  # watch + assets on 127.0.0.1:3000
-pnpm check                # strict tsc for the TypeScript integration code
-pnpm build                # minified dist/index.js and dist/styles.css
+pnpm check                # strict tsc + scripts/check-repo.mjs
+pnpm build                # minified dist/ (commit it with the src/ change)
 pnpm exec playwright install chromium  # first browser-test setup
 pnpm test                 # build + isolated Playwright regression tests
 pnpm test:webflow         # build + read-only checks against published staging
@@ -161,10 +170,12 @@ node scripts/check-webflow.mjs --local /  # verify a running pnpm dev server
 ```
 
 Node 22+ and the pinned pnpm 11. Run `pnpm check` and `pnpm test` before
-pushing. `.github/workflows/staging.yml` (push to `master` or manual run):
-a `test` job runs `pnpm check` + `pnpm test`; only then does `deploy` build
-and publish `dist/` to GitHub Pages. Failed Playwright reports are uploaded
-as an artifact.
+pushing. `dist/` is committed: run `pnpm build` and commit `dist/` together
+with any `src/` change. `.github/workflows/staging.yml` runs on pull
+requests, pushes to `master` and manual runs: the `test` job runs
+`pnpm check` + `pnpm test` and fails if the committed `dist/` differs from a
+fresh build; on `master` only, `deploy` then publishes that tested `dist/`
+to GitHub Pages. Failed Playwright reports are uploaded as an artifact.
 
 Dev mode: `https://regen-x.webflow.io/?bv-dev=1` loads assets from
 `http://localhost:3000` (allow the local-network-access prompt), `?bv-dev=0`
@@ -176,10 +187,10 @@ staging.
 ## Release (not yet configured)
 
 There is no production release. When ready (README, "Production — later"):
-commit the built `dist/` into a release tag, then set `RELEASE` in the HEAD
-snippet (e.g. `"1.0.0"` → `https://cdn.jsdelivr.net/gh/brandvm/regenx@1.0.0/dist/`)
-— the one value the Embed and footer both read. Un-track `dist/` again with
-`git rm -r --cached dist` in the next commit. Validate both pinned URLs before
+tag a commit on `master` whose CI passed (`dist/` is already committed), then
+set `RELEASE` in the HEAD snippet (e.g. `"1.0.0"` →
+`https://cdn.jsdelivr.net/gh/brandvm/regenx@1.0.0/dist/`) — the one value the
+Embed and footer both read. Validate both pinned URLs before
 publishing to a custom domain; roll back with the prior `RELEASE` value.
 Never move a published tag. Never use `@latest` or a branch URL in
 production. Replace placeholder content (timeline preview stages, Lorem Ipsum
@@ -192,8 +203,9 @@ Worked around, not fixed — do not rediscover these.
 - `custom_value` is rejected for Color and Size variables (`color-mix()`,
   `oklch()`, `calc()`). Create those through the variables JSON import with
   `valueType: "custom"`.
-- No variable rename or reorder within a collection. Rename in the Designer
-  (preserves ids and aliases; recreating does not).
+- No variable reorder within a collection. `rename_variable` works and
+  keeps ids and aliases (recreating does not). Read the name back from a
+  create result, which can come back suffixed ("-9").
 - The WHTML importer drops `class` attributes. Create the style, then apply
   it.
 - `get_all_elements` does not descend into component definitions — pass the
@@ -205,7 +217,10 @@ Worked around, not fixed — do not rediscover these.
 
 ## Session protocol
 
-1. **Start:** read `GOTCHAS.md`. Do not repeat a mistake already logged.
+1. **Start:** read `GOTCHAS.md`, `docs/handoff/`, and the webflow-build
+   lessons file for the area you work in
+   (`.claude/skills/webflow-build/lessons/`). Do not repeat a mistake
+   already logged.
 2. **During:** when something surprising costs time — a Webflow quirk, a
    template default that gets in the way, an MCP limitation, a fix that had
    to be reverted — add an entry to `GOTCHAS.md` in the same commit as the

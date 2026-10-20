@@ -62,9 +62,10 @@ The three old CodeSandbox references should be gone: `regenx-main.css`,
 would register duplicate listeners and animations.
 
 The Embed keeps Remix Icon 4.9.0 available in the Designer. Its static staging CSS
-link supports canvas styling where scripts do not execute. The embed script points
-that stylesheet at `localhost` only in Dev mode, so public visitors never contact
-the local network. If the Embed is missing, the footer can still supply site CSS
+link supports canvas styling where scripts do not execute. The embed script swaps
+that stylesheet without an unstyled gap: to `localhost` only in Dev mode, so public
+visitors never contact the local network, and on staging to a cache-busted copy
+after the page has loaded (the first paint uses the sheet already fetched). If the Embed is missing, the footer can still supply site CSS
 and JS, but the Designer preview and icon font require the Embed.
 
 Finsweet Attributes loads once, from the head snippet, with every attribute the
@@ -76,12 +77,14 @@ published snippets drift from `loader.html`.
 
 The staging asset URL is **https://brandvm.github.io/regenx/**.
 GitHub Pages is enabled with **GitHub Actions** as its source (2026-09-15).
-Pushes to `master` trigger the `staging` workflow to deploy the current build.
+Pushes to `master` trigger the `staging` workflow to deploy the committed build;
+pull requests run the same checks without deploying.
 
 1. GitHub `brandvm/regenx` uses **Settings → Pages → Source → GitHub Actions**.
-2. Push changes to `master`. The `staging` workflow installs dependencies and
-   runs the type check and browser tests; only then does it build `dist/` and
-   deploy it to GitHub Pages. Failed test reports are kept as a workflow artifact. It can also
+2. Run `pnpm build` and commit `dist/` with the `src/` change, then push to
+   `master`. The `staging` workflow installs dependencies, runs the type check
+   and browser tests, and fails if `dist/` doesn't match a fresh build; only
+   then does it deploy that `dist/` to GitHub Pages. Failed test reports are kept as a workflow artifact. It can also
    be run manually using **Actions → staging → Run workflow** after it is pushed.
 3. Check the workflow succeeds and `/regenx/index.js` and `/regenx/styles.css`
    return 200. Then open **https://regen-x.webflow.io/?bv-dev=0**.
@@ -108,8 +111,8 @@ Webflow's own disabled state for spam protection and pending submissions.
 
 ```sh
 pnpm dev                  # watch + assets on localhost:3000
-pnpm check                # strict TypeScript checks for the new integration code
-pnpm build                # minified dist/index.js and dist/styles.css
+pnpm check                # strict TypeScript checks + scripts/check-repo.mjs
+pnpm build                # minified dist/ (committed)
 pnpm exec playwright install chromium  # first browser-test setup
 pnpm test                 # build + isolated browser regression tests
 pnpm test:webflow          # build + read-only checks against published Webflow HTML
@@ -122,7 +125,9 @@ Browser tests cover those files' runtime integration. `pnpm check` does not type
 check every inherited JavaScript function.
 
 The isolated tests cover environment routing, storage persistence, missing CSS
-Embed, local CSS/JS fallback, unavailable assets, watchdog recovery, duplicate
+Embed, local CSS/JS fallback, the staging → release fallback, one stylesheet
+fetch before first paint, the Designer preview origin, duplicate CMS radio ids,
+unavailable assets, watchdog recovery, duplicate
 loaders, editor bypass, mobile footer/compare controls, form-step validation,
 carousel navigation, video mute controls, email share links, and that public
 pages never request `localhost`.
@@ -180,8 +185,9 @@ with the bullets, which are keyboard buttons.
 
 Each **SB Tab Pane** holds an **SB Benefit | Slider W** (`data-benefit-slider`)
 with the global **Swiper**, **Swiper Wrapper**, and **Swiper Slide** classes.
-Cards reuse **SB Benefit | Card** with an `is_slider` combo, so the TRT page's
-benefit cards are unchanged. Slide widths are 57% on desktop, 80% on tablet,
+Cards reuse **SB Benefit | Card** with an `is_slider` combo. The TRT page uses
+the same section (**Top Benefits of Testosterone Replacement Therapy**, five
+tabs; the first carries the real cards, tabs 2–5 still hold placeholders). Slide widths are 57% on desktop, 80% on tablet,
 and 88% on mobile; Swiper reads them from Webflow.
 
 A centred loop needs at least five slides. When a tab has fewer, the runtime
@@ -220,6 +226,7 @@ carousel observer reuse, including sliders added after initialization.
 | `src/modules/animation.ts` | Share Webflow GSAP/plugins with packaged fallbacks |
 | `src/modules/smooth-scroll.ts` | Original vertical + responsive horizontal Lenis setup |
 | `src/modules/environment-switcher.ts` | Compact staging-only Dev / Staging control |
+| `src/modules/unique-form-ids.ts` | Unique ids for CMS filter radios (wf-template starter) |
 | `src/modules/main.js` | Imports the site features and initializes each in isolation |
 | `src/modules/debug.js`, `page-ready.js` | `?debug=1` diagnostics; the page-unlocked signal |
 | `src/modules/smart-swiper.js` | Config-driven Swiper manager (`CONFIGS`), tab-aware |
@@ -233,7 +240,7 @@ carousel observer reuse, including sliders added after initialization.
 | `src/styles/benefit-slider.css` | Benefit slider fades, bullets, and active-tab caret |
 | `src/styles.css` | Site CSS, Swiper/Lenis CSS, and migrated document-state rules |
 | `loader.html` | The three Webflow snippets |
-| `build.mjs` | esbuild bundle + development live reload |
+| `build.mjs` | esbuild bundle, `dist/version.json` (wf-template tooling) |
 
 The existing 1680px desktop sizing system replaces the template's 1440px defaults.
 Swiper 11.2.10 and Lenis 1.3.24 are pinned to the versions used by the old code;
@@ -250,12 +257,12 @@ the original on-screen diagnostics and `window.__RGX` helpers.
 
 ## Production — later
 
-There is no production release in this migration. When ready, build and commit
-`dist/` into a release tag before pointing `RELEASE` in the **HEAD** snippet to it.
-For example, `RELEASE = "1.0.0"` uses
-`https://cdn.jsdelivr.net/gh/brandvm/regenx@1.0.0/dist/`.
+There is no production release in this migration. `dist/` is committed and CI
+checks it matches `src/`, so a release is a tag on a `master` commit whose CI
+passed. Point `RELEASE` in the **HEAD** snippet at it: for example,
+`RELEASE = "1.0.0"` uses `https://cdn.jsdelivr.net/gh/brandvm/regenx@1.0.0/dist/`.
+Once set, staging also falls back to that release if GitHub Pages is down.
 
-Never move a published tag. After tagging a commit containing the build, untrack
-`dist/` with `git rm -r --cached dist` in a subsequent commit so daily builds stay
-ignored. Validate the pinned JS and CSS URLs, update the head snippet, and verify
-before publishing to a custom domain. Rollback uses the prior release value.
+Never move a published tag. Validate the pinned JS and CSS URLs, update the head
+snippet, and verify before publishing to a custom domain. Rollback uses the prior
+release value.
