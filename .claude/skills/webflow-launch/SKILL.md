@@ -1,6 +1,6 @@
 ---
 name: webflow-launch
-description: Take a finished Webflow build live and through its first month: pre-launch QA (content, function, devices, accessibility, speed, SEO and tracking), launch day (publish, release, redirects, noindex off), handoff to the client and the 30-day follow-up. Use when a Webflow site built with wf-template is signed off and heading for launch, on launch day, when handing the site to the client, or for after-launch checks.
+description: Take a finished Webflow build live and through its first month: the SEO plan and schema, pre-launch QA (content, function, devices, accessibility, speed, SEO and tracking), launch day (publish, release, redirects, noindex off), handoff to the client and the 30-day follow-up. Use when a Webflow site built with wf-template is signed off and heading for launch, on launch day, when handing the site to the client, or for after-launch checks.
 ---
 
 # Webflow launch: signed-off build → live site → first 30 days
@@ -26,12 +26,48 @@ How to run it:
 4. The `webflow-build` check scripts still work against the live domain:
    pass `--live`, and point `stagingUrl` at the domain when checking it.
 
+## SEO plan (during review, before pre-launch QA)
+
+SEO is planned and built, not only checked at the end. The plan lives in
+the repo's `docs/handoff/SEO-PLAN.md` (the template has the stub): what
+staging outputs today, the steps, the schema per page and what is needed
+from the client.
+
+- [Claude] Inventory every page and template: title and description
+  (with lengths), Open Graph fields and image, noindex, JSON-LD. Read the
+  published HTML (`pnpm wf:seo`), not the page settings.
+- [Claude] Draft the missing or weak titles and descriptions;
+  [Person] approves them; [Claude] writes them in the page settings
+  (templates bind a Meta Title and Meta Description field).
+- [Claude] Open Graph "same as SEO" everywhere; [Person] approves a
+  default 1200×630 share image; templates bind an image field.
+- [Claude] Site-wide tags Webflow doesn't write (`og:site_name`,
+  `og:locale`) go in the head snippet in `loader.html`: re-paste and
+  publish, then `pnpm wf:install`.
+- [Claude] Schema as JSON-LD files in the repo, one per page
+  (`docs/seo/schema/<page>.jsonld`) and `docs/seo/schema/templates.md`
+  for CMS templates with their `{Field}` bindings. Each item refers to one
+  Organization by `@id` on the production domain. The file is the source
+  of truth; the page's head code (or `jsonLdSchema` through the pages
+  tool, where the connector has it) is a copy. Bind single-line fields
+  only: a quote or line break breaks the JSON, and an apostrophe becomes
+  `&#39;`.
+- [Claude checks] `pnpm wf:seo` on staging: every page in the sitemap
+  passes; long titles and short descriptions are fixed or accepted;
+  pages with no schema are in `seo.noSchemaOk`. Then Google's Rich
+  Results Test on one page of each type.
+- [Person] Supplies the official name, address, phone, hours, social
+  profiles and the production domain (www or apex).
+
 ## Pre-launch QA
 
 Content
 - [Claude checks] No placeholder text or `#` links (`pnpm wf:links`, which
   also flags lorem ipsum); stand-in images checked against the known issues.
 - [Person] Proofread every page.
+- [Claude checks] No `data-manual-todo` marker left in the published HTML
+  (every manual step done); `docs/handoff/REVIEW.md` › Before launch all
+  ticked.
 - [Claude checks] Contact data: phones as `tel:` links, addresses,
   emails, hours; [Person] confirms they're correct.
 - [Claude checks] Legal pages present and linked in the footer; copyright
@@ -50,6 +86,9 @@ Function
 Devices, accessibility, speed
 - [Person] Real devices: iPhone Safari, Android Chrome; desktop Chrome,
   Safari, Firefox, Edge.
+- [Claude checks] `pnpm wf:overflow` on every page template: nothing
+  runs off the right edge and no sideways scroll, at every width from
+  2560 to 360 (laptop widths between the breakpoints included).
 - [Claude checks] Automated accessibility scan on every page
   (`pnpm wf:a11y --all-widths`, no serious or critical failures), keyboard-only walkthrough of every page (focus visible, order, menus,
   dialogs, Escape); [Person] screen reader spot check. Target: WCAG 2.2 AA.
@@ -58,10 +97,12 @@ Devices, accessibility, speed
   design trades off.
 
 SEO and tracking
-- [Claude checks] Titles, meta descriptions, one H1 per page, alt text
-  (`asset-audit`), OG images, favicon, schema where planned.
+- [Claude checks] Titles, meta descriptions, OG tags, one H1 per page and
+  JSON-LD that parses with no HTML entities, on every page in the sitemap
+  (`pnpm wf:seo`); noindex only on the pages in `seo.noindexOk`. Alt text
+  (`asset-audit`), favicon, schema where `SEO-PLAN.md` plans it.
 - [Claude checks] Canonicals point to the live domain (after the domain is
-  attached).
+  attached: `liveUrl` in the config, then `pnpm wf:seo --live --canonical`).
 - [Person] GA4 and conversions fire (real-time view); nothing tracks
   before cookie consent where consent is required. [Claude checks] the tags
   load only after consent in the page's network requests.
@@ -77,6 +118,11 @@ SEO and tracking
   and set `RELEASE` in the head snippet (README › Release).
 - [Claude checks] SSL works; www and https redirects go to the canonical
   host.
+- [Claude checks] `pnpm wf:install --live`: the published snippets match
+  `loader.html` (with the new `RELEASE`), one viewport meta, no request to
+  localhost.
+- [Claude checks] `pnpm wf:seo --live --canonical`: no noindex left
+  outside `seo.noindexOk`, every canonical on the live domain.
 - [Claude] Remove noindex and the staging password; robots.txt allows
   indexing.
 - [Claude] Save the visual baselines of the live site (`pnpm wf:baseline

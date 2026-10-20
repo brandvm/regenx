@@ -1,0 +1,37 @@
+/* Page loader failsafe (recipes/snippets, conventions.md §16).
+   A full-screen loader whose only exit is a Webflow page-load interaction
+   (or a module) covers the site for good when that never runs. This is a
+   timed backstop: the loader fades out and stops taking clicks 4 s after
+   first paint whatever happens. Normally the exit has already removed it.
+   Hook: data-page-loader on the loader element.
+
+   repo-css: designer-cant — @keyframes backstop. Goes in §05. */
+@keyframes page-loader-failsafe {
+  to {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+[data-page-loader] {
+  animation: page-loader-failsafe 0.4s ease 4s forwards;
+}
+
+/* repo-css: canvas-preview — never let the backstop act in the Designer
+   canvas, where the loader would otherwise cover the page being edited.
+   Goes in §08. */
+html.wf-design-mode [data-page-loader] {
+  display: none;
+  animation: none;
+}
+
+/* repo-css: designer-cant — prefers-reduced-motion: no loader at all, not
+   a shortened one. !important beats the inline display an interaction
+   writes. Goes in §07, inside the existing reduced-motion block. */
+@media (prefers-reduced-motion: reduce) {
+  [data-page-loader] {
+    display: none !important;
+    animation: none;
+  }
+}

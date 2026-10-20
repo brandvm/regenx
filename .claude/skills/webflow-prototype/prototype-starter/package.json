@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --host 127.0.0.1 --port 5173",
+    "dev": "vite --host 127.0.0.1 --port 5173 --strictPort",
     "build": "vite build",
     "check": "tsc --noEmit",
     "css": "node scripts/gen-webflow-css.mjs",
@@ -12,6 +12,10 @@
     "style-guide": "node scripts/skill.mjs webflow-style-guide gen-style-guide.mjs",
     "check:snapshot": "node scripts/check-snapshot.mjs",
     "check:drift": "node scripts/check-drift.mjs",
+    "css:published": "node scripts/css-from-published.mjs",
+    "screens": "node scripts/screens.mjs",
+    "check:states": "node scripts/check-states.mjs",
+    "measure:type": "node scripts/measure-type.mjs",
     "fig": "node scripts/fig.mjs"
   },
   "devDependencies": {

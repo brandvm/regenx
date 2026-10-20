@@ -4,6 +4,9 @@
 //    (or in the nav and footer partials), so Webflow's "Clean up unused
 //    styles" can never delete one that only the CMS, a script or an unbuilt
 //    page uses.
+//    Combos are Webflow styles too: every combo chain (".a.b" in one
+//    compound selector) must sit on one element, or the cleanup deletes the
+//    combo even though both classes survive on their own.
 // 2. The layout is the fixed one: only the known sections, in the fixed
 //    order; the sidebar lists exactly those sections; a title; every section
 //    is made of rows; no inline styles (the Webflow importer turns each one
@@ -23,19 +26,39 @@ const errors = [];
 // 1 classes
 const cssFiles = ['src/css/webflow.css', ...fs.readdirSync(path.join(root, 'src/css')).filter((f) => /^new-classes.*\.css$/.test(f)).map((f) => `src/css/${f}`)].filter((f) => fs.existsSync(path.join(root, f)));
 const classes = new Set();
+const chains = new Map(); // "a.b" → ["a", "b"]
+// Webflow's state classes (w--current…) and component variants
+// (:where(.w-variant-…)) are not styles anyone creates or the cleanup
+// deletes: not required on the page, and not part of a combo's name.
+const STATE = /^w--|^w-variant-/;
 for (const f of cssFiles) {
   const css = read(f).replace(/\/\*[\s\S]*?\*\//g, '');
   for (const [, prelude] of css.matchAll(/([^{}]+)\{/g)) {
     if (prelude.trim().startsWith('@')) continue;
-    for (const [, c] of prelude.matchAll(/\.([a-z][\w-]*)/g)) classes.add(c);
+    for (const [, c] of prelude.matchAll(/\.([a-z][\w-]*)/g)) if (!STATE.test(c)) classes.add(c);
+    for (const sel of prelude.split(/,(?![^(]*\))/)) {
+      // Compound selectors: split on combinators, drop :not()/:where()/:is() arguments.
+      const flat = sel.replace(/:(?:not|where|is|has)\([^)]*\)/g, '');
+      for (const compound of flat.trim().split(/\s*[>+~]\s*|\s+/)) {
+        const cs = [...new Set([...compound.matchAll(/\.([a-z][\w-]*)/g)].map((m) => m[1]).filter((c) => !STATE.test(c)))];
+        if (cs.length > 1) chains.set([...cs].sort().join('.'), cs);
+      }
+    }
   }
 }
 const raw = read(page);
 const html = raw.replace(/<!-- @include ([\w/.-]+) -->/g, (_, f) => (fs.existsSync(path.join(root, f)) ? read(f) : ''));
 const used = new Set();
-for (const [, list] of html.matchAll(/\bclass="([^"]*)"/g)) for (const c of list.split(/\s+/)) if (c) used.add(c);
+const sets = [];
+for (const [, list] of html.matchAll(/\bclass="([^"]*)"/g)) {
+  const set = new Set(list.split(/\s+/).filter(Boolean));
+  sets.push(set);
+  for (const c of set) used.add(c);
+}
 const missing = [...classes].filter((c) => !used.has(c)).sort();
 if (missing.length) errors.push(`Not on the style guide (${missing.length} of ${classes.size}); run pnpm style-guide:\n    ${missing.join('\n    ')}`);
+const loose = [...chains.values()].filter((cs) => !sets.some((set) => cs.every((c) => set.has(c)))).map((cs) => `.${cs.join('.')}`).sort();
+if (loose.length) errors.push(`Combos not on one element (${loose.length} of ${chains.size}); each needs a specimen or an Other classes row with all its classes:\n    ${loose.join('\n    ')}`);
 
 // 2 layout
 const known = SECTIONS.map(([id]) => anchorOf(id));
@@ -60,4 +83,4 @@ const inline = (raw.match(/\sstyle="/g) ?? []).length;
 if (inline) errors.push(`${inline} inline style attribute(s): move them to a class (the Webflow importer makes a junk combo from each)`);
 
 if (errors.length) { console.log(`Style guide check failed:\n  - ${errors.join('\n  - ')}`); process.exit(1); }
-console.log(`Style guide OK: ${ids.length} sections in the fixed order (${ids.join(', ')}), all ${classes.size} classes applied, sidebar matches.`);
+console.log(`Style guide OK: ${ids.length} sections in the fixed order (${ids.join(', ')}), all ${classes.size} classes and ${chains.size} combos applied, sidebar matches.`);

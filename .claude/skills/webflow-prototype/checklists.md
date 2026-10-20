@@ -49,9 +49,13 @@ comes back as rework in Webflow, where it costs more.
   every class or component this page added has its row
   (`pnpm style-guide`, `pnpm check:style-guide`).
 - [Claude checks] Tablet and phone, not only desktop: looked at 1440, 820
-  and 390, no sideways scroll, nothing overlapping or cut off.
+  and 390, no sideways scroll, nothing overlapping or cut off. `pnpm
+  screens` passes: no overflow and no errors at any width from 2560 to
+  360 (the screenshots are in `.screens/`).
 - [Claude] States: hover, focus-visible, pressed, disabled, error, empty
-  and open, for every control on the page.
+  and open, for every control on the page. `pnpm check:states` passes:
+  keyboard focus visible on every control, no focus ring on a mouse
+  click, a pressed state on every button.
 - [Claude checks] Heading outline: one h1, no skipped levels. Keyboard:
   every control reachable, focus visible, nothing trapped. Images have alt
   text or `alt=""`.
@@ -82,6 +86,8 @@ comes back as rework in Webflow, where it costs more.
 - [Claude checks] `pnpm check:snapshot`, `pnpm check:style-guide` and
   `pnpm check` pass in the prototype, and `pnpm check:drift` reports no
   drift against staging (or every difference it lists is a change still
-  waiting in `proposed.css`).
+  waiting in `proposed.css`). A snapshot made by `pnpm css:published` has
+  been replaced by one from the MCP (`webflow-snapshot/source.json` is
+  gone), or `HANDOFF.md` says why not.
 - [Claude] The kickoff message for the build session is written
   (SKILL.md › Handing over to the build).

@@ -57,12 +57,28 @@ for (const f of cssFiles) {
       sel = sel.trim().replace(/^[a-z]+(?=\.)/, '');
       const m = sel.match(/^((?:\.[a-z][\w-]*)+)/);
       if (m && !chains.has(m[1])) chains.set(m[1], m[1].slice(1).split('.'));
+      // A combo later in the selector (`.list .card.is-small`) is a style too.
+      for (const compound of sel.replace(/:(?:not|where|is|has)\([^)]*\)/g, '').split(/\s*[>+~]\s*|\s+/).slice(1)) {
+        const cs = [...new Set([...compound.matchAll(/\.([a-z][\w-]*)/g)].map((x) => x[1]).filter((c) => !/^w--|^w-variant-/.test(c)))];
+        if (cs.length > 1 && !chains.has(`.${cs.join('.')}`)) chains.set(`.${cs.join('.')}`, cs);
+      }
     }
   }
 }
 const hasClass = (c) => chains.has(`.${c}`);
 const used = new Set();
-const useMarkup = (html) => { for (const [, list] of html.matchAll(/\bclass="([^"]*)"/g)) for (const c of list.split(/\s+/)) if (c) used.add(c); return html; };
+// Class lists as they sit on elements: a combo counts as shown only when
+// all its classes are on one element (check-style-guide checks the same).
+const usedSets = [];
+const useMarkup = (html) => {
+  for (const [, list] of html.matchAll(/\bclass="([^"]*)"/g)) {
+    const set = new Set(list.split(/\s+/).filter(Boolean));
+    usedSets.push(set);
+    for (const c of set) used.add(c);
+  }
+  return html;
+};
+const shown = (cls) => (cls.length === 1 ? used.has(cls[0]) : usedSets.some((set) => cls.every((c) => set.has(c))));
 // Names as the Designer shows them: the snapshot's name, else words.
 const words = (c) => c.split('-').filter(Boolean).map((w) => (w.length === 1 ? w.toUpperCase() : w[0].toUpperCase() + w.slice(1))).join(' ');
 const nameOf = (sel) => {
@@ -177,14 +193,14 @@ const dot = (alias) => (colorCombo.has(alias) ? `<div class="sg-dot"><div class=
   for (const s of typed) {
     const mode = s.variableModes.main[STYLES];
     const size = sizes(mode);
-    add('typography', row(s.name, s.selector, `${mode} role${size ? `. Size ${size}.` : ''}`, `<div class="${s.selector.slice(1)}">${sampleFor(mode)}</div>`));
+    add('typography', row(s.name, s.selector, `${mode} role${size ? `. Size ${size}.` : ''}`, `<div class="${s.selector.slice(1)}" data-sg-type="${esc(s.name)}">${sampleFor(mode)}</div>`));
   }
   // Native tags: what a heading, paragraph or link looks like with no class.
   const TAGS = [['h1', 'All H1 Headings'], ['h2', 'All H2 Headings'], ['h3', 'All H3 Headings'], ['h4', 'All H4 Headings'], ['h5', 'All H5 Headings'], ['h6', 'All H6 Headings'], ['p', 'All Paragraphs'], ['a', 'All Links']];
   const tagged = TAGS.filter(([t]) => S.some((x) => x.selector === t));
   for (const [t, label] of tagged) {
     const mode = S.find((x) => x.selector === t).variableModes?.main?.[STYLES];
-    add('typography', row(label, t, mode ? `Tag style · ${mode}` : 'Tag style', t === 'a' ? '<p>A paragraph with <a href="#typography">a link</a> in it.</p>' : `<${t}>${t === 'h1' || t === 'h2' ? 'The quick brown fox' : 'The quick brown fox jumps over the lazy dog'}</${t}>`));
+    add('typography', row(label, t, mode ? `Tag style · ${mode}` : 'Tag style', t === 'a' ? `<p>A paragraph with <a href="#typography" data-sg-type="${label}">a link</a> in it.</p>` : `<${t} data-sg-type="${label}">${t === 'h1' || t === 'h2' ? 'The quick brown fox' : 'The quick brown fox jumps over the lazy dog'}</${t}>`));
   }
   // Font features set on the Body tag style apply to all text: show what they change.
   const features = S.find((x) => x.selector === 'body')?.properties?.main?.['font-feature-settings'];
@@ -329,7 +345,7 @@ ${stats.map(([n, l]) => `                  <div class="sg-stat"><div class="sg-s
 useMarkup(expand('<!-- @include partials/nav.html --><!-- @include partials/footer.html -->'));
 for (const html of sections.values()) html.forEach(useMarkup);
 ['g-page-w', 'g-main-w'].forEach((c) => used.add(c));
-const left = [...chains].filter(([, cls]) => !cls.every((c) => used.has(c)) && !cls[0].startsWith('sg-'));
+const left = [...chains].filter(([, cls]) => !shown(cls) && !cls[0].startsWith('sg-'));
 if (left.length) {
   add('other-classes', row('Kept for cleanup', '', `${left.length} class${left.length === 1 ? '' : 'es'} or combo${left.length === 1 ? '' : 's'} not shown above. Each is applied here so Webflow's “Clean up unused styles” can't delete it.`, `
                 <div class="sg-tiles">

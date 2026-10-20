@@ -1,5 +1,5 @@
 // Compare the Webflow snapshot with what the site actually publishes.
-//   pnpm check:drift [https://<site>.webflow.io]
+//   pnpm check:drift [https://<site>.webflow.io] [--crawl] [--all]
 // The snapshot is written by hand from the Webflow MCP, and the Designer
 // keeps changing after it is taken. This reads the stylesheet the staging
 // site publishes and reports every place the snapshot no longer matches:
@@ -9,66 +9,47 @@
 // Publish the site to staging first: only published changes are visible.
 // The address comes from the argument, or from `stagingUrl` in the repo's
 // webflow-build.config.json. Classes with the prefixes in IGNORE (Webflow's
-// own, and the style guide's layout) are not expected in the snapshot.
+// own, and the style guide's layout) are not expected in the snapshot. A
+// site with per-page CSS is read page by page and merged
+// (published-css.mjs); --crawl does that for any site.
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { root, config, args } from './lib.mjs';
+import { parseCss, declarations, selectors, readPublished, asCss } from './published-css.mjs';
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const IGNORE = /^\.(w-|sg-|wf-|inline-div-)/;
-const arg = process.argv.slice(2).find((a) => !a.startsWith('--'));
-const all = process.argv.includes('--all');
-
-function stagingUrl() {
-  if (arg) return arg;
-  for (let d = root; d !== path.dirname(d); d = path.dirname(d)) {
-    const f = path.join(d, 'webflow-build.config.json');
-    if (fs.existsSync(f)) return JSON.parse(fs.readFileSync(f, 'utf8')).stagingUrl;
-  }
-}
-const base = stagingUrl();
+const { flags, pos } = args();
+const all = flags.has('--all');
+const base = pos[0] ?? config().stagingUrl;
 if (!base) { console.error('Which site? pnpm check:drift https://<site>.webflow.io (or set stagingUrl in webflow-build.config.json).'); process.exit(1); }
 
 // CSS → Map("<media>|<selector>" → {property: value}). One level of @media
 // is enough for both stylesheets; other at-rules are skipped.
 function parse(css) {
   const out = new Map();
-  css = css.replace(/\/\*[\s\S]*?\*\//g, '');
-  const block = (text, media) => {
-    let i = 0;
-    while (i < text.length) {
-      const open = text.indexOf('{', i);
-      if (open < 0) break;
-      const head = text.slice(i, open).trim();
-      let depth = 1, j = open + 1;
-      for (; j < text.length && depth; j++) depth += text[j] === '{' ? 1 : text[j] === '}' ? -1 : 0;
-      const body = text.slice(open + 1, j - 1);
-      i = j;
-      if (head.startsWith('@media')) block(body, head.replace(/\s+/g, ' ').match(/\((?:max|min)-width:\s*\d+px\)/)?.[0].replace(/\s/g, '') ?? head);
-      else if (!head.startsWith('@')) {
-        const decl = {};
-        for (const d of body.split(/;(?![^(]*\))/)) {
-          const c = d.indexOf(':');
-          if (c > 0) Object.assign(decl, expand(d.slice(0, c).trim(), norm(d.slice(c + 1))));
-        }
-        for (const sel of head.split(',')) {
-          // One spelling per selector: Webflow writes :before, puts a state
-          // before the variant, and repeats focus-visible for its own script.
-          const name = sel.trim().replace(/\s+/g, ' ').replace(/::(before|after)/g, ':$1')
-            .replace(/^((?:\.[\w-]+)+)((?::[a-z-]+)+)(:where\([^)]*\))/, '$1$3$2');
-          if (name.includes('[data-wf-focus-visible]')) continue;
-          // Variables sit on :root or on body depending on who wrote the
-          // sheet (modes set on the Body tag publish on body): one place here.
-          const targets = name === ':root' || name === 'body' ? [[VARS, (p) => isVar(p)], [name, (p) => !isVar(p)]] : [[name, () => true]];
-          for (const [t, keep] of targets) {
-            const part = Object.fromEntries(Object.entries(decl).filter(([p]) => keep(p)));
-            if (Object.keys(part).length) out.set(`${media}|${t}`, { ...out.get(`${media}|${t}`), ...part });
-          }
+  const block = (rules, media) => {
+    for (const r of rules) {
+      if (r.rules && r.at.startsWith('@media')) block(r.rules, r.at.match(/\((?:max|min)-width:\s*\d+px\)/)?.[0].replace(/\s/g, '') ?? r.at);
+      if (r.sel === undefined) continue;
+      const decl = {};
+      for (const [p, v] of declarations(r.body)) Object.assign(decl, expand(p, norm(v)));
+      for (const sel of selectors(r.sel)) {
+        // One spelling per selector: Webflow writes :before, puts a state
+        // before the variant, and repeats focus-visible for its own script.
+        const name = sel.replace(/\s+/g, ' ').replace(/::(before|after)/g, ':$1')
+          .replace(/^((?:\.[\w-]+)+)((?::[a-z-]+)+)(:where\([^)]*\))/, '$1$3$2');
+        if (/\[data-wf-focus-(visible|within)\]/.test(name)) continue;
+        // Variables sit on :root or on body depending on who wrote the
+        // sheet (modes set on the Body tag publish on body): one place here.
+        const targets = name === ':root' || name === 'body' ? [[VARS, (p) => isVar(p)], [name, (p) => !isVar(p)]] : [[name, () => true]];
+        for (const [t, keep] of targets) {
+          const part = Object.fromEntries(Object.entries(decl).filter(([p]) => keep(p)));
+          if (Object.keys(part).length) out.set(`${media}|${t}`, { ...out.get(`${media}|${t}`), ...part });
         }
       }
     }
   };
-  block(css, '');
+  block(parseCss(css), '');
   return out;
 }
 const VARS = '(variables)';
@@ -120,10 +101,10 @@ function norm(v) {
     .replace(/^([\w -]+),(?:[\w -]+,)*(?:sans-serif|serif|monospace)$/, '$1');
 }
 
-const page = await (await fetch(base)).text();
-const sheet = page.match(/href="([^"]+website-files\.com[^"]+\.css[^"]*)"/)?.[1];
-if (!sheet) { console.error(`No Webflow stylesheet found on ${base}. Is the site published, and is the page public?`); process.exit(1); }
-const live = parse(await (await fetch(sheet)).text());
+let published;
+try { published = await readPublished(base, { crawl: flags.has('--crawl'), log: console.log }); }
+catch (e) { console.error(e.message); process.exit(1); }
+const live = parse(asCss(published));
 const mine = parse(['tokens.css', 'webflow.css'].map((f) => fs.readFileSync(path.join(root, 'src/css', f), 'utf8')).join('\n'));
 
 const report = { 'Variables in Webflow, not in the snapshot': [], 'Variables in the snapshot, not in Webflow': [], 'Classes in Webflow, not in the snapshot': [], 'Classes in the snapshot, not in Webflow': [], 'Values that differ': [] };

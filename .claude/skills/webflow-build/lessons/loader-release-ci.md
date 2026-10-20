@@ -24,6 +24,56 @@ refer to the project the lesson came from; Status is that project's.
 
 <!-- Add new entries here, newest first. -->
 
+### 2026-10-13 · Local Lighthouse adds a second to some hosts on some networks
+- Area: ci, perf
+- Symptom: every local Lighthouse run showed the staging stylesheet and
+  Webflow's jQuery taking ~1.1 s each, which put mobile at 82 for a page
+  that scored 96 elsewhere. `curl` and Playwright fetched the same files
+  in 70 ms.
+- Cause: the newer DNS and connection path in the Chrome that Lighthouse
+  launches, on that network; not the site.
+- Fix: run local Lighthouse with
+  `--chrome-flags="--headless=new --disable-features=HappyEyeballsV3,AsyncDns"`
+  (`wf:perf` passes them from `WF_PERF_CHROME_FLAGS`), and check
+  the request list for a host that is slow only there before believing a
+  score. The keyless PageSpeed API quota is usually spent; the PageSpeed
+  website is the reference.
+- Status: workaround confirmed
+- Found by: claude
+
+### 2026-10-16 · Staging fetched its stylesheet twice before first paint
+- Area: loader, perf
+- Symptom: on `*.webflow.io`, `styles.css` was requested twice before
+  first paint (`?v=1` from Embed 2a, then `?v=<timestamp>` from 2b), the
+  second render-blocking; Lighthouse CLS on staging was ~0.18. PageSpeed
+  also flagged the fixed jsDelivr preconnect as unused on staging.
+- Cause: 2b cache-busted the staging sheet straight away, so a page that
+  already had the sheet parsed waited for a second copy.
+- Fix: on staging 2b keeps the 2a sheet and swaps in a cache-busted copy
+  through `setCSS` only after `load` (skipped when dev mode or a fallback
+  has taken the bundle elsewhere); the footer loader re-points the sheet
+  only when the bundle comes from another origin. The head code
+  preconnects to the bundle's own origin (Pages, jsDelivr or localhost)
+  instead of a fixed jsDelivr pair. CLS on staging 0.005.
+- Status: fixed in the template's loader.html, 0.6.0 (all three snippets
+  must be re-pasted into Webflow)
+- Found by: claude
+
+### 2026-09-11 · The Designer's custom-code preview isn't staging
+- Area: loader
+- Symptom: `?wfc-dev=1` on the Designer URL or the staging site does not
+  put the custom-code preview into dev mode; the preview loads the
+  production path.
+- Cause: the preview runs on `*.canvas.webflow.com`, a separate origin
+  with its own URL and localStorage, and the head code only treated
+  `*.webflow.io` as staging.
+- Fix: the head code treats `*.canvas.webflow.com` as staging too. Set
+  the flag on the frame's own URL or storage, or check on published
+  staging.
+- Status: fixed in the template's loader.html, 0.6.0 (head code must be
+  re-pasted)
+- Found by: codex
+
 ### 2026-10-09 · Swapping the stylesheet href in 2b causes a full-page layout shift
 - Area: loader
 - Symptom: after a site was cut over to the template's loader, Lighthouse

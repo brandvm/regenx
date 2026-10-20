@@ -1,2 +1,5 @@
 # Decoded Figma files (pnpm fig): large, and they hold the client design.
 design/fig/
+
+# Screenshots and crops from pnpm screens and pnpm check:states.
+.screens/

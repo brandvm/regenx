@@ -1,0 +1,16 @@
+/* repo-css: third-party — Lenis (recipes/smooth-scroll). The core of
+   lenis/dist/lenis.css; compare with that file in the installed version
+   and copy anything newer. .lenis-stopped is how lenis.stop() locks the
+   page (the modal recipe relies on it). Goes in §04 DOCUMENT STATE. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
+}
+
+.lenis [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}

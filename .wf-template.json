@@ -1,8 +1,8 @@
 {
   "template": "brandvm/wf-template",
   "skills": {
-    "version": "v0.5.1",
-    "commit": "b040970495baece6ebacc9a89a76edf0fefac888",
-    "updated": "2026-10-18"
+    "version": "v0.7.1",
+    "commit": "cdc8a4a",
+    "updated": "2026-10-20"
   }
 }

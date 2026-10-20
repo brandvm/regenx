@@ -271,14 +271,21 @@ has been set on it), then bind through the MCP:
 - **Images:** descriptive alt on content images, `alt=""` on decorative ones
   inside an `aria-hidden` S Bg.
 - **Forms:** labelled by a visible label or an sr-only one, `name` and
-  `required` set, a Form Block class with margin 0.
+  `required` set, a Form Block class with margin 0. Radios and checkboxes
+  in a Collection List publish one id on every item; the starter module
+  `src/modules/unique-form-ids.ts` makes them unique and moves each
+  label's `for` with it.
 - **Tabs, lists and dialogs:** keep ARIA roles on DOM elements or set them from
-  script (`data-aria-role`); Webflow rewrites roles on its List elements.
+  script: put the role in `data-aria-role` and the starter module
+  `src/modules/aria-roles.ts` sets it; Webflow rewrites roles on its List
+  elements.
 - **Head:** Open Graph and Twitter meta, `theme-color`, favicon, and an
   Organization JSON-LD (address, phone, e-mail) in the home page's head
   code.
 - **Motion:** reduced motion stops video autoplay (poster shows) and long
   scroll scenes; a looping hero video needs a pause control (WCAG 2.2.2).
+  Both come from the video recipe ([recipes/video/](recipes/video/README.md)).
+  The rest of motion, and moving off Webflow interactions, is §16.
 
 ## 10. Components
 
@@ -304,7 +311,8 @@ has been set on it), then bind through the MCP:
 - **Props:**
   - bindable text is a Text Block, Paragraph, Heading or Link, never a Span;
   - an input placeholder comes from a text prop bound to `data-placeholder`
-    (a module copies it to `placeholder`), since placeholders can't bind;
+    (the starter module `src/modules/placeholders.ts` copies it to
+    `placeholder`), since placeholders can't bind;
   - a boolean attribute is an attribute whose *name* is a text prop
     (default `muted`, value `true`); clearing the prop removes it;
   - a variant that changes an element's styles needs that element to carry a
@@ -325,7 +333,10 @@ has been set on it), then bind through the MCP:
 - **Conditional visibility on CMS fields** is a Designer step; put it on a
   plain wrapper div, not on a component instance.
 - **Collection lists publish `role="list"` / `listitem`:** put the intended
-  role in `data-aria-role` and let a module set it.
+  role in `data-aria-role`; `src/modules/aria-roles.ts` sets it.
+- **Form controls in a Collection List** share one Designer id;
+  `src/modules/unique-form-ids.ts` rewrites them. Style them by class,
+  never by id.
 - Plan the collections (fields, references, sort field) with the designer
   before the template page is built.
 
@@ -381,6 +392,10 @@ the folder a project starts from). In short:
   phones. Skip WebM when it is larger than the MP4.
 - **`<video>` attributes need values** (`muted="true"`, `loop="true"`,
   `playsinline="true"`), or publishing drops them and autoplay is blocked.
+- **Autoplay video** uses the video recipe
+  ([recipes/video/](recipes/video/README.md)): sources load late, play only
+  on screen, reduced motion and the visitor's pause are respected, and a
+  `data-video-toggle` button pauses it.
 - **Images:** Webflow adds `srcset`; a module that swaps an image removes
   `srcset` and `sizes` first. Give images a size or a class with
   `aspect-ratio`, since the importer drops their attributes.
@@ -391,10 +406,11 @@ These live in client repos, not in the template. Rebuild them when a design
 asks for them:
 
 - **Page transitions:** Barba with a parallax swap, and an image zoom from a
-  card into the next page's hero. Page modules run per page inside a
-  `gsap.context` and their listeners are removed on leave; Webflow is
-  re-initialised after each swap; the clicked link's hash is restored after
-  the swap.
+  card into the next page's hero. The skeleton every Barba site needs (head
+  and current-link sync, Webflow and Turnstile re-init, focus, page views,
+  per-page modules) is a recipe with a plain cross-fade:
+  [recipes/barba/](recipes/barba/README.md); the design's transition
+  replaces the fade.
 - **Floating nav:** the bar scrolls away with the page; a small fixed nav
   appears once it is off screen, light or dark from the section under it, and
   opens the menu as a side sheet. The blur sits on a child, never on the
@@ -404,3 +420,83 @@ asks for them:
 - **Anchor handling:** unbind webflow.js's `click.wf-scroll`, glide with
   Lenis to the section (or its pin spacer) flush with the top, pause scroll
   snapping during the glide, and jump to the hash again after pins are added.
+  The first part (unbind, clear sticky bars, optional Lenis) is a recipe:
+  [recipes/anchor-scroll/](recipes/anchor-scroll/README.md), with Lenis
+  from [recipes/smooth-scroll/](recipes/smooth-scroll/README.md).
+- **Modals, count-ups, marquees, FAQ, CMS tabs:**
+  [recipes/modal/](recipes/modal/README.md) and
+  [recipes/snippets/](recipes/snippets/README.md).
+
+## 16. Motion and Webflow interactions
+
+- **New motion goes in the repo, not in Webflow Interactions** (classic IX,
+  IX2 or IX3), and existing interactions move out page by page when a
+  site is worked on, keeping the approved motion and timing:
+  1. **CSS first:** a transition or `@keyframes` on a class or
+     `[data-state]` a module toggles (`js-state`), CSS scroll-driven
+     animation (`animation-timeline: view()` inside `@supports`) for
+     parallax-style effects, and the reduced-motion override in §07.
+  2. **A module only where CSS can't:** one shared IntersectionObserver for
+     reveals keyed by a `data-*` attribute; GSAP
+     ([recipes/smooth-scroll/](recipes/smooth-scroll/README.md), only the
+     plugins used) for split-text reveals and scrubbed or pinned scenes.
+  3. **Never hide first-screen content waiting for JS.** A hero heading,
+     logo or CTA set to `visibility: hidden` or opacity 0 until a script
+     reveals it costs LCP on every load and stays hidden when the script
+     fails. First-screen motion starts from visible content (a small
+     offset or a clip, never invisible), with `gsap.set()` + `gsap.to()`,
+     not `gsap.from()`.
+  4. When a page has no interactions left, its IX hidden-state styles go
+     too; when the site has none, turn off Webflow's GSAP and interactions
+     site settings so they stop loading. Webflow components (nav,
+     dropdown, tabs, slider) are not interactions and stay.
+- **Until then, IX3 content needs a fallback.** Content IX3 hides before
+  its entrance stays invisible if IX3 never starts. Webflow adds
+  `w-mod-js` to `<html>` when webflow.js runs and `w-mod-ix3` once IX3
+  has started, so `html.w-mod-js:not(.w-mod-ix3) [data-ix-fallback]
+  { visibility: visible !important }` shows it in between and stops
+  matching once IX3 runs. Visibility only: it doesn't undo opacity or
+  transforms. It is an `override-webflow` rule (ask first, log it in
+  `GOTCHAS.md`); the CSS is in [recipes/snippets/](recipes/snippets/README.md)
+  (`ix3-fallback.css`). IX3 has no public re-init, so a site with page
+  transitions moves off IX3 first.
+- **A page loader always has a CSS exit.** A full-screen loader removed
+  only by an interaction or a module covers the site for good when that
+  never runs. Give it `data-page-loader` and the backstop in
+  [recipes/snippets/](recipes/snippets/README.md) (`page-loader.css`): it
+  fades out and stops taking clicks 4 s after first paint, is never shown
+  in the Designer canvas (`html.wf-design-mode`), and is not shown at all
+  under reduced motion. The starter's `styles.css` has no loader rule;
+  copy it when a site has a loader.
+- **Reduced motion** turns off smooth scrolling, marquees, count-ups,
+  page-transition animation, autoplay and long scroll scenes; content is
+  shown in its final state, never left hidden.
+
+## 17. Splitting the stylesheet (optional, large sites)
+
+`src/styles.css` can become a manifest of `@import`s, one file per
+section, once it is too long to navigate (several hundred lines of
+components). esbuild bundles CSS imports (`build.mjs` has
+`bundle: true`, and the Phosphor `@import` already works this way), so
+the output is still one `dist/styles.css` and the loader is unchanged.
+
+```css
+/* src/styles.css — no rules; the import order is the cascade order. */
+@import "./phosphor.css";
+@import "./styles/01-tokens.css";
+@import "./styles/02-base.css";
+@import "./styles/03-webflow-internals.css";
+@import "./styles/04-document-state.css";
+@import "./styles/05-components/_index.css"; /* one file per component */
+@import "./styles/06-utilities.css";
+@import "./styles/07-accessibility.css";
+@import "./styles/08-editor-dev-supports.css";
+```
+
+- Keep the cascade notes at the top of the manifest; reordering the lines
+  reorders the cascade.
+- `@import` lines must come before any rule, so the manifest holds none.
+- Each file keeps its section header and `repo-css:` tags; a rule still
+  goes in the file for its section, not the one that happens to be open.
+- `pnpm build` and diff `dist/styles.css` before and after the split: it
+  should only move, not change.

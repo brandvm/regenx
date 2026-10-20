@@ -1,0 +1,17 @@
+/* IX3 hidden-state fallback (recipes/snippets, conventions.md §16).
+   Content authored hidden for an IX3 entrance stays invisible if IX3 never
+   starts (a script error, a blocked GSAP). Webflow puts w-mod-js on <html>
+   as soon as webflow.js runs and w-mod-ix3 once IX3 has started; between
+   the two, or when IX3 never comes, this keeps the marked content visible.
+   It stops matching once IX3 runs, so the entrance plays as designed.
+   Visibility only: it does not undo opacity, transforms or display, so an
+   entrance that starts at opacity 0 needs its start state moved off IX3
+   (conventions.md §16), not this.
+   Hook: data-ix-fallback on each element IX3 hides at load (first screen:
+   nav CTAs, hero heading and buttons).
+
+   repo-css: override-webflow — beats IX3's inline hidden state; needs the
+   user's approval and a GOTCHAS.md entry (AGENTS.md). Goes in §04. */
+html.w-mod-js:not(.w-mod-ix3) [data-ix-fallback] {
+  visibility: visible !important;
+}

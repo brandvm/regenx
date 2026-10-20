@@ -1,0 +1,15 @@
+/* Goes in src/styles.css §07 ACCESSIBILITY, before the reduced-motion
+   block (recipes/video/README.md). */
+
+/* repo-css: designer-cant — ::-webkit-media-controls pseudo-elements. When
+   autoplay is refused (iOS Low Power Mode) Safari paints its own play and
+   skip glyphs over a video that has no controls; hide them so the poster
+   shows clean. autoplay-video.ts starts the video on the first tap. */
+video:not([controls])::-webkit-media-controls,
+video:not([controls])::-webkit-media-controls-panel,
+video:not([controls])::-webkit-media-controls-start-playback-button,
+video:not([controls])::-webkit-media-controls-overlay-play-button {
+  display: none !important;
+  -webkit-appearance: none !important;
+  opacity: 0 !important;
+}

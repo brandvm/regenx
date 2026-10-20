@@ -64,6 +64,19 @@ Per page, in this order:
 - **Re-read before building a page.** The file may have changed since the
   prototype; compare the frame's last-modified date with the approval
   date in `HANDOFF.md` and ask if it is newer.
+- **A layer's screenshot is clipped to its frame, at 1x at most.** The
+  connector renders a node as it shows in its parent, so a background
+  without the card drawn over it can't be exported, and Figma stays
+  read-only. Read each layer's image hash, scale mode and crop transform
+  (a read-only `use_figma` call), take the source images from a `.fig`
+  (`images/<hash>`), and rebuild the stack in a local HTML page: images
+  at their node rectangles, 1x exports for textures, blend modes as
+  `mix-blend-mode`. Screenshot that page at the scale needed, opened from
+  a file (`page.goto('file://…')`; `setContent` runs on about:blank and
+  may not load local images).
+- **Video fills don't come through the connector.** `get_design_context`
+  returns an empty div for a VIDEO fill and no asset URL, and screenshots
+  only render a frame. Ask for the `.fig` (below): the video is in it.
 - **Review against the frames:** with a prototype, the `pnpm wf:*` checks
   compare staging with it. Without one, put the frame screenshot next to
   a staging screenshot at the same width and list the differences.
@@ -86,6 +99,12 @@ pnpm fig "../Assets/figma/<file>.fig" --images         # also unpack the images
 - **What it doesn't:** it renders nothing and reads no Figma variables,
   so ask the person for a PNG export of each frame (the screenshots step
   above), and treat every repeated value as a candidate variable.
+- **Videos:** a `.fig` is a zip. Video fills sit at `videos/<hash>`
+  (the hash is in the node's `fills`, from a read-only `use_figma` call;
+  `tree.json` lists image hashes only) and images at `images/<hash>`,
+  full size, without extensions; `--images` unpacks images only. Unzip the one video entry
+  into its own folder, re-encode it for the web with ffmpeg (H.264,
+  `-an`, `-movflags +faststart`) and take the poster from frame 1.
 - **It is a copy from one moment.** Note the date it was saved in
   `HANDOFF.md`; a design change means a new file.
 - The format is Figma's own and undocumented. If a file fails to decode,

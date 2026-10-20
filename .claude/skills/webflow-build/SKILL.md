@@ -49,9 +49,10 @@ Every checklist item says who does it:
 
 1. Read the workspace `CLAUDE.md`, then this repo's `AGENTS.md` and
    `GOTCHAS.md`, then `docs/handoff/` (`HANDOFF.md`, `MANUAL-TODO.md`,
-   `BUILD-NOTES.md`). Skim [lessons/README.md](lessons/README.md) and read
-   the lesson file for today's area (MCP work: `lessons/mcp.md`). Never
-   repeat a mistake already logged.
+   `BUILD-NOTES.md`, and `REVIEW.md` once the review phase has started).
+   Skim [lessons/README.md](lessons/README.md) and read the lesson file
+   for today's area (MCP work: `lessons/mcp.md`). Never repeat a mistake
+   already logged.
 2. Read the project memory: where the last session stopped, open manual
    steps, open questions. Say in one line where things stand and what's
    next; ask which page or section if it isn't clear.
@@ -85,6 +86,14 @@ The shared rules are in [rules.md](rules.md). The build adds:
 - **After every Webflow write batch, say two things:** "reload the
   Designer" (an open Designer tab doesn't show MCP changes, and saving
   from a stale tab can overwrite them), and what is not published yet.
+- **Mark manual steps on the page.** A `MANUAL-TODO.md` row that leaves
+  something visibly unfinished (a value still missing, a binding not
+  made) gets a marker next to the element, or next to its specimen on the
+  style guide: a Caption with `data-manual-todo="<letter>"` and the text
+  "Manual step <letter>: <what>". It shows on the canvas and on staging,
+  so nobody reviews the unfinished state as the design. Remove it in the
+  batch that ticks the row; none may be left at the build handoff or at
+  launch (search the published HTML for `data-manual-todo`).
 
 ## The order of a build
 
@@ -104,7 +113,10 @@ Structure and names follow `conventions.md`. Each step is gated in
 8. components, built from the real page markup (never from style guide
    previews), each adding its style guide row → **Component done**;
 9. pages, section by section → **Page done**;
-10. the style guide final check, then **Build handoff**.
+10. the style guide final check, then **Build handoff**;
+11. the review phase: `docs/handoff/REVIEW.md` lists what is built per
+    page, each feedback round and what is left before launch, until the
+    `webflow-launch` skill takes over.
 
 A site duplicated from the starter already has the base of steps 1 to
 3 and the page shell; the project adds to it. Before each import run
@@ -176,7 +188,8 @@ The scripts are in this skill's `scripts/` folder, with a `pnpm` shortcut
 each. They read `webflow-build.config.json` from the current directory or a
 parent (the example is `webflow-build.config.example.json`). By default
 staging loads this repo's local `dist/`, so code can be checked before a
-push; `--live` checks what visitors get. Screenshots go to
+push; `--live` checks what visitors get (`seo`, `install` and `parity`
+check the custom domain in `liveUrl` with it). Screenshots go to
 `.webflow-build/` next to the config.
 
 ```bash
@@ -191,6 +204,10 @@ pnpm wf:links [/path…] [--max 50] [--external]                   # crawl: brok
 pnpm wf:baseline save|compare [/path…]                           # full-page visual baselines (launch, releases)
 pnpm wf:html [/path…]                                            # published HTML: what Webflow changed on publish
 pnpm wf:perf [/path…] [--runs 5] [--mobile|--desktop]            # Lighthouse, median of several runs
+pnpm wf:seo [/path…] [--live] [--canonical]                      # sitemap crawl: titles, OG, one h1, JSON-LD, noindex
+pnpm wf:install [/path…] [--live]                                # installed snippets vs loader.html, localhost requests
+pnpm wf:parity [/path…] [--live] [--width W] [--control]         # migration: old custom code vs dist/, every element
+pnpm wf:overflow [/path…] [--live] [--width W[,W…]] [--why]     # what runs off the right edge, 2560 … 360
 ```
 
 Two more read the prototype's files, with no browser and no Webflow
@@ -233,6 +250,31 @@ Reading results:
 - `perf`: read the median, and the range next to it. A change smaller
   than the range is noise, not a result. It always measures the deployed
   bundle.
+- `seo`: pages from `sitemap.xml`, else a crawl from `pages`. Missing
+  title, description or OG tags, not one `<h1>`, and JSON-LD that doesn't
+  parse or holds an HTML entity (`&#39;`) fail; noindex pages are listed,
+  and fail with `--live` unless `seo.noindexOk` allows them. Long titles,
+  short descriptions and pages with no JSON-LD (outside `seo.noSchemaOk`)
+  are notes.
+- `install`: a loader piece (head code, Embed 2a, 2b, footer code) that
+  differs from `loader.html` is an old paste: re-paste it and publish.
+  Also fails on two viewport metas, two Finsweet Attributes tags and any
+  request to localhost from the page.
+- `parity`: every difference is a change the live site would see. Run
+  `--control` first: what differs between two renders of the published
+  page is noise, for `parity.ignore`. Screenshot pairs are in
+  `.webflow-build/parity/`.
+- `overflow`: each row is the first element of a chain whose visible
+  right edge passes the viewport, with the widths and the worst
+  overshoot; a page that scrolls sideways is its own finding. The sweep
+  covers the widths the three checks miss (1366, 1280, 1024, 992…), where
+  the fluid scale holds and fixed sizes stop fitting. Clipped content
+  (slider masks, marquees), off-canvas menus and hidden elements are
+  skipped; `--why` lists them, `overflow.ignore` adds selectors. A row
+  marked "moved by a transform" may be an animation's start state: check
+  it after the animation has played. Fixes are Designer fixes:
+  `minmax(0, 1fr)` columns, `min-width: 0` on flex and grid children,
+  wrapping instead of fixed widths.
 - `preflight`: **FIX** means change the prototype markup now (an empty
   span as a shape, a control outside a form, a valueless boolean, an inline
   style, a class in no CSS file). **PLAN** means the markup is right and
@@ -247,8 +289,9 @@ Reading results:
 Run `preflight` on a prototype page before it is approved and again before
 its import; `styles` before the first class batch and whenever
 `new-classes*.css` changes; `compare` per section while building; `pass`,
-`outline`, `anchors`, `a11y`, `links` and `html` when a page is done;
-`perf` at the build handoff and before and after any speed work; `load-film` after touching the hero or the loader;
+`outline`, `anchors`, `a11y`, `links`, `html` and `overflow` when a page is done;
+`perf` at the build handoff and before and after any speed work;
+`install` after every paste of a loader piece; `seo` before launch; `load-film` after touching the hero or the loader;
 `transitions` after touching pages, links or modules. Check all three
 widths (Webflow's breakpoints are 991/767/479). For interactions, script
 the hover, click or scroll state and compare that, not only the resting
@@ -274,12 +317,40 @@ handoff, review against the frame screenshots in `Assets/figma/`
   section's `.pin-spacer`; pause scroll snapping during the glide.
 - Never put `backdrop-filter`, `filter` or `transform` on a wrapper that
   holds `position: fixed` children.
-- Libraries are bundled, never Webflow script tags. Finsweet Attributes:
-  [recipes/finsweet/](recipes/finsweet/README.md).
+- Libraries are bundled, never Webflow script tags. Copy-in recipes:
+  [finsweet](recipes/finsweet/README.md) (Finsweet Attributes),
+  [phosphor](recipes/phosphor/README.md), [video](recipes/video/README.md),
+  [anchor-scroll](recipes/anchor-scroll/README.md),
+  [smooth-scroll](recipes/smooth-scroll/README.md) (GSAP + Lenis),
+  [barba](recipes/barba/README.md), [modal](recipes/modal/README.md),
+  [snippets](recipes/snippets/README.md) (count-up, marquee, FAQ, tabs,
+  dropdown close, resize reload, page-loader backstop, IX3 fallback).
 - Sizes follow the fluid scaling in `src/styles.css` §01: Webflow
   variables in em, the desktop frame set to the design before building.
 - Loader snippets aren't versioned: any `loader.html` change must be
   re-pasted in Webflow (a manual step).
+
+## Migrating a live site
+
+Moving a site that is already live onto the template (its old custom
+code hosted elsewhere) happens in two phases, never one:
+
+1. **Parity first.** The port reproduces the live site with no visual,
+   content or behaviour change. Map each old custom-code asset in
+   `parity.oldAssets` (a URL regex → `index.js`, `styles.css`, or `""` for
+   a library the bundle now carries), then `pnpm wf:parity --live` on every
+   template page at every width until it reports zero differences, or
+   each one is explained. Only then paste the loader and remove the old
+   code, and run `pnpm wf:install --live`.
+2. **Improvements second**, in later releases, one at a time, each
+   re-checked with `wf:parity` and shown to the person.
+
+Template defaults that change a live site are improvements, not parity:
+check each before the first release and keep it off until approved. The
+scroll lock (`html.is-loading` in the head code and `src/styles.css`),
+the `theme-color` meta in the head code, the icon font in the bundle
+(`pnpm phosphor`), and the base CSS (`box-sizing`, the §01 type scaling)
+all show up in `wf:parity` if the live site didn't have them.
 
 ## Working rhythm
 
@@ -296,6 +367,10 @@ handoff, review against the frame screenshots in `Assets/figma/`
 - **`docs/handoff/` stays current** during the session, not at the end:
   a decision goes into `HANDOFF.md` when it is made, a manual step into
   `MANUAL-TODO.md` when it is found.
+- **After the build handoff, review.** Fill in `docs/handoff/REVIEW.md`:
+  what is built per page, then one table per feedback round, the next
+  free `MANUAL-TODO.md` letter and the list of what has to happen before
+  launch.
 - **Lessons go back.** At wrap-up, offer every `template-candidate`
   lesson to the template ([rules.md](rules.md) › Contributing).
 

@@ -86,7 +86,10 @@ refer to the project the lesson came from; Status is that project's.
   the `.w-dropdown-toggle` reset broke Webflow's chevron spacing on another.
 - Fix: one project removed ten neutralizers so Webflow's own defaults stood
   unopposed. Delete a neutralizer the moment it fights the
-  Designer.
+  Designer. Delete it rather than comment it out: CSS comments don't
+  nest, so on that project a `/* … */` around a block that already held a
+  comment closed early, a "commented-out" `.w-nav` neutralizer had been
+  live all along, and a stray `*/` was left for esbuild to warn about.
 - Status: fixed in the template — selectable-component rules removed; only Designer-unselectable internals remain in §03
 - Found by: human
 
@@ -147,3 +150,80 @@ refer to the project the lesson came from; Status is that project's.
   nothing.
 - Status: fixed in the template's prototype starter
 - Found by: claude
+
+### 2026-10-09 · `<button>` drops the inherited letter-spacing
+- Area: css
+- Symptom: accordion questions wrapped to two lines where the design has
+  one; the heading's −3% tracking was missing on the text inside the
+  button.
+- Cause: the browser's default stylesheet sets `letter-spacing: normal`
+  (and `word-spacing`, `text-transform`) on `<button>`; `font: inherit`
+  does not cover them.
+- Fix: `letter-spacing: inherit` (with `word-spacing` and `text-transform`)
+  on any class used on a `<button>` that should take its parent's type;
+  classes that set their own tracking are fine. A native-button reset in
+  the Designer (designer.md, "Native `<button type="submit">` in Webflow
+  forms") should include them.
+- Status: fixed in that project's prototype; template 0.7.1 §02 sets
+  `letter-spacing` and `word-spacing` to `inherit` on `:where(button)`
+  (zero specificity, so a Designer tag style or class still wins).
+  `text-transform` stays per class: normalize sets it at 0-0-1.
+- Found by: claude
+
+### 2026-10-15 · A script-hidden overlay blocks the Designer canvas
+- Area: css
+- Symptom: below 992px every click on the canvas selected the nav.
+- Cause: the full-screen mobile menu is hidden by a module (`hidden`); the
+  canvas runs no script, so it sat over the page at opacity 0. The canvas
+  also ignored `pointer-events: none`. (The 2a stylesheet link is fetched
+  without a cache-buster in the Designer, so a new repo rule can take up
+  to 10 minutes to reach the canvas.)
+- Fix: hide it on the canvas only:
+  `html.wf-design-mode .mobile-menu:not(.is-open) { display: none; }`
+  (tag `canvas-preview`). To edit the menu, add its open combo for the
+  session. Any overlay that a script hides needs the same rule.
+- Status: fixed in that project's repo
+- Found by: human
+
+### 2026-09-16 · A scroll lock belongs on `html` only: locking `body` un-sticks the header
+- Area: css
+- Symptom: on a scrolled page (always the case when arriving with a
+  #hash), the open mobile menu started above the viewport and only its
+  bottom-pinned button showed.
+- Cause: the open-menu state set `overflow: hidden` on `html` **and**
+  `body`. That makes `body` its own scroll container; the sticky header
+  then sticks inside `body`, which never scrolls, so it sat at the
+  document top off-screen and a menu offset measured from it went
+  negative. Forcing `position: relative` on the open header had the same
+  effect.
+- Fix: lock `html` only, drop any position override on the header, and
+  clamp offsets measured from it at 0. Use the same rule for every lock
+  (menu, modal, loader; `recipes/modal/` should follow it).
+- Status: fixed in that project's repo; template 0.7.0 §04 locks `html`
+  only.
+- Found by: claude
+
+### 2026-10-07 · Finsweet filters: style `.is-list-active`, and the operator is `contain`
+- Area: css, js
+- Symptom: (1) a filter set from the query string filtered the list, but
+  its checkbox looked inactive, and the first click removed the filter
+  while making the checkbox look active. (2) Year filter pills did
+  nothing; once they could be selected every year showed zero items, and
+  "All" never cleared the filter.
+- Cause: (1) Finsweet sets the real input and `.is-list-active`
+  correctly, but Webflow's decorative `.w--redirected-checked` isn't
+  synced when Finsweet initialises from the URL; the CSS styled the
+  Webflow class. (2) `fs-list-operator="contains"` isn't a Finsweet v2
+  value (it is `contain`), and an unknown value silently falls back to
+  `equal`; the "All" radio had no operator, so it became a separate
+  `equal` condition that never cleared the other. The labels also
+  published `for=""`, which detaches them from their nested radios (see
+  designer.md, "Duplicate ids in CMS lists and component instances").
+- Fix: style the Finsweet state (`.is-list-active` on the filter's
+  wrapper) as the source of truth, and keep the decorative Webflow
+  checkbox neutral when the wrapper is inactive. Give every radio in a
+  group the same `fs-list-operator`, spelled `contain`, and every label a
+  custom `for`. Check attribute values against the Finsweet v2 docs and
+  `recipes/finsweet/`: typos fail silently.
+- Status: fixed in two projects
+- Found by: claude + codex

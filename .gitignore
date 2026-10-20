@@ -4,12 +4,12 @@ node_modules/
 # These repos are public — never let a key reach a commit.
 .env
 
-# Build output. Rebuilt by CI on every push to master. A release commits it
-# with `git add -f dist` and then un-tracks it again with
-# `git rm -r --cached dist` — this rule does nothing while it stays tracked.
-# See "Production — later" in the README.
-dist
+# dist/ is committed on purpose: release tags need the built files for
+# jsDelivr, and CI fails if dist/ does not match a fresh build of src/.
 
 # Browser verification artifacts
 test-results/
 playwright-report/
+
+# webflow-build skill output (screenshots)
+.webflow-build/

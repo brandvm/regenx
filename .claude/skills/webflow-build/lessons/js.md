@@ -6,6 +6,103 @@ Harvested from client builds made from this template (`Scope:
 template-candidate` entries in their `GOTCHAS.md`). Module and file names
 refer to the project the lesson came from; Status is that project's.
 
+### 2026-10-16 · Barba: forms dead after a page change; stale head and current links
+- Area: js
+- Symptom: comparing a direct load with arriving by transition:
+  - every form reached by a transition had no Turnstile widget, so Webflow
+    kept its submit disabled for good; the console showed "Turnstile
+    already has been loaded" and "Cannot find Widget …";
+  - links outside the container (nav, floating nav, menu sheet) kept the
+    first page's `w--current` / `aria-current="page"`;
+  - meta description, Open Graph, Twitter, robots and JSON-LD stayed the
+    first page's (Barba swaps only the container and `<title>`).
+- Cause: webflow.js renders a form's Turnstile widget from
+  `$(document).on("ready")` whenever `turnstile` is already defined, and
+  jQuery 3 never fires that event again; on a full load the script's
+  onload is used instead, so only swaps break. Webflow writes current
+  states at publish time, so they don't follow Barba.
+- Fix: in the transition module: `beforeLeave` removes the old page's
+  widgets (`turnstile.remove`); the re-init clears
+  `$(document).off("ready")`, runs `Webflow.destroy()` / `ready()` / IX2,
+  then fires `$(document).trigger("ready")` once, so each widget renders as
+  its form nears the viewport, as on a direct load. `syncCurrentLinks()`
+  applies Webflow's rule (same path, no hash) to every link outside the
+  container; `syncHead()` copies the page-specific head tags from the next
+  page. For accessibility, `focusPage()` moves focus to the #hash target
+  or `<main>` without scrolling and announces the new title in a polite
+  `.sr-only` live region (the clicked link is gone after a swap). The
+  "already loaded" warning stays (webflow.js re-adds the script on every
+  `ready()`). Token and submit can't be checked headless or in a hidden
+  browser pane: confirm a real submit in a normal browser.
+- Status: fixed in that project's repo
+- Found by: claude
+
+### 2026-10-16 · Pins created out of page order are measured in the wrong place
+- Area: js
+- Symptom: after a horizontal timeline section (pinned) moved below
+  another pinned section, scrolling into it showed an empty screen; the
+  timeline appeared later, near the end of its pin.
+- Cause: ScrollTrigger measures pins in creation order. The timeline's
+  module ran before the other section's module in the manifest, so its
+  start was calculated before the pin above it had added its spacer.
+- Fix: `src/index.ts` calls `ScrollTrigger.sort()` and then `refresh()`
+  once all page modules have started, so pins are measured top to bottom
+  whatever order the modules run in.
+- Status: fixed in that project's repo
+- Found by: claude
+
+### 2026-10-13 · Barba ignores a root `custom` rule when `to` or `from` is set
+- Area: js
+- Symptom: some links felt dead: nothing moved for about a second, then
+  the page changed. A rule "zoom only from an image at least half on
+  screen" had no effect.
+- Cause: in Barba 2.10.3's `resolve`, each rule is checked on the
+  transition root and then on `to` / `from`, and the second result
+  overwrites the first. A transition with `custom` at the root and
+  `to: { namespace }` therefore matched on namespace alone, so an image
+  zoom ran with no image.
+- Fix: put `custom` inside `to` (`to: { namespace, custom }`) and type
+  `src/barba.d.ts` to allow it. Check that a plain link gets the default
+  transition and only the intended trigger gets the special one.
+- Status: fixed in that project's repo
+- Found by: human + claude
+
+### 2026-10-13 · iOS Low Power Mode refuses autoplay and Safari paints a play glyph
+- Area: js
+- Symptom: on an iPhone in Low Power Mode the muted, looping hero video
+  stayed on its poster with Safari's own play and skip glyphs painted over
+  it; nothing in the console.
+- Cause: Low Power Mode (and data saver modes) refuse autoplay: `play()`
+  rejects with `NotAllowedError`, which the module swallowed. A video
+  without `controls` still gets Safari's native start-playback overlay,
+  and with `pointer-events: none` on the video it can't even be tapped.
+- Fix: use `recipes/video/`. It keeps the poster, remembers videos whose
+  `play()` was refused with `NotAllowedError`, and retries them on the
+  visitor's first `touchend`, `click` or `keydown` (capture phase, once).
+  Repo CSS hides `::-webkit-media-controls`, `-panel`,
+  `-start-playback-button` and `-overlay-play-button` on
+  `video:not([controls])`. Test on a real iPhone with Low Power Mode on;
+  simulators and desktop Safari autoplay normally.
+- Status: recipe in the template (`recipes/video/`)
+- Found by: human + claude
+
+### 2026-10-13 · Testing local code in the built-in browser pane
+- Area: js
+- Symptom: the environment switcher on staging loaded the staging bundle,
+  not localhost (`ERR_BLOCKED_BY_CLIENT` on `http://localhost:3000/…`).
+  With the browser pane hidden, GSAP timelines, CSS animations and
+  IntersectionObserver callbacks didn't advance, so a transition sampled
+  from script looked frozen and a keyframe sat on its first frame.
+- Cause: the Claude desktop browser pane blocks a public page from
+  requesting localhost, and a hidden pane gets no animation frames.
+- Fix: for logic checks, save the staging HTML, point the loader's
+  staging URL at a local static server holding `dist/` (an absolute URL:
+  the loader passes it to `new URL()`) and open that. Class toggles and
+  layout can be read while the pane is hidden; anything that moves needs
+  the pane visible, or a check on staging by a person.
+- Status: documented
+- Found by: claude
+
 ### 2026-10-09 · Moving off IX3: decode the published interactions, then replay them
 - Area: js
 - Symptom: rebuilding IX3 motion by eye drifts from the approved timing,
@@ -167,8 +264,12 @@ refer to the project the lesson came from; Status is that project's.
   round trips between two pages keep 3 pin spacers and the same
   page height, and every scene still runs. Global modules (Lenis, nav) run
   once and expose refresh hooks. Webflow is re-initialised after each swap
-  (`data-wf-page`, `Webflow.destroy()` / `ready()`, IX2); Turnstile then
-  logs "already has been loaded" — harmless.
+  (`data-wf-page`, `Webflow.destroy()` / `ready()`, IX2). Correction
+  (2026-10-16): Turnstile then logs "already has been loaded". The warning
+  itself is harmless, but it hid a real fault: forms reached by a
+  transition get no widget and stay disabled, and head tags and current
+  links stay the first page's. See "Barba: forms dead after a page
+  change; stale head and current links".
 - Status: fixed in that project's repo
 - Found by: claude
 
@@ -218,7 +319,93 @@ refer to the project the lesson came from; Status is that project's.
 - Symptom: Same-page hash links land under a sticky nav.
 - Cause: Webflow's scroll module offsets only for `position: fixed` headers
   and never reads `scroll-margin-top`.
-- Fix: an earlier project's `anchor-scroll.ts` unbinds `click.wf-scroll` and measures
-  `--nav-h` from the nav.
-- Status: project pattern
+- Fix: use `recipes/anchor-scroll/`. It unbinds `click.wf-scroll` (again
+  after every `Webflow.ready()`), scrolls through Lenis, and offsets by the
+  larger of `scroll-margin-top` and any sticky or fixed bar pinned above
+  the target that overlaps it horizontally (a sticky side nav must not
+  count), measured with a ResizeObserver, never a hard-coded nav height.
+  Don't add a second hash-link handler beside it. Three projects wrote
+  their own before the recipe existed.
+- Status: recipe in the template (`recipes/anchor-scroll/`)
 - Found by: human
+
+### 2026-09-28 · `window.lenis` is a version marker, not the instance
+- Area: js
+- Symptom: a card's popup did nothing and the page silently
+  scroll-locked.
+- Cause: the scroll lock probed `window.lenis`, but Lenis sets
+  `window.lenis = { version }` itself, so the probe was always truthy and
+  `.stop()` threw "stop is not a function" after `aria-hidden` and the
+  lock were set but before the modal was shown.
+- Fix: pass the Lenis instance into any module that needs it (as the nav
+  module does); never look it up on `window`.
+- Status: fixed in that project's repo
+- Found by: claude
+
+### 2026-09-14 · GSAP `.from()` animates to the current value: items stranded at 0
+- Area: js
+- Symptom: footer accordions on mobile opened to full height with
+  invisible links.
+- Cause: `.from()` takes the element's current value as its end value. An
+  earlier timeline had left the items at opacity 0, so the new tween
+  animated 0 → 0. (A throw in one module also stopped later inits; see
+  "One throwing module leaves the page scroll-locked".)
+- Fix: state both ends (`fromTo()`, or `set()` + `to()`, as in
+  "gsap.from() start state reverts on load") for any tween that can run
+  more than once or after another animation on the same elements, and clip
+  inside the panel itself.
+- Status: fixed in that project's repo
+- Found by: claude
+
+### 2026-10-08 · A consent manager blocks the dynamically inserted bundle
+- Area: js, loader
+- Symptom: behaviour from the bundle worked after cookie consent but
+  failed on another page or in a fresh browser before consent: the CSS
+  loaded, `index.js` was never requested.
+- Cause: the consent manager (Iubenda) blocks scripts it doesn't know are
+  essential, including ones created by another script. The site's old
+  script tags carried its exemption attribute (`data-cmp-ab="2"`); the
+  new footer loader didn't, so the whole bundle was treated as a
+  consent-dependent script.
+- Fix: mark the inline footer loader itself with the consent manager's
+  allow attribute (for Iubenda `data-cmp-ab="2"`), so scripts it creates
+  are exempt too, and set the same attribute on each script it appends.
+  When a site has a consent manager, test the bundle in a fresh private
+  window before consenting, on more than one page.
+- Status: fixed in that project's loader
+- Found by: codex
+
+### 2026-10-16 · HubSpot forms with CAPTCHA must use the embed
+- Area: js
+- Symptom: the plan was the designed Webflow form posting to HubSpot's
+  Forms API, but the client's form has CAPTCHA on, which the submit
+  endpoints refuse. The embed then rendered the themed form inside an
+  iframe, out of reach of page CSS, and changes made in `onFormReady`
+  (placeholders, a custom button) vanished.
+- Cause: themed HubSpot forms render in a same-origin, srcless iframe;
+  the form is a React app that re-renders after `onFormReady` and may
+  replace the form element it passed. HubSpot's theme selectors beat
+  plain class rules.
+- Fix: keep the HubSpot embed for any form with CAPTCHA. A module loads
+  it near the viewport, writes the design's CSS into the iframe (every
+  declaration `!important`, sizes relative to the iframe root), and
+  re-applies its DOM changes (placeholders from labels, a designed button
+  that clicks HubSpot's hidden submit, the reCAPTCHA disclosure) from a
+  MutationObserver, always on the live `form.hs-form`. Test with headless
+  Playwright: a hidden browser pane never fires IntersectionObserver.
+- Status: fixed in that project's repo
+- Found by: claude
+
+### 2026-10-12 · A WebGL context created before the first paint delays it
+- Area: js, perf
+- Symptom: Lighthouse mobile showed an observed first paint at 2.1 s with
+  0 ms blocking time; desktop was fine.
+- Cause: a hero shader created its WebGL context and compiled during
+  boot. Where the GPU is emulated (headless Chrome, lab tests) that work
+  holds back the first frame without showing as main-thread time.
+- Fix: a canvas on screen at load starts after `load`, two animation
+  frames and idle time, with a still image as the first paint; canvases
+  further down start near the viewport. Observed first paint went to
+  0.26 s.
+- Status: fixed in that project's repo
+- Found by: claude

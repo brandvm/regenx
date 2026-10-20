@@ -119,6 +119,18 @@ duplicated the starter site under the client's name
   `pnpm check:snapshot`, then `pnpm check:drift`, which compares the
   snapshot with the stylesheet the staging site publishes and lists every
   variable, class and value that differs (publish to staging first).
+- **No Webflow connector?** (not set up yet, signed in to another site,
+  or no MCP call allowed) `pnpm css:published <staging URL>` builds
+  `tokens.css`, `webflow.css` and `webflow-base.css` from the CSS the
+  site publishes (GET only; per-page CSS is read page by page and
+  merged), and recovers the snapshot as far as the CSS allows. The CSS is
+  exact; Designer names, mode names, empty classes and interactions are
+  not in it (the script's header lists everything it guesses), so say in
+  `HANDOFF.md` that the snapshot is a stand-in, never propose a variable
+  or class by a guessed name without checking it in the Designer, and
+  replace the snapshot from the MCP as soon as it is available (delete
+  `webflow-snapshot/source.json`, then `pnpm css`). While `source.json`
+  exists, `pnpm css` refuses to run.
 - **Variable changes are proposed, never made:** as old → new in
   `proposed.css`, grouped and lettered for approval. New classes go in
   `new-classes*.css`, written as the Designer can hold them.
@@ -129,12 +141,15 @@ duplicated the starter site under the client's name
 
 **Order.**
 
-1. Snapshot, `pnpm css`, `pnpm check:snapshot`, `pnpm check:drift`.
+1. Snapshot, `pnpm css`, `pnpm check:snapshot`, `pnpm check:drift` (no
+   connector: `pnpm css:published`, then the same checks).
 2. **The style guide** (`webflow-style-guide` skill), approved before any
    content page.
 3. Pages, one at a time. For each: build it; add the row for every class
-   or component it introduced (`pnpm style-guide`); run **Prototype page
-   done**; the person approves it at 1440, 820 and 390.
+   or component it introduced (`pnpm style-guide`); `pnpm screens` (every
+   width from 2560 to 360: overflow and errors) and `pnpm check:states`
+   (focus and pressed states); run **Prototype page done**; the person
+   approves it at 1440, 820 and 390.
 4. The handoff (below).
 
 ## Handing over to the build

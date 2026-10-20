@@ -45,10 +45,11 @@ ask.
   `pnpm build` and `pnpm test` pass; committed and pushed with an OK.
 - [Person] Loader pasted (head code, Embeds 2a and 2b, footer code).
   [Claude checks] staging loads the bundle and the stylesheet with no
-  console errors.
+  console errors, and `pnpm wf:install` finds no drift.
 - [Claude] `MANUAL-TODO.md` lists every value the API couldn't set
-  (calc, gradient and shadow values, reserved names, tag styles), and
-  [Person] has done them.
+  (calc, gradient and shadow values, reserved names, tag styles), each
+  visible one marked on the page with `data-manual-todo` (SKILL.md ›
+  Standing rules), and [Person] has done them.
 
 Then the style guide page: the `webflow-style-guide` skill's **Style
 guide base done** gate.
@@ -86,6 +87,9 @@ Procedure: [media.md](media.md).
   `links`: no broken links (`#` placeholders listed in the known issues).
 - [Claude checks] `html`: nothing Webflow rewrote on publish breaks the
   page (roles, dropped attributes, form field names, variant classes).
+- [Claude checks] `overflow`: nothing runs off the right edge and the page
+  doesn't scroll sideways at any width from 2560 to 360, not only the
+  three check widths.
 - [Claude] States built and checked: hover, focus-visible, active,
   disabled, error; animations as specced; reduced motion respected.
 - [Claude] Forms: validation, spam protection, success and error messages,
@@ -113,6 +117,10 @@ notes, integrations, changes log, redirect map and known issues.
   previews whose page now exists are removed.
 - [Claude checks] `pnpm wf:perf` on the key pages, mobile and desktop
   (the median of several runs); the numbers go in `BUILD-NOTES.md`.
+- [Claude checks] `pnpm wf:install` on every page template: the installed
+  snippets match `loader.html`, one viewport meta, no localhost request.
+- [Claude checks] `pnpm wf:seo`: every page has its title, description,
+  OG tags, one H1 and valid JSON-LD; noindex only where planned.
 - [Claude] CMS notes: how to edit what (collections, fields, conditional
   sections, components and their props).
 - [Claude] Integration list and configuration notes (no credentials).
@@ -120,8 +128,29 @@ notes, integrations, changes log, redirect map and known issues.
 - [Claude] Redirect map: every old URL → its closest new page (from the
   crawl saved in discovery).
 - [Claude] Known issues, split into fix before launch and fix after launch.
+- [Claude checks] `pnpm wf:overflow` on every page template: no sideways
+  scroll, nothing past the right edge at any width.
 - [Claude] `GOTCHAS.md` and `docs/handoff/MANUAL-TODO.md` current; every
-  manual step done or handed over.
+  manual step done or handed over, and no `data-manual-todo` marker left
+  in the published HTML.
+- [Claude] `docs/handoff/REVIEW.md` started: what is built per page, how
+  review works, the next `MANUAL-TODO.md` letter and the before-launch
+  list. Review rounds are tracked there until launch.
 
 The lists after the build (pre-launch QA, launch day, handoff to client,
 after launch) are in the `webflow-launch` skill.
+
+## Migration parity (a live site moving onto the template)
+
+Before the loader replaces a live site's old custom code (SKILL.md ›
+Migrating a live site):
+
+- [Claude] `parity.oldAssets` maps every old custom-code asset;
+  `pnpm wf:parity --control` is clean, so a difference is not noise.
+- [Claude checks] `pnpm wf:parity --live` on every page template at every
+  width: zero differences, or each one explained and approved.
+- [Claude checks] Template defaults the live site didn't have (scroll
+  lock, `theme-color`, the icon font, base CSS) are off, or approved as
+  a later improvement.
+- [Person] Approves the cutover; [Claude checks] `pnpm wf:install --live`
+  after the paste.

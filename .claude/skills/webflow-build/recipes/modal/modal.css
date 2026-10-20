@@ -1,0 +1,35 @@
+/* repo-css: js-state — modal.ts (recipes/modal) shows [data-modal] with an
+   inline display, then adds .is-open a frame later; the fade runs on that
+   class. Goes in §05 COMPONENTS & MOTION. Opacity only: the panel's own
+   entrance (a slide, a scale) can be a Designer transition on a combo
+   class, or added here under the same class. */
+[data-modal] {
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+[data-modal].is-open {
+  opacity: 1;
+}
+
+/* repo-css: js-state — the scroll lock when there is no Lenis (reduced
+   motion). On <html> only: overflow on <body> makes body the scroll
+   container and un-sticks a sticky header. Goes in §04 DOCUMENT STATE. */
+html.is-modal-open {
+  overflow: hidden;
+}
+
+/* repo-css: designer-cant — prefers-reduced-motion. Goes in §07, inside
+   the existing reduced-motion block. */
+@media (prefers-reduced-motion: reduce) {
+  [data-modal] {
+    transition: none !important;
+  }
+}
+
+/* repo-css: canvas-preview — the canvas runs no script: show the overlay
+   there only if the Designer has it open (its own display), at full
+   opacity. Goes in §08. */
+html.wf-design-mode [data-modal] {
+  opacity: 1;
+}

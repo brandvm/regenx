@@ -4,13 +4,17 @@
 // working directory or the nearest parent (usually the repo root):
 //
 // {
-//   "prototypeUrl": "http://127.0.0.1:5173",       // approved localhost prototype
+//   "prototypeUrl": "http://127.0.0.1:5173",       // approved localhost prototype (port per project)
 //   "stagingUrl":   "https://<site>.webflow.io",    // published Webflow staging
 //   "repoDir":      ".",                           // this repo (has dist/ and @playwright/test), relative to the config
 //   "bundlePattern": "<org>\\.github\\.io/<repo>/(index\\.js|styles\\.css)",
 //   "widths": [[1440, 900], [820, 1180], [390, 844]],
 //   "pages": ["/", "/about"],                       // optional: default paths for a11y, links, baseline, html, perf
-//   "prototypeDir": "../prototype"                  // optional: the prototype folder, for preflight and styles
+//   "prototypeDir": "../prototype",                 // optional: the prototype folder, for preflight and styles
+//   "liveUrl": "https://www.client.com",            // optional: the custom domain, for --live
+//   "seo": { "noindexOk": [], "noSchemaOk": [] },   // optional: path regexes wf:seo allows
+//   "parity": { "oldAssets": {} },                  // optional: wf:parity, old asset URL regex -> dist file
+//   "overflow": { "widths": [], "ignore": [] }      // optional: wf:overflow width sweep and selectors to skip
 // }
 //
 // By default staging pages load this repo's local dist/ instead of the

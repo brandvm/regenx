@@ -67,12 +67,48 @@ page that shows an icon of that weight. Commit `src/phosphor.css`,
 A weight other than regular has its own first class: `ph-bold ph-<name>`,
 `ph-fill ph-<name>`, `ph-thin`, `ph-light`, `ph-duotone`.
 
+## Only the icons the site uses (`--subset`)
+
+```bash
+pnpm phosphor --subset                          # regular, icons found in src/** and phosphor.icons
+pnpm phosphor --subset regular bold --icons x,list,caret-down
+pnpm phosphor --subset --from https://<SLUG>.webflow.io   # + every page in its sitemap.xml
+pnpm build
+```
+
+The script collects icon names from `ph-<name>` classes in `src/**`, from
+`phosphor.icons` at the repo root (one name per line, `#` comments), from
+`--icons`, and with `--from` from the class attributes of every page in
+that site's `sitemap.xml` (the page alone when there is none). It keeps
+only those icons' rules in `src/phosphor.css` and cuts each weight's font
+down to their glyphs with `subset-font` (a few hundred bytes per icon
+instead of ~150 KB), inlined into the stylesheet as a data URL: no font
+request, so no invisible-icon moment either. A name that is not a Phosphor
+icon is reported, which catches the typo that otherwise publishes silently.
+
+The trade-off, which is why the full font stays the default:
+
+- **A new icon shows nothing until the script runs again.** Typing
+  `ph ph-house` into an Icon prop draws an empty box on the canvas and on
+  the site until someone re-runs `pnpm phosphor --subset`, builds and
+  pushes. Keep the list in `phosphor.icons` (or re-run with `--from`) so
+  the next run doesn't drop icons that only Webflow names.
+- **The Designer canvas shows only the subset.** Picking icons by trying
+  names on the canvas no longer works; use phosphoricons.com.
+- Every icon is in every page's stylesheet: fine for tens of icons, but
+  past a few hundred the full font (fetched only on pages with an icon) is
+  smaller.
+
+Use it on a site whose icon set is settled, typically before launch.
+`pnpm phosphor` (no `--subset`) goes back to the full font.
+
 ## How it works
 
 - `scripts/phosphor.mjs` downloads, for the pinned version, the stylesheet
   and `.woff2` of each chosen weight and writes `src/phosphor.css` (with
   the `@font-face` reduced to woff2) and `src/phosphor/`. The npm package
-  is not installed: it is about 46 MB.
+  is not installed: it is about 46 MB. `--subset` starts from the same
+  full download every time, so re-running it never loses glyphs.
 - `src/styles.css` imports `phosphor.css` first (an `@import` must come
   before every rule). `build.mjs` copies the fonts to `dist/fonts/` with a
   content hash in the name.

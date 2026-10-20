@@ -9,6 +9,9 @@
 // Lighthouse is fetched by npx on first use (not a dependency of the
 // repo) and runs in the Chromium that Playwright installed.
 // Results are saved to .webflow-build/perf/ for the before/after report.
+// Extra Chrome flags come from WF_PERF_CHROME_FLAGS, e.g. on a network
+// where local runs are slow only there (lessons › loader-release-ci):
+//   WF_PERF_CHROME_FLAGS=--disable-features=HappyEyeballsV3,AsyncDns
 import fs from 'fs';
 import path from 'path';
 import { execFile } from 'child_process';
@@ -37,7 +40,7 @@ const METRICS = [
 const median = (a) => { const s = [...a].sort((x, y) => x - y); const m = s.length >> 1; return s.length % 2 ? s[m] : Math.round(((s[m - 1] + s[m]) / 2) * 1000) / 1000; };
 
 async function once(url, mode) {
-  const a = ['--yes', LIGHTHOUSE, url, '--output=json', '--output-path=stdout', '--quiet', '--only-categories=performance', '--chrome-flags=--headless=new --no-sandbox'];
+  const a = ['--yes', LIGHTHOUSE, url, '--output=json', '--output-path=stdout', '--quiet', '--only-categories=performance', `--chrome-flags=--headless=new --no-sandbox${process.env.WF_PERF_CHROME_FLAGS ? ' ' + process.env.WF_PERF_CHROME_FLAGS : ''}`];
   if (mode === 'desktop') a.push('--preset=desktop');
   const { stdout } = await run('npx', a, { env: { ...process.env, CHROME_PATH: chrome }, maxBuffer: 64 * 1024 * 1024 });
   const lhr = JSON.parse(stdout);

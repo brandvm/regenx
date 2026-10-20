@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node build.mjs --dev",
     "build": "node build.mjs",
-    "check": "tsc --noEmit",
+    "check": "tsc --noEmit && node scripts/check-repo.mjs",
     "test": "pnpm build && playwright test",
     "test:webflow": "pnpm build && node scripts/check-webflow.mjs",
     "update-skills": "node scripts/update-skills.mjs",
@@ -23,13 +23,18 @@
     "wf:preflight": "node .claude/skills/webflow-build/scripts/preflight.mjs",
     "wf:styles": "node .claude/skills/webflow-build/scripts/styles.mjs",
     "wf:html": "node .claude/skills/webflow-build/scripts/html.mjs",
-    "wf:perf": "node .claude/skills/webflow-build/scripts/perf.mjs"
+    "wf:perf": "node .claude/skills/webflow-build/scripts/perf.mjs",
+    "wf:seo": "node .claude/skills/webflow-build/scripts/seo.mjs",
+    "wf:install": "node .claude/skills/webflow-build/scripts/install.mjs",
+    "wf:parity": "node .claude/skills/webflow-build/scripts/parity.mjs",
+    "wf:overflow": "node .claude/skills/webflow-build/scripts/overflow.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",
     "esbuild": "^0.28.2",
     "typescript": "^7.0.2",
-    "axe-core": "4.10.3"
+    "axe-core": "4.10.3",
+    "subset-font": "2.9.0"
   },
   "dependencies": {
     "gsap": "3.15.0",

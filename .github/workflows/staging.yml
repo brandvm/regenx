@@ -1,40 +1,45 @@
 name: staging
 on:
-  push:
-    branches: [master]
+  push: { branches: [master] }
+  pull_request:
   workflow_dispatch:
-permissions: { pages: write, id-token: write, contents: read }
+permissions: { contents: read }
 concurrency:
-  group: github-pages
+  group: staging-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  # Staging only deploys a build that passes the type check and browser tests.
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 22 }
+        with: { node-version: 22, cache: pnpm }
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
       - run: pnpm exec playwright install --with-deps chromium
+      # Builds dist/, then runs the browser checks against it.
       - run: pnpm test
-      - if: failure()
-        uses: actions/upload-artifact@v4
-        with: { name: test-results, path: test-results/playwright, retention-days: 7 }
+      # dist/ is committed for release tags; it must match src/.
+      - name: dist matches src
+        run: |
+          git diff --exit-code -- dist || {
+            echo "::error::dist/ is out of date. Run pnpm build and commit dist/."
+            exit 1
+          }
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with: { name: playwright-report, path: test-results, if-no-files-found: ignore }
+      - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'pull_request'
+        with: { path: dist }
+  # Staging is the client preview AND what the Designer canvas loads, so it
+  # only deploys after the type check, browser tests and dist check pass.
   deploy:
     needs: test
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
+    permissions: { pages: write, id-token: write }
     environment: { name: github-pages }
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: 22 }
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm build
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
-        with: { path: dist }
       - uses: actions/deploy-pages@v4

@@ -9,6 +9,13 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const load = (f) => JSON.parse(fs.readFileSync(path.join(root, 'webflow-snapshot', f), 'utf8'));
+// A snapshot recovered by `pnpm css:published` has guessed names and modes,
+// and that command already wrote the exact CSS: rebuilding it from the
+// guesses would lose rules. Take an MCP snapshot and delete source.json first.
+if (fs.existsSync(path.join(root, 'webflow-snapshot/source.json')) && load('source.json').from === 'published-css' && !process.argv.includes('--force')) {
+  console.error('The snapshot came from the published CSS (webflow-snapshot/source.json), and src/css already holds that CSS exactly.\nRun pnpm css:published again to refresh it, or write the snapshot from the Webflow MCP, delete source.json, then pnpm css. (--force rebuilds from the guessed snapshot anyway.)');
+  process.exit(1);
+}
 const V = load('variables.json');
 const S = load('styles.json');
 const BP = { medium: 991, small: 767, tiny: 479 };
