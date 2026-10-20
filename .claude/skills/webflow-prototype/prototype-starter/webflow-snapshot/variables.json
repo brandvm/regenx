@@ -1,0 +1,1751 @@
+[
+ {
+  "collection": "Colors",
+  "modes": [
+   "Base"
+  ],
+  "variables": [
+   {
+    "name": "Brand/Ink",
+    "type": "Color",
+    "cssName": "--_colors---brand--ink",
+    "values": {
+     "Base": "#111111"
+    }
+   },
+   {
+    "name": "Brand/Paper",
+    "type": "Color",
+    "cssName": "--_colors---brand--paper",
+    "values": {
+     "Base": "#ffffff"
+    }
+   },
+   {
+    "name": "Brand/Accent",
+    "type": "Color",
+    "cssName": "--_colors---brand--accent",
+    "values": {
+     "Base": "#2f5bff"
+    }
+   },
+   {
+    "name": "Ink Tint/Ink 4",
+    "type": "Color",
+    "cssName": "--_colors---ink-tint--ink-4",
+    "values": {
+     "Base": "#1111110a"
+    }
+   },
+   {
+    "name": "Ink Tint/Ink 12",
+    "type": "Color",
+    "cssName": "--_colors---ink-tint--ink-12",
+    "values": {
+     "Base": "#1111111f"
+    }
+   },
+   {
+    "name": "Ink Tint/Ink 24",
+    "type": "Color",
+    "cssName": "--_colors---ink-tint--ink-24",
+    "values": {
+     "Base": "#1111113d"
+    }
+   },
+   {
+    "name": "Ink Tint/Ink 48",
+    "type": "Color",
+    "cssName": "--_colors---ink-tint--ink-48",
+    "values": {
+     "Base": "#1111117a"
+    }
+   },
+   {
+    "name": "Ink Tint/Ink 64",
+    "type": "Color",
+    "cssName": "--_colors---ink-tint--ink-64",
+    "values": {
+     "Base": "#111111a3"
+    }
+   },
+   {
+    "name": "Paper Tint/Paper 12",
+    "type": "Color",
+    "cssName": "--_colors---paper-tint--paper-12",
+    "values": {
+     "Base": "#ffffff1f"
+    }
+   },
+   {
+    "name": "Paper Tint/Paper 24",
+    "type": "Color",
+    "cssName": "--_colors---paper-tint--paper-24",
+    "values": {
+     "Base": "#ffffff3d"
+    }
+   },
+   {
+    "name": "Paper Tint/Paper 48",
+    "type": "Color",
+    "cssName": "--_colors---paper-tint--paper-48",
+    "values": {
+     "Base": "#ffffff7a"
+    }
+   },
+   {
+    "name": "Paper Tint/Paper 64",
+    "type": "Color",
+    "cssName": "--_colors---paper-tint--paper-64",
+    "values": {
+     "Base": "#ffffffa3"
+    }
+   },
+   {
+    "name": "Status/Success",
+    "type": "Color",
+    "cssName": "--_colors---status--success",
+    "values": {
+     "Base": "#1a7f4b"
+    }
+   },
+   {
+    "name": "Status/Warning",
+    "type": "Color",
+    "cssName": "--_colors---status--warning",
+    "values": {
+     "Base": "#b45309"
+    }
+   },
+   {
+    "name": "Status/Error",
+    "type": "Color",
+    "cssName": "--_colors---status--error",
+    "values": {
+     "Base": "#c62828"
+    }
+   },
+   {
+    "name": "Status/Success On Dark",
+    "type": "Color",
+    "cssName": "--_colors---status--success-on-dark",
+    "values": {
+     "Base": "#4ade80"
+    }
+   },
+   {
+    "name": "Status/Warning On Dark",
+    "type": "Color",
+    "cssName": "--_colors---status--warning-on-dark",
+    "values": {
+     "Base": "#fbbf24"
+    }
+   },
+   {
+    "name": "Status/Error On Dark",
+    "type": "Color",
+    "cssName": "--_colors---status--error-on-dark",
+    "values": {
+     "Base": "#f87171"
+    }
+   }
+  ]
+ },
+ {
+  "collection": "Colors Semantic",
+  "modes": [
+   "Base",
+   "Dark"
+  ],
+  "variables": [
+   {
+    "name": "Background/Page",
+    "type": "Color",
+    "cssName": "--_colors-semantic---background--page",
+    "alias": {
+     "Base": "Colors/Brand/Paper",
+     "Dark": "Colors/Brand/Ink"
+    }
+   },
+   {
+    "name": "Background/Surface",
+    "type": "Color",
+    "cssName": "--_colors-semantic---background--surface",
+    "alias": {
+     "Base": "Colors/Ink Tint/Ink 4",
+     "Dark": "Colors/Paper Tint/Paper 12"
+    }
+   },
+   {
+    "name": "Background/Overlay",
+    "type": "Color",
+    "cssName": "--_colors-semantic---background--overlay",
+    "alias": {
+     "Base": "Colors/Ink Tint/Ink 48",
+     "Dark": "Colors/Ink Tint/Ink 64"
+    }
+   },
+   {
+    "name": "Text/Primary",
+    "type": "Color",
+    "cssName": "--_colors-semantic---text--primary",
+    "alias": {
+     "Base": "Colors/Brand/Ink",
+     "Dark": "Colors/Brand/Paper"
+    }
+   },
+   {
+    "name": "Text/Secondary",
+    "type": "Color",
+    "cssName": "--_colors-semantic---text--secondary",
+    "alias": {
+     "Base": "Colors/Ink Tint/Ink 64",
+     "Dark": "Colors/Paper Tint/Paper 64"
+    }
+   },
+   {
+    "name": "Text/Accent",
+    "type": "Color",
+    "cssName": "--_colors-semantic---text--accent",
+    "alias": {
+     "Base": "Colors/Brand/Accent",
+     "Dark": "Colors/Brand/Accent"
+    }
+   },
+   {
+    "name": "Border/Subtle",
+    "type": "Color",
+    "cssName": "--_colors-semantic---border--subtle",
+    "alias": {
+     "Base": "Colors/Ink Tint/Ink 12",
+     "Dark": "Colors/Paper Tint/Paper 12"
+    }
+   },
+   {
+    "name": "Button/Background",
+    "type": "Color",
+    "cssName": "--_colors-semantic---button--background",
+    "alias": {
+     "Base": "Colors/Brand/Ink",
+     "Dark": "Colors/Brand/Paper"
+    }
+   },
+   {
+    "name": "Button/Text",
+    "type": "Color",
+    "cssName": "--_colors-semantic---button--text",
+    "alias": {
+     "Base": "Colors/Brand/Paper",
+     "Dark": "Colors/Brand/Ink"
+    }
+   },
+   {
+    "name": "Button/Background Hover",
+    "type": "Color",
+    "cssName": "--_colors-semantic---button--background-hover",
+    "alias": {
+     "Base": "Colors/Brand/Accent",
+     "Dark": "Colors/Brand/Accent"
+    }
+   },
+   {
+    "name": "Form/Focus",
+    "type": "Color",
+    "cssName": "--_colors-semantic---form--focus",
+    "alias": {
+     "Base": "Colors/Brand/Accent",
+     "Dark": "Colors/Brand/Accent"
+    }
+   },
+   {
+    "name": "Link/Hover",
+    "type": "Color",
+    "cssName": "--_colors-semantic---link--hover",
+    "alias": {
+     "Base": "Colors/Brand/Accent",
+     "Dark": "Colors/Brand/Accent"
+    }
+   },
+   {
+    "name": "Status/Success",
+    "type": "Color",
+    "cssName": "--_colors-semantic---status--success",
+    "alias": {
+     "Base": "Colors/Status/Success",
+     "Dark": "Colors/Status/Success On Dark"
+    }
+   },
+   {
+    "name": "Status/Warning",
+    "type": "Color",
+    "cssName": "--_colors-semantic---status--warning",
+    "alias": {
+     "Base": "Colors/Status/Warning",
+     "Dark": "Colors/Status/Warning On Dark"
+    }
+   },
+   {
+    "name": "Status/Error",
+    "type": "Color",
+    "cssName": "--_colors-semantic---status--error",
+    "alias": {
+     "Base": "Colors/Status/Error",
+     "Dark": "Colors/Status/Error On Dark"
+    }
+   }
+  ]
+ },
+ {
+  "collection": "Typography Scale",
+  "modes": [
+   "Base"
+  ],
+  "variables": [
+   {
+    "name": "Family/Base",
+    "type": "FontFamily",
+    "cssName": "--_typography-scale---family--base",
+    "values": {
+     "Base": "Geist"
+    }
+   },
+   {
+    "name": "Size/12",
+    "type": "Size",
+    "cssName": "--_typography-scale---size--12",
+    "values": {
+     "Base": {
+      "value": 0.75,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "Size/14",
+    "type": "Size",
+    "cssName": "--_typography-scale---size--14",
+    "values": {
+     "Base": {
+      "value": 0.875,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "Size/16",
+    "type": "Size",
+    "cssName": "--_typography-scale---size--16",
+    "values": {
+     "Base": {
+      "value": 1,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "Size/18",
+    "type": "Size",
+    "cssName": "--_typography-scale---size--18",
+    "values": {
+     "Base": {
+      "value": 1.125,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "Size/20",
+    "type": "Size",
+    "cssName": "--_typography-scale---size--20",
+    "values": {
+     "Base": {
+      "value": 1.25,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "Size/24",
+    "type": "Size",
+    "cssName": "--_typography-scale---size--24",
+    "values": {
+     "Base": {
+      "value": 1.5,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "Size/32",
+    "type": "Size",
+    "cssName": "--_typography-scale---size--32",
+    "values": {
+     "Base": {
+      "value": 2,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "Size/40",
+    "type": "Size",
+    "cssName": "--_typography-scale---size--40",
+    "values": {
+     "Base": {
+      "value": 2.5,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "Size/48",
+    "type": "Size",
+    "cssName": "--_typography-scale---size--48",
+    "values": {
+     "Base": {
+      "value": 3,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "Size/64",
+    "type": "Size",
+    "cssName": "--_typography-scale---size--64",
+    "values": {
+     "Base": {
+      "value": 4,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "Size/80",
+    "type": "Size",
+    "cssName": "--_typography-scale---size--80",
+    "values": {
+     "Base": {
+      "value": 5,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "Size/96",
+    "type": "Size",
+    "cssName": "--_typography-scale---size--96",
+    "values": {
+     "Base": {
+      "value": 6,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "Weight/Thin",
+    "type": "Number",
+    "cssName": "--_typography-scale---weight--thin",
+    "values": {
+     "Base": 100
+    }
+   },
+   {
+    "name": "Weight/Extra Light",
+    "type": "Number",
+    "cssName": "--_typography-scale---weight--extra-light",
+    "values": {
+     "Base": 200
+    }
+   },
+   {
+    "name": "Weight/Light",
+    "type": "Number",
+    "cssName": "--_typography-scale---weight--light",
+    "values": {
+     "Base": 300
+    }
+   },
+   {
+    "name": "Weight/Regular",
+    "type": "Number",
+    "cssName": "--_typography-scale---weight--regular",
+    "values": {
+     "Base": 400
+    }
+   },
+   {
+    "name": "Weight/Medium",
+    "type": "Number",
+    "cssName": "--_typography-scale---weight--medium",
+    "values": {
+     "Base": 500
+    }
+   },
+   {
+    "name": "Weight/Semibold",
+    "type": "Number",
+    "cssName": "--_typography-scale---weight--semibold",
+    "values": {
+     "Base": 600
+    }
+   },
+   {
+    "name": "Weight/Bold",
+    "type": "Number",
+    "cssName": "--_typography-scale---weight--bold",
+    "values": {
+     "Base": 700
+    }
+   },
+   {
+    "name": "Weight/Extra Bold",
+    "type": "Number",
+    "cssName": "--_typography-scale---weight--extra-bold",
+    "values": {
+     "Base": 800
+    }
+   },
+   {
+    "name": "Weight/Black",
+    "type": "Number",
+    "cssName": "--_typography-scale---weight--black",
+    "values": {
+     "Base": 900
+    }
+   },
+   {
+    "name": "Line Height/Tight",
+    "type": "Number",
+    "cssName": "--_typography-scale---line-height--tight",
+    "values": {
+     "Base": 1.1
+    }
+   },
+   {
+    "name": "Line Height/Snug",
+    "type": "Number",
+    "cssName": "--_typography-scale---line-height--snug",
+    "values": {
+     "Base": 1.25
+    }
+   },
+   {
+    "name": "Line Height/Normal",
+    "type": "Number",
+    "cssName": "--_typography-scale---line-height--normal",
+    "values": {
+     "Base": 1.5
+    }
+   },
+   {
+    "name": "Letter Spacing/Tight",
+    "type": "Size",
+    "cssName": "--_typography-scale---letter-spacing--tight",
+    "values": {
+     "Base": {
+      "value": -0.02,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "Letter Spacing/Normal",
+    "type": "Size",
+    "cssName": "--_typography-scale---letter-spacing--normal",
+    "values": {
+     "Base": {
+      "value": 0,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "Letter Spacing/Wide",
+    "type": "Size",
+    "cssName": "--_typography-scale---letter-spacing--wide",
+    "values": {
+     "Base": {
+      "value": 0.08,
+      "unit": "em"
+     }
+    }
+   }
+  ]
+ },
+ {
+  "collection": "Typography Role",
+  "modes": [
+   "Base",
+   "Tablet",
+   "Mobile Landscape",
+   "Mobile"
+  ],
+  "variables": [
+   {
+    "name": "Family/Display",
+    "type": "FontFamily",
+    "cssName": "--_typography-role---family--display",
+    "alias": {
+     "Base": "Typography Scale/Family/Base",
+     "Tablet": "Typography Scale/Family/Base",
+     "Mobile Landscape": "Typography Scale/Family/Base",
+     "Mobile": "Typography Scale/Family/Base"
+    }
+   },
+   {
+    "name": "Family/H1",
+    "type": "FontFamily",
+    "cssName": "--_typography-role---family--h1",
+    "alias": {
+     "Base": "Typography Scale/Family/Base",
+     "Tablet": "Typography Scale/Family/Base",
+     "Mobile Landscape": "Typography Scale/Family/Base",
+     "Mobile": "Typography Scale/Family/Base"
+    }
+   },
+   {
+    "name": "Family/H2",
+    "type": "FontFamily",
+    "cssName": "--_typography-role---family--h2",
+    "alias": {
+     "Base": "Typography Scale/Family/Base",
+     "Tablet": "Typography Scale/Family/Base",
+     "Mobile Landscape": "Typography Scale/Family/Base",
+     "Mobile": "Typography Scale/Family/Base"
+    }
+   },
+   {
+    "name": "Family/H3",
+    "type": "FontFamily",
+    "cssName": "--_typography-role---family--h3",
+    "alias": {
+     "Base": "Typography Scale/Family/Base",
+     "Tablet": "Typography Scale/Family/Base",
+     "Mobile Landscape": "Typography Scale/Family/Base",
+     "Mobile": "Typography Scale/Family/Base"
+    }
+   },
+   {
+    "name": "Family/H4",
+    "type": "FontFamily",
+    "cssName": "--_typography-role---family--h4",
+    "alias": {
+     "Base": "Typography Scale/Family/Base",
+     "Tablet": "Typography Scale/Family/Base",
+     "Mobile Landscape": "Typography Scale/Family/Base",
+     "Mobile": "Typography Scale/Family/Base"
+    }
+   },
+   {
+    "name": "Family/H5",
+    "type": "FontFamily",
+    "cssName": "--_typography-role---family--h5",
+    "alias": {
+     "Base": "Typography Scale/Family/Base",
+     "Tablet": "Typography Scale/Family/Base",
+     "Mobile Landscape": "Typography Scale/Family/Base",
+     "Mobile": "Typography Scale/Family/Base"
+    }
+   },
+   {
+    "name": "Family/H6",
+    "type": "FontFamily",
+    "cssName": "--_typography-role---family--h6",
+    "alias": {
+     "Base": "Typography Scale/Family/Base",
+     "Tablet": "Typography Scale/Family/Base",
+     "Mobile Landscape": "Typography Scale/Family/Base",
+     "Mobile": "Typography Scale/Family/Base"
+    }
+   },
+   {
+    "name": "Family/Body",
+    "type": "FontFamily",
+    "cssName": "--_typography-role---family--body",
+    "alias": {
+     "Base": "Typography Scale/Family/Base",
+     "Tablet": "Typography Scale/Family/Base",
+     "Mobile Landscape": "Typography Scale/Family/Base",
+     "Mobile": "Typography Scale/Family/Base"
+    }
+   },
+   {
+    "name": "Family/Body Large",
+    "type": "FontFamily",
+    "cssName": "--_typography-role---family--body-large",
+    "alias": {
+     "Base": "Typography Scale/Family/Base",
+     "Tablet": "Typography Scale/Family/Base",
+     "Mobile Landscape": "Typography Scale/Family/Base",
+     "Mobile": "Typography Scale/Family/Base"
+    }
+   },
+   {
+    "name": "Family/Body Small",
+    "type": "FontFamily",
+    "cssName": "--_typography-role---family--body-small",
+    "alias": {
+     "Base": "Typography Scale/Family/Base",
+     "Tablet": "Typography Scale/Family/Base",
+     "Mobile Landscape": "Typography Scale/Family/Base",
+     "Mobile": "Typography Scale/Family/Base"
+    }
+   },
+   {
+    "name": "Family/Label",
+    "type": "FontFamily",
+    "cssName": "--_typography-role---family--label",
+    "alias": {
+     "Base": "Typography Scale/Family/Base",
+     "Tablet": "Typography Scale/Family/Base",
+     "Mobile Landscape": "Typography Scale/Family/Base",
+     "Mobile": "Typography Scale/Family/Base"
+    }
+   },
+   {
+    "name": "Family/Button",
+    "type": "FontFamily",
+    "cssName": "--_typography-role---family--button",
+    "alias": {
+     "Base": "Typography Scale/Family/Base",
+     "Tablet": "Typography Scale/Family/Base",
+     "Mobile Landscape": "Typography Scale/Family/Base",
+     "Mobile": "Typography Scale/Family/Base"
+    }
+   },
+   {
+    "name": "Size/Display",
+    "type": "Size",
+    "cssName": "--_typography-role---size--display",
+    "alias": {
+     "Base": "Typography Scale/Size/96",
+     "Tablet": "Typography Scale/Size/80",
+     "Mobile Landscape": "Typography Scale/Size/64",
+     "Mobile": "Typography Scale/Size/48"
+    }
+   },
+   {
+    "name": "Size/H1",
+    "type": "Size",
+    "cssName": "--_typography-role---size--h1",
+    "alias": {
+     "Base": "Typography Scale/Size/80",
+     "Tablet": "Typography Scale/Size/64",
+     "Mobile Landscape": "Typography Scale/Size/48",
+     "Mobile": "Typography Scale/Size/40"
+    }
+   },
+   {
+    "name": "Size/H2",
+    "type": "Size",
+    "cssName": "--_typography-role---size--h2",
+    "alias": {
+     "Base": "Typography Scale/Size/64",
+     "Tablet": "Typography Scale/Size/48",
+     "Mobile Landscape": "Typography Scale/Size/40",
+     "Mobile": "Typography Scale/Size/32"
+    }
+   },
+   {
+    "name": "Size/H3",
+    "type": "Size",
+    "cssName": "--_typography-role---size--h3",
+    "alias": {
+     "Base": "Typography Scale/Size/48",
+     "Tablet": "Typography Scale/Size/40",
+     "Mobile Landscape": "Typography Scale/Size/32",
+     "Mobile": "Typography Scale/Size/24"
+    }
+   },
+   {
+    "name": "Size/H4",
+    "type": "Size",
+    "cssName": "--_typography-role---size--h4",
+    "alias": {
+     "Base": "Typography Scale/Size/32",
+     "Tablet": "Typography Scale/Size/24",
+     "Mobile Landscape": "Typography Scale/Size/24",
+     "Mobile": "Typography Scale/Size/20"
+    }
+   },
+   {
+    "name": "Size/H5",
+    "type": "Size",
+    "cssName": "--_typography-role---size--h5",
+    "alias": {
+     "Base": "Typography Scale/Size/24",
+     "Tablet": "Typography Scale/Size/20",
+     "Mobile Landscape": "Typography Scale/Size/20",
+     "Mobile": "Typography Scale/Size/18"
+    }
+   },
+   {
+    "name": "Size/H6",
+    "type": "Size",
+    "cssName": "--_typography-role---size--h6",
+    "alias": {
+     "Base": "Typography Scale/Size/20",
+     "Tablet": "Typography Scale/Size/18",
+     "Mobile Landscape": "Typography Scale/Size/18",
+     "Mobile": "Typography Scale/Size/16"
+    }
+   },
+   {
+    "name": "Size/Body",
+    "type": "Size",
+    "cssName": "--_typography-role---size--body",
+    "alias": {
+     "Base": "Typography Scale/Size/16",
+     "Tablet": "Typography Scale/Size/16",
+     "Mobile Landscape": "Typography Scale/Size/16",
+     "Mobile": "Typography Scale/Size/16"
+    }
+   },
+   {
+    "name": "Size/Body Large",
+    "type": "Size",
+    "cssName": "--_typography-role---size--body-large",
+    "alias": {
+     "Base": "Typography Scale/Size/20",
+     "Tablet": "Typography Scale/Size/18",
+     "Mobile Landscape": "Typography Scale/Size/18",
+     "Mobile": "Typography Scale/Size/18"
+    }
+   },
+   {
+    "name": "Size/Body Small",
+    "type": "Size",
+    "cssName": "--_typography-role---size--body-small",
+    "alias": {
+     "Base": "Typography Scale/Size/14",
+     "Tablet": "Typography Scale/Size/14",
+     "Mobile Landscape": "Typography Scale/Size/14",
+     "Mobile": "Typography Scale/Size/14"
+    }
+   },
+   {
+    "name": "Size/Label",
+    "type": "Size",
+    "cssName": "--_typography-role---size--label",
+    "alias": {
+     "Base": "Typography Scale/Size/12",
+     "Tablet": "Typography Scale/Size/12",
+     "Mobile Landscape": "Typography Scale/Size/12",
+     "Mobile": "Typography Scale/Size/12"
+    }
+   },
+   {
+    "name": "Size/Button",
+    "type": "Size",
+    "cssName": "--_typography-role---size--button",
+    "alias": {
+     "Base": "Typography Scale/Size/16",
+     "Tablet": "Typography Scale/Size/16",
+     "Mobile Landscape": "Typography Scale/Size/16",
+     "Mobile": "Typography Scale/Size/16"
+    }
+   },
+   {
+    "name": "Weight/Display",
+    "type": "Number",
+    "cssName": "--_typography-role---weight--display",
+    "alias": {
+     "Base": "Typography Scale/Weight/Bold",
+     "Tablet": "Typography Scale/Weight/Bold",
+     "Mobile Landscape": "Typography Scale/Weight/Bold",
+     "Mobile": "Typography Scale/Weight/Bold"
+    }
+   },
+   {
+    "name": "Weight/H1",
+    "type": "Number",
+    "cssName": "--_typography-role---weight--h1",
+    "alias": {
+     "Base": "Typography Scale/Weight/Bold",
+     "Tablet": "Typography Scale/Weight/Bold",
+     "Mobile Landscape": "Typography Scale/Weight/Bold",
+     "Mobile": "Typography Scale/Weight/Bold"
+    }
+   },
+   {
+    "name": "Weight/H2",
+    "type": "Number",
+    "cssName": "--_typography-role---weight--h2",
+    "alias": {
+     "Base": "Typography Scale/Weight/Bold",
+     "Tablet": "Typography Scale/Weight/Bold",
+     "Mobile Landscape": "Typography Scale/Weight/Bold",
+     "Mobile": "Typography Scale/Weight/Bold"
+    }
+   },
+   {
+    "name": "Weight/H3",
+    "type": "Number",
+    "cssName": "--_typography-role---weight--h3",
+    "alias": {
+     "Base": "Typography Scale/Weight/Medium",
+     "Tablet": "Typography Scale/Weight/Medium",
+     "Mobile Landscape": "Typography Scale/Weight/Medium",
+     "Mobile": "Typography Scale/Weight/Medium"
+    }
+   },
+   {
+    "name": "Weight/H4",
+    "type": "Number",
+    "cssName": "--_typography-role---weight--h4",
+    "alias": {
+     "Base": "Typography Scale/Weight/Medium",
+     "Tablet": "Typography Scale/Weight/Medium",
+     "Mobile Landscape": "Typography Scale/Weight/Medium",
+     "Mobile": "Typography Scale/Weight/Medium"
+    }
+   },
+   {
+    "name": "Weight/H5",
+    "type": "Number",
+    "cssName": "--_typography-role---weight--h5",
+    "alias": {
+     "Base": "Typography Scale/Weight/Medium",
+     "Tablet": "Typography Scale/Weight/Medium",
+     "Mobile Landscape": "Typography Scale/Weight/Medium",
+     "Mobile": "Typography Scale/Weight/Medium"
+    }
+   },
+   {
+    "name": "Weight/H6",
+    "type": "Number",
+    "cssName": "--_typography-role---weight--h6",
+    "alias": {
+     "Base": "Typography Scale/Weight/Medium",
+     "Tablet": "Typography Scale/Weight/Medium",
+     "Mobile Landscape": "Typography Scale/Weight/Medium",
+     "Mobile": "Typography Scale/Weight/Medium"
+    }
+   },
+   {
+    "name": "Weight/Body",
+    "type": "Number",
+    "cssName": "--_typography-role---weight--body",
+    "alias": {
+     "Base": "Typography Scale/Weight/Regular",
+     "Tablet": "Typography Scale/Weight/Regular",
+     "Mobile Landscape": "Typography Scale/Weight/Regular",
+     "Mobile": "Typography Scale/Weight/Regular"
+    }
+   },
+   {
+    "name": "Weight/Body Large",
+    "type": "Number",
+    "cssName": "--_typography-role---weight--body-large",
+    "alias": {
+     "Base": "Typography Scale/Weight/Regular",
+     "Tablet": "Typography Scale/Weight/Regular",
+     "Mobile Landscape": "Typography Scale/Weight/Regular",
+     "Mobile": "Typography Scale/Weight/Regular"
+    }
+   },
+   {
+    "name": "Weight/Body Small",
+    "type": "Number",
+    "cssName": "--_typography-role---weight--body-small",
+    "alias": {
+     "Base": "Typography Scale/Weight/Regular",
+     "Tablet": "Typography Scale/Weight/Regular",
+     "Mobile Landscape": "Typography Scale/Weight/Regular",
+     "Mobile": "Typography Scale/Weight/Regular"
+    }
+   },
+   {
+    "name": "Weight/Label",
+    "type": "Number",
+    "cssName": "--_typography-role---weight--label",
+    "alias": {
+     "Base": "Typography Scale/Weight/Medium",
+     "Tablet": "Typography Scale/Weight/Medium",
+     "Mobile Landscape": "Typography Scale/Weight/Medium",
+     "Mobile": "Typography Scale/Weight/Medium"
+    }
+   },
+   {
+    "name": "Weight/Button",
+    "type": "Number",
+    "cssName": "--_typography-role---weight--button",
+    "alias": {
+     "Base": "Typography Scale/Weight/Medium",
+     "Tablet": "Typography Scale/Weight/Medium",
+     "Mobile Landscape": "Typography Scale/Weight/Medium",
+     "Mobile": "Typography Scale/Weight/Medium"
+    }
+   },
+   {
+    "name": "Line Height/Display",
+    "type": "Number",
+    "cssName": "--_typography-role---line-height--display",
+    "alias": {
+     "Base": "Typography Scale/Line Height/Tight",
+     "Tablet": "Typography Scale/Line Height/Tight",
+     "Mobile Landscape": "Typography Scale/Line Height/Tight",
+     "Mobile": "Typography Scale/Line Height/Tight"
+    }
+   },
+   {
+    "name": "Line Height/H1",
+    "type": "Number",
+    "cssName": "--_typography-role---line-height--h1",
+    "alias": {
+     "Base": "Typography Scale/Line Height/Tight",
+     "Tablet": "Typography Scale/Line Height/Tight",
+     "Mobile Landscape": "Typography Scale/Line Height/Tight",
+     "Mobile": "Typography Scale/Line Height/Tight"
+    }
+   },
+   {
+    "name": "Line Height/H2",
+    "type": "Number",
+    "cssName": "--_typography-role---line-height--h2",
+    "alias": {
+     "Base": "Typography Scale/Line Height/Tight",
+     "Tablet": "Typography Scale/Line Height/Tight",
+     "Mobile Landscape": "Typography Scale/Line Height/Tight",
+     "Mobile": "Typography Scale/Line Height/Tight"
+    }
+   },
+   {
+    "name": "Line Height/H3",
+    "type": "Number",
+    "cssName": "--_typography-role---line-height--h3",
+    "alias": {
+     "Base": "Typography Scale/Line Height/Snug",
+     "Tablet": "Typography Scale/Line Height/Snug",
+     "Mobile Landscape": "Typography Scale/Line Height/Snug",
+     "Mobile": "Typography Scale/Line Height/Snug"
+    }
+   },
+   {
+    "name": "Line Height/H4",
+    "type": "Number",
+    "cssName": "--_typography-role---line-height--h4",
+    "alias": {
+     "Base": "Typography Scale/Line Height/Snug",
+     "Tablet": "Typography Scale/Line Height/Snug",
+     "Mobile Landscape": "Typography Scale/Line Height/Snug",
+     "Mobile": "Typography Scale/Line Height/Snug"
+    }
+   },
+   {
+    "name": "Line Height/H5",
+    "type": "Number",
+    "cssName": "--_typography-role---line-height--h5",
+    "alias": {
+     "Base": "Typography Scale/Line Height/Snug",
+     "Tablet": "Typography Scale/Line Height/Snug",
+     "Mobile Landscape": "Typography Scale/Line Height/Snug",
+     "Mobile": "Typography Scale/Line Height/Snug"
+    }
+   },
+   {
+    "name": "Line Height/H6",
+    "type": "Number",
+    "cssName": "--_typography-role---line-height--h6",
+    "alias": {
+     "Base": "Typography Scale/Line Height/Snug",
+     "Tablet": "Typography Scale/Line Height/Snug",
+     "Mobile Landscape": "Typography Scale/Line Height/Snug",
+     "Mobile": "Typography Scale/Line Height/Snug"
+    }
+   },
+   {
+    "name": "Line Height/Body",
+    "type": "Number",
+    "cssName": "--_typography-role---line-height--body",
+    "alias": {
+     "Base": "Typography Scale/Line Height/Normal",
+     "Tablet": "Typography Scale/Line Height/Normal",
+     "Mobile Landscape": "Typography Scale/Line Height/Normal",
+     "Mobile": "Typography Scale/Line Height/Normal"
+    }
+   },
+   {
+    "name": "Line Height/Body Large",
+    "type": "Number",
+    "cssName": "--_typography-role---line-height--body-large",
+    "alias": {
+     "Base": "Typography Scale/Line Height/Normal",
+     "Tablet": "Typography Scale/Line Height/Normal",
+     "Mobile Landscape": "Typography Scale/Line Height/Normal",
+     "Mobile": "Typography Scale/Line Height/Normal"
+    }
+   },
+   {
+    "name": "Line Height/Body Small",
+    "type": "Number",
+    "cssName": "--_typography-role---line-height--body-small",
+    "alias": {
+     "Base": "Typography Scale/Line Height/Normal",
+     "Tablet": "Typography Scale/Line Height/Normal",
+     "Mobile Landscape": "Typography Scale/Line Height/Normal",
+     "Mobile": "Typography Scale/Line Height/Normal"
+    }
+   },
+   {
+    "name": "Line Height/Label",
+    "type": "Number",
+    "cssName": "--_typography-role---line-height--label",
+    "alias": {
+     "Base": "Typography Scale/Line Height/Snug",
+     "Tablet": "Typography Scale/Line Height/Snug",
+     "Mobile Landscape": "Typography Scale/Line Height/Snug",
+     "Mobile": "Typography Scale/Line Height/Snug"
+    }
+   },
+   {
+    "name": "Line Height/Button",
+    "type": "Number",
+    "cssName": "--_typography-role---line-height--button",
+    "alias": {
+     "Base": "Typography Scale/Line Height/Snug",
+     "Tablet": "Typography Scale/Line Height/Snug",
+     "Mobile Landscape": "Typography Scale/Line Height/Snug",
+     "Mobile": "Typography Scale/Line Height/Snug"
+    }
+   },
+   {
+    "name": "Letter Spacing/Display",
+    "type": "Size",
+    "cssName": "--_typography-role---letter-spacing--display",
+    "alias": {
+     "Base": "Typography Scale/Letter Spacing/Tight",
+     "Tablet": "Typography Scale/Letter Spacing/Tight",
+     "Mobile Landscape": "Typography Scale/Letter Spacing/Tight",
+     "Mobile": "Typography Scale/Letter Spacing/Tight"
+    }
+   },
+   {
+    "name": "Letter Spacing/H1",
+    "type": "Size",
+    "cssName": "--_typography-role---letter-spacing--h1",
+    "alias": {
+     "Base": "Typography Scale/Letter Spacing/Tight",
+     "Tablet": "Typography Scale/Letter Spacing/Tight",
+     "Mobile Landscape": "Typography Scale/Letter Spacing/Tight",
+     "Mobile": "Typography Scale/Letter Spacing/Tight"
+    }
+   },
+   {
+    "name": "Letter Spacing/H2",
+    "type": "Size",
+    "cssName": "--_typography-role---letter-spacing--h2",
+    "alias": {
+     "Base": "Typography Scale/Letter Spacing/Tight",
+     "Tablet": "Typography Scale/Letter Spacing/Tight",
+     "Mobile Landscape": "Typography Scale/Letter Spacing/Tight",
+     "Mobile": "Typography Scale/Letter Spacing/Tight"
+    }
+   },
+   {
+    "name": "Letter Spacing/H3",
+    "type": "Size",
+    "cssName": "--_typography-role---letter-spacing--h3",
+    "alias": {
+     "Base": "Typography Scale/Letter Spacing/Normal",
+     "Tablet": "Typography Scale/Letter Spacing/Normal",
+     "Mobile Landscape": "Typography Scale/Letter Spacing/Normal",
+     "Mobile": "Typography Scale/Letter Spacing/Normal"
+    }
+   },
+   {
+    "name": "Letter Spacing/H4",
+    "type": "Size",
+    "cssName": "--_typography-role---letter-spacing--h4",
+    "alias": {
+     "Base": "Typography Scale/Letter Spacing/Normal",
+     "Tablet": "Typography Scale/Letter Spacing/Normal",
+     "Mobile Landscape": "Typography Scale/Letter Spacing/Normal",
+     "Mobile": "Typography Scale/Letter Spacing/Normal"
+    }
+   },
+   {
+    "name": "Letter Spacing/H5",
+    "type": "Size",
+    "cssName": "--_typography-role---letter-spacing--h5",
+    "alias": {
+     "Base": "Typography Scale/Letter Spacing/Normal",
+     "Tablet": "Typography Scale/Letter Spacing/Normal",
+     "Mobile Landscape": "Typography Scale/Letter Spacing/Normal",
+     "Mobile": "Typography Scale/Letter Spacing/Normal"
+    }
+   },
+   {
+    "name": "Letter Spacing/H6",
+    "type": "Size",
+    "cssName": "--_typography-role---letter-spacing--h6",
+    "alias": {
+     "Base": "Typography Scale/Letter Spacing/Normal",
+     "Tablet": "Typography Scale/Letter Spacing/Normal",
+     "Mobile Landscape": "Typography Scale/Letter Spacing/Normal",
+     "Mobile": "Typography Scale/Letter Spacing/Normal"
+    }
+   },
+   {
+    "name": "Letter Spacing/Body",
+    "type": "Size",
+    "cssName": "--_typography-role---letter-spacing--body",
+    "alias": {
+     "Base": "Typography Scale/Letter Spacing/Normal",
+     "Tablet": "Typography Scale/Letter Spacing/Normal",
+     "Mobile Landscape": "Typography Scale/Letter Spacing/Normal",
+     "Mobile": "Typography Scale/Letter Spacing/Normal"
+    }
+   },
+   {
+    "name": "Letter Spacing/Body Large",
+    "type": "Size",
+    "cssName": "--_typography-role---letter-spacing--body-large",
+    "alias": {
+     "Base": "Typography Scale/Letter Spacing/Normal",
+     "Tablet": "Typography Scale/Letter Spacing/Normal",
+     "Mobile Landscape": "Typography Scale/Letter Spacing/Normal",
+     "Mobile": "Typography Scale/Letter Spacing/Normal"
+    }
+   },
+   {
+    "name": "Letter Spacing/Body Small",
+    "type": "Size",
+    "cssName": "--_typography-role---letter-spacing--body-small",
+    "alias": {
+     "Base": "Typography Scale/Letter Spacing/Normal",
+     "Tablet": "Typography Scale/Letter Spacing/Normal",
+     "Mobile Landscape": "Typography Scale/Letter Spacing/Normal",
+     "Mobile": "Typography Scale/Letter Spacing/Normal"
+    }
+   },
+   {
+    "name": "Letter Spacing/Label",
+    "type": "Size",
+    "cssName": "--_typography-role---letter-spacing--label",
+    "alias": {
+     "Base": "Typography Scale/Letter Spacing/Wide",
+     "Tablet": "Typography Scale/Letter Spacing/Wide",
+     "Mobile Landscape": "Typography Scale/Letter Spacing/Wide",
+     "Mobile": "Typography Scale/Letter Spacing/Wide"
+    }
+   },
+   {
+    "name": "Letter Spacing/Button",
+    "type": "Size",
+    "cssName": "--_typography-role---letter-spacing--button",
+    "alias": {
+     "Base": "Typography Scale/Letter Spacing/Normal",
+     "Tablet": "Typography Scale/Letter Spacing/Normal",
+     "Mobile Landscape": "Typography Scale/Letter Spacing/Normal",
+     "Mobile": "Typography Scale/Letter Spacing/Normal"
+    }
+   }
+  ],
+  "breakpointModes": {
+   "medium": "Tablet",
+   "small": "Mobile Landscape",
+   "tiny": "Mobile"
+  }
+ },
+ {
+  "collection": "Typography Styles",
+  "modes": [
+   "Base",
+   "Display",
+   "H1",
+   "H2",
+   "H3",
+   "H4",
+   "H5",
+   "H6",
+   "Body Large",
+   "Body Small",
+   "Label",
+   "Button"
+  ],
+  "variables": [
+   {
+    "name": "Family",
+    "type": "FontFamily",
+    "cssName": "--_typography-styles---family",
+    "alias": {
+     "Base": "Typography Role/Family/Body",
+     "Display": "Typography Role/Family/Display",
+     "H1": "Typography Role/Family/H1",
+     "H2": "Typography Role/Family/H2",
+     "H3": "Typography Role/Family/H3",
+     "H4": "Typography Role/Family/H4",
+     "H5": "Typography Role/Family/H5",
+     "H6": "Typography Role/Family/H6",
+     "Body Large": "Typography Role/Family/Body Large",
+     "Body Small": "Typography Role/Family/Body Small",
+     "Label": "Typography Role/Family/Label",
+     "Button": "Typography Role/Family/Button"
+    }
+   },
+   {
+    "name": "Size",
+    "type": "Size",
+    "cssName": "--_typography-styles---size",
+    "alias": {
+     "Base": "Typography Role/Size/Body",
+     "Display": "Typography Role/Size/Display",
+     "H1": "Typography Role/Size/H1",
+     "H2": "Typography Role/Size/H2",
+     "H3": "Typography Role/Size/H3",
+     "H4": "Typography Role/Size/H4",
+     "H5": "Typography Role/Size/H5",
+     "H6": "Typography Role/Size/H6",
+     "Body Large": "Typography Role/Size/Body Large",
+     "Body Small": "Typography Role/Size/Body Small",
+     "Label": "Typography Role/Size/Label",
+     "Button": "Typography Role/Size/Button"
+    }
+   },
+   {
+    "name": "Weight",
+    "type": "Number",
+    "cssName": "--_typography-styles---weight",
+    "alias": {
+     "Base": "Typography Role/Weight/Body",
+     "Display": "Typography Role/Weight/Display",
+     "H1": "Typography Role/Weight/H1",
+     "H2": "Typography Role/Weight/H2",
+     "H3": "Typography Role/Weight/H3",
+     "H4": "Typography Role/Weight/H4",
+     "H5": "Typography Role/Weight/H5",
+     "H6": "Typography Role/Weight/H6",
+     "Body Large": "Typography Role/Weight/Body Large",
+     "Body Small": "Typography Role/Weight/Body Small",
+     "Label": "Typography Role/Weight/Label",
+     "Button": "Typography Role/Weight/Button"
+    }
+   },
+   {
+    "name": "Line Height",
+    "type": "Number",
+    "cssName": "--_typography-styles---line-height",
+    "alias": {
+     "Base": "Typography Role/Line Height/Body",
+     "Display": "Typography Role/Line Height/Display",
+     "H1": "Typography Role/Line Height/H1",
+     "H2": "Typography Role/Line Height/H2",
+     "H3": "Typography Role/Line Height/H3",
+     "H4": "Typography Role/Line Height/H4",
+     "H5": "Typography Role/Line Height/H5",
+     "H6": "Typography Role/Line Height/H6",
+     "Body Large": "Typography Role/Line Height/Body Large",
+     "Body Small": "Typography Role/Line Height/Body Small",
+     "Label": "Typography Role/Line Height/Label",
+     "Button": "Typography Role/Line Height/Button"
+    }
+   },
+   {
+    "name": "Letter Spacing",
+    "type": "Size",
+    "cssName": "--_typography-styles---letter-spacing",
+    "alias": {
+     "Base": "Typography Role/Letter Spacing/Body",
+     "Display": "Typography Role/Letter Spacing/Display",
+     "H1": "Typography Role/Letter Spacing/H1",
+     "H2": "Typography Role/Letter Spacing/H2",
+     "H3": "Typography Role/Letter Spacing/H3",
+     "H4": "Typography Role/Letter Spacing/H4",
+     "H5": "Typography Role/Letter Spacing/H5",
+     "H6": "Typography Role/Letter Spacing/H6",
+     "Body Large": "Typography Role/Letter Spacing/Body Large",
+     "Body Small": "Typography Role/Letter Spacing/Body Small",
+     "Label": "Typography Role/Letter Spacing/Label",
+     "Button": "Typography Role/Letter Spacing/Button"
+    }
+   }
+  ]
+ },
+ {
+  "collection": "Layout",
+  "modes": [
+   "Base",
+   "Tablet",
+   "Mobile Landscape",
+   "Mobile"
+  ],
+  "variables": [
+   {
+    "name": "Section/Padding V",
+    "type": "Size",
+    "cssName": "--_layout---section--padding-v",
+    "values": {
+     "Base": {
+      "value": 8,
+      "unit": "em"
+     },
+     "Tablet": {
+      "value": 6,
+      "unit": "em"
+     },
+     "Mobile Landscape": {
+      "value": 5,
+      "unit": "em"
+     },
+     "Mobile": {
+      "value": 4,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "Section/Padding H",
+    "type": "Size",
+    "cssName": "--_layout---section--padding-h",
+    "values": {
+     "Base": {
+      "value": 4,
+      "unit": "em"
+     },
+     "Tablet": {
+      "value": 3,
+      "unit": "em"
+     },
+     "Mobile Landscape": {
+      "value": 2,
+      "unit": "em"
+     },
+     "Mobile": {
+      "value": 1.25,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "Container/Max Width",
+    "type": "Size",
+    "cssName": "--_layout---container--max-width",
+    "values": {
+     "Base": {
+      "value": 90,
+      "unit": "em"
+     },
+     "Tablet": {
+      "value": 90,
+      "unit": "em"
+     },
+     "Mobile Landscape": {
+      "value": 90,
+      "unit": "em"
+     },
+     "Mobile": {
+      "value": 90,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "Content/Gap",
+    "type": "Size",
+    "cssName": "--_layout---content--gap",
+    "values": {
+     "Base": {
+      "value": 3,
+      "unit": "em"
+     },
+     "Tablet": {
+      "value": 2.5,
+      "unit": "em"
+     },
+     "Mobile Landscape": {
+      "value": 2,
+      "unit": "em"
+     },
+     "Mobile": {
+      "value": 1.5,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "Nav/Height",
+    "type": "Size",
+    "cssName": "--_layout---nav--height",
+    "values": {
+     "Base": {
+      "value": 5,
+      "unit": "em"
+     },
+     "Tablet": {
+      "value": 4.5,
+      "unit": "em"
+     },
+     "Mobile Landscape": {
+      "value": 4,
+      "unit": "em"
+     },
+     "Mobile": {
+      "value": 4,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "Nav/Padding H",
+    "type": "Size",
+    "cssName": "--_layout---nav--padding-h",
+    "values": {
+     "Base": {
+      "value": 4,
+      "unit": "em"
+     },
+     "Tablet": {
+      "value": 3,
+      "unit": "em"
+     },
+     "Mobile Landscape": {
+      "value": 2,
+      "unit": "em"
+     },
+     "Mobile": {
+      "value": 1.25,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "Button/Height",
+    "type": "Size",
+    "cssName": "--_layout---button--height",
+    "values": {
+     "Base": {
+      "value": 3,
+      "unit": "em"
+     },
+     "Tablet": {
+      "value": 3,
+      "unit": "em"
+     },
+     "Mobile Landscape": {
+      "value": 3,
+      "unit": "em"
+     },
+     "Mobile": {
+      "value": 3,
+      "unit": "em"
+     }
+    }
+   }
+  ]
+ },
+ {
+  "collection": "Spacing",
+  "modes": [
+   "Base"
+  ],
+  "variables": [
+   {
+    "name": "None",
+    "type": "Size",
+    "cssName": "--_spacing---none",
+    "values": {
+     "Base": {
+      "value": 0,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "Hairline",
+    "type": "Size",
+    "cssName": "--_spacing---hairline",
+    "values": {
+     "Base": {
+      "value": 0.0625,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "2",
+    "type": "Size",
+    "cssName": "--_spacing---2",
+    "values": {
+     "Base": {
+      "value": 0.125,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "4",
+    "type": "Size",
+    "cssName": "--_spacing---4",
+    "values": {
+     "Base": {
+      "value": 0.25,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "8",
+    "type": "Size",
+    "cssName": "--_spacing---8",
+    "values": {
+     "Base": {
+      "value": 0.5,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "12",
+    "type": "Size",
+    "cssName": "--_spacing---12",
+    "values": {
+     "Base": {
+      "value": 0.75,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "16",
+    "type": "Size",
+    "cssName": "--_spacing---16",
+    "values": {
+     "Base": {
+      "value": 1,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "24",
+    "type": "Size",
+    "cssName": "--_spacing---24",
+    "values": {
+     "Base": {
+      "value": 1.5,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "32",
+    "type": "Size",
+    "cssName": "--_spacing---32",
+    "values": {
+     "Base": {
+      "value": 2,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "48",
+    "type": "Size",
+    "cssName": "--_spacing---48",
+    "values": {
+     "Base": {
+      "value": 3,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "64",
+    "type": "Size",
+    "cssName": "--_spacing---64",
+    "values": {
+     "Base": {
+      "value": 4,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "96",
+    "type": "Size",
+    "cssName": "--_spacing---96",
+    "values": {
+     "Base": {
+      "value": 6,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "128",
+    "type": "Size",
+    "cssName": "--_spacing---128",
+    "values": {
+     "Base": {
+      "value": 8,
+      "unit": "em"
+     }
+    }
+   }
+  ]
+ },
+ {
+  "collection": "Radius",
+  "modes": [
+   "Base"
+  ],
+  "variables": [
+   {
+    "name": "None",
+    "type": "Size",
+    "cssName": "--_radius---none",
+    "values": {
+     "Base": {
+      "value": 0,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "2",
+    "type": "Size",
+    "cssName": "--_radius---2",
+    "values": {
+     "Base": {
+      "value": 0.125,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "4",
+    "type": "Size",
+    "cssName": "--_radius---4",
+    "values": {
+     "Base": {
+      "value": 0.25,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "8",
+    "type": "Size",
+    "cssName": "--_radius---8",
+    "values": {
+     "Base": {
+      "value": 0.5,
+      "unit": "em"
+     }
+    }
+   },
+   {
+    "name": "Pill",
+    "type": "Size",
+    "cssName": "--_radius---pill",
+    "values": {
+     "Base": {
+      "value": 999,
+      "unit": "em"
+     }
+    }
+   }
+  ]
+ }
+]

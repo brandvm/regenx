@@ -8,12 +8,28 @@
     "build": "node build.mjs",
     "check": "tsc --noEmit",
     "test": "pnpm build && playwright test",
-    "test:webflow": "pnpm build && node scripts/check-webflow.mjs"
+    "test:webflow": "pnpm build && node scripts/check-webflow.mjs",
+    "update-skills": "node scripts/update-skills.mjs",
+    "phosphor": "node scripts/phosphor.mjs",
+    "wf:compare": "node .claude/skills/webflow-build/scripts/compare.mjs",
+    "wf:pass": "node .claude/skills/webflow-build/scripts/pass.mjs",
+    "wf:anchors": "node .claude/skills/webflow-build/scripts/anchors.mjs",
+    "wf:outline": "node .claude/skills/webflow-build/scripts/outline.mjs",
+    "wf:film": "node .claude/skills/webflow-build/scripts/load-film.mjs",
+    "wf:transitions": "node .claude/skills/webflow-build/scripts/transitions.mjs",
+    "wf:a11y": "node .claude/skills/webflow-build/scripts/a11y.mjs",
+    "wf:links": "node .claude/skills/webflow-build/scripts/links.mjs",
+    "wf:baseline": "node .claude/skills/webflow-build/scripts/baseline.mjs",
+    "wf:preflight": "node .claude/skills/webflow-build/scripts/preflight.mjs",
+    "wf:styles": "node .claude/skills/webflow-build/scripts/styles.mjs",
+    "wf:html": "node .claude/skills/webflow-build/scripts/html.mjs",
+    "wf:perf": "node .claude/skills/webflow-build/scripts/perf.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",
     "esbuild": "^0.28.2",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "axe-core": "4.10.3"
   },
   "dependencies": {
     "gsap": "3.15.0",

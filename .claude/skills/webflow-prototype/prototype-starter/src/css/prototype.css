@@ -1,0 +1,30 @@
+/* PROTOTYPE-ONLY BASE: stands in for what Webflow ships itself, plus the
+   tag styles that are set once in the Designer (conventions.md §5). Not
+   moved to Webflow or the repo as is.
+
+   This file loads last, so every element rule is wrapped in :where()
+   (specificity 0): a site that already has tag styles (All H2 Headings,
+   All Links, body…) gets them from the generated webflow.css, and the
+   stand-ins only apply where the snapshot sets nothing. Keep new element
+   rules inside :where() for the same reason. */
+
+/* The default font: stands in for the upload in Webflow's Site settings ›
+   Fonts (same file, family name Geist, weights 100 to 900). */
+@font-face { font-family: "Geist"; src: url("/fonts/Geist-Variable.woff2") format("woff2"); font-weight: 100 900; font-style: normal; font-display: swap; }
+
+*, *::before, *::after { box-sizing: border-box; }
+:where(html) { -webkit-text-size-adjust: 100%; }
+:where(body) { margin: 0; min-height: 100%; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+:where(img, video) { max-width: 100%; vertical-align: middle; display: inline-block; }
+:where(button) { font: inherit; }
+html.is-loading body { overflow: hidden; }
+
+/* Tag styles to set in the Designer: All H1–H6 and All Paragraphs margin 0,
+   All Links colour inherit and no underline. */
+:where(h1, h2, h3, h4, h5, h6, p) { margin-top: 0; margin-bottom: 0; font-weight: inherit; }
+:where(a) { color: inherit; text-decoration: none; }
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.skip-link { position: absolute; left: 1rem; top: -4rem; z-index: 1000; padding: .75rem 1rem; background: #000; color: #fff; }
+.skip-link:focus { top: 1rem; }
+:where(:focus-visible) { outline: 2px solid currentColor; outline-offset: 3px; }

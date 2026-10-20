@@ -1,0 +1,8 @@
+<!-- Specimens for the style guide's "Forms" section. In Webflow this is a
+     Form Block: Form on the form, a Form Field holding the Label and a Form
+     Input (the one class for text inputs, selects and textareas), and a real <button type="submit"> holding a Button Color
+     instance (a native submit input can't hold the icon and label). It
+     also keeps the reserved classes Form and Label in use. -->
+
+<!-- sg: section=forms | name=Form | class=.form · .form-field · .label · .form-input · .is-textarea | note=Form Block with a text field, a select, a textarea and a submit button. Form Input is the one class for all three (it replaces Webflow's input defaults); Is Textarea makes it tall. Focus states: border on focus, ring on keyboard focus. -->
+<form class="form"><div class="form-field"><label class="label">Name<input class="form-input" type="text" name="Name"></label></div><div class="form-field"><label class="label">Topic<select class="form-input" name="Topic"><option value="">Select one…</option><option value="First">First choice</option><option value="Second">Second choice</option></select></label></div><div class="form-field"><label class="label">Message<textarea class="form-input is-textarea" name="Message"></textarea></label></div><button class="button" type="submit"><div class="button-color"><div class="button-size"><div class="button-content"><div>Submit</div><div class="button-icon"><div class="icon"><i class="icon-glyph ph ph-arrow-right" aria-hidden="true">&nbsp;</i></div></div></div></div></div></button></form>

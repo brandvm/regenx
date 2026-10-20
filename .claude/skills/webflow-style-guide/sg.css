@@ -1,0 +1,119 @@
+/* The style guide page's own layout: the same on every site.
+   `pnpm style-guide` copies this file to src/css/style-guide.css and adds
+   one combo per colour, radius and spacing variable below it. Never edit
+   the copy.
+
+   These are Designer classes (Sg …), created once in Webflow with the page
+   (the starter site ships them). They use no project class, so the page
+   looks the same whatever the project's type scale or section padding is.
+   Sizes are in em, and lines and panels are a neutral grey at low opacity,
+   so the page works on a light or a dark site. Every label uses the site's
+   own font: a class holds one font family in the Designer, and a system
+   monospace font would bring its own slashed zero. The few variables read here
+   (nav height, page background) are bound in the Designer; the fallbacks
+   cover a prototype whose snapshot doesn't have them.
+
+   Every class used on an empty element (swatch, radius box, bar) sets
+   padding 0 and font-size inherit, so the Designer canvas doesn't draw it
+   as an empty placeholder. */
+
+/* Frame: sticky sidebar + one content column */
+.sg-layout { display: flex; align-items: flex-start; gap: 4em; max-width: 92em; margin-right: auto; margin-left: auto; padding: calc(var(--_layout---nav--height, 5em) + 3em) 2.5em 8em; }
+.sg-sidebar { position: sticky; top: calc(var(--_layout---nav--height, 5em) + 3em); flex: 0 0 14em; display: flex; flex-direction: column; }
+.sg-sidebar-title { margin-bottom: 1.25em; font-size: 0.6875em; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.55; }
+.sg-sidebar-link { display: flex; align-items: baseline; gap: 0.75em; padding: 0.5em 1em; border-left: 1px solid rgb(128 128 128 / 0.3); color: inherit; font-size: 0.9375em; line-height: 1.3; text-decoration: none; opacity: 0.6; transition: opacity 200ms ease, border-color 200ms ease; }
+.sg-sidebar-link:hover { opacity: 1; }
+.sg-sidebar-link.w--current { border-left-color: currentColor; font-weight: 500; opacity: 1; }
+.sg-sidebar-number { flex: none; font-size: 0.75em; font-weight: 400; opacity: 0.6; }
+.sg-content { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; }
+
+/* Sections and their headings */
+.sg-section { display: flex; flex-direction: column; padding: 5em 0; border-top: 1px solid rgb(128 128 128 / 0.3); scroll-margin-top: calc(var(--_layout---nav--height, 5em) + 1em); }
+.sg-section.is-first { padding-top: 0; border-top-width: 0; }
+.sg-section-head { display: flex; flex-direction: column; align-items: flex-start; gap: 0.75em; margin-bottom: 2.5em; }
+.sg-eyebrow { font-size: 0.75em; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.55; }
+.sg-title { margin: 0; font-size: 4.5em; line-height: 1; font-weight: 500; letter-spacing: -0.035em; }
+.sg-section-title { margin: 0; font-size: 2.25em; line-height: 1.1; font-weight: 500; letter-spacing: -0.025em; }
+.sg-intro { max-width: 38em; margin: 0; font-size: 1.0625em; line-height: 1.5; opacity: 0.7; }
+
+/* The row: what it is on the left, the live specimen on the right */
+.sg-row { display: flex; align-items: flex-start; gap: 2.5em; padding: 2em 0; border-top: 1px solid rgb(128 128 128 / 0.18); }
+.sg-row-meta { position: sticky; top: calc(var(--_layout---nav--height, 5em) + 1.5em); flex: 0 0 15em; display: flex; flex-direction: column; align-items: flex-start; gap: 0.5em; min-width: 0; }
+.sg-row-name { font-weight: 500; line-height: 1.3; }
+.sg-row-class { max-width: 100%; padding: 0.25em 0.5em; border: 1px solid rgb(128 128 128 / 0.2); border-radius: 0.375em; background-color: rgb(128 128 128 / 0.1); font-size: 0.75em; line-height: 1.4; overflow-wrap: anywhere; }
+.sg-row-note { font-size: 0.8125em; line-height: 1.5; opacity: 0.65; }
+.sg-row-demo { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 1em; }
+
+/* Overview: how to use the page, and the site at a glance */
+.sg-cards { align-self: stretch; display: flex; flex-wrap: wrap; gap: 1em; }
+.sg-card { flex: 1 1 18em; display: flex; flex-direction: column; gap: 0.5em; padding: 1.5em; border: 1px solid rgb(128 128 128 / 0.2); border-radius: 0.75em; background-color: rgb(128 128 128 / 0.05); }
+.sg-card-step { margin-bottom: 1em; font-size: 0.75em; opacity: 0.55; }
+.sg-card-title { font-size: 1.125em; font-weight: 500; line-height: 1.3; letter-spacing: -0.01em; }
+.sg-card-text { font-size: 0.875em; line-height: 1.5; opacity: 0.7; }
+.sg-stats { align-self: stretch; display: flex; flex-wrap: wrap; gap: 1em; }
+.sg-stat { flex: 1 1 9em; display: flex; flex-direction: column; gap: 0.5em; padding: 1.5em; border: 1px solid rgb(128 128 128 / 0.2); border-radius: 0.75em; }
+.sg-stat-value { font-size: 2.25em; font-weight: 500; line-height: 1; letter-spacing: -0.03em; }
+.sg-stat-label { font-size: 0.8125em; line-height: 1.4; opacity: 0.65; }
+
+/* Specimens */
+.sg-swatches { align-self: stretch; display: flex; flex-wrap: wrap; gap: 1em; }
+.sg-swatch { flex: 0 0 9.5em; display: flex; flex-direction: column; overflow: hidden; border: 1px solid rgb(128 128 128 / 0.2); border-radius: 0.75em; }
+.sg-swatch-color { height: 5.5em; padding: 0; border-bottom: 1px solid rgb(128 128 128 / 0.2); font-size: inherit; }
+/* A colour dot in a table: a small window onto a swatch. A wrapper, not a
+   combo, so no element carries three classes (the Webflow importer makes a
+   junk entry for every three-class chain). */
+.sg-dot { flex: none; width: 1em; height: 1em; overflow: hidden; border: 1px solid rgb(128 128 128 / 0.3); border-radius: 0.25em; }
+.sg-swatch-name { padding: 0.75em 0.875em 0; font-size: 0.8125em; font-weight: 500; line-height: 1.3; }
+.sg-swatch-value { padding: 0.25em 1em 1em; font-size: 0.6875em; line-height: 1.4; opacity: 0.65; overflow-wrap: anywhere; }
+.sg-radius { height: 4.5em; margin: 0.75em 0.75em 0; padding: 0; border: 1px solid currentColor; background-color: rgb(128 128 128 / 0.14); font-size: inherit; }
+.sg-bar { flex: none; max-width: 100%; height: 0.5em; padding: 0; border-radius: 0.125em; background-color: currentColor; font-size: inherit; opacity: 0.75; }
+.sg-glyphs { font-size: 2.5em; line-height: 1.2; letter-spacing: 0; }
+.sg-ramp { align-self: stretch; display: flex; flex-wrap: wrap; align-items: baseline; gap: 1em 1.5em; line-height: 1.1; }
+.sg-demo { align-self: stretch; display: flex; flex-wrap: wrap; align-items: center; gap: 1em; padding: 2.5em; border: 1px solid rgb(128 128 128 / 0.2); border-radius: 0.75em; background-color: rgb(128 128 128 / 0.05); }
+.sg-theme-frame { align-self: stretch; overflow: hidden; border: 1px solid rgb(128 128 128 / 0.2); border-radius: 0.75em; }
+
+/* Tables: first column is the name, then one column per mode or value */
+.sg-table { align-self: stretch; display: flex; flex-direction: column; overflow-x: auto; border: 1px solid rgb(128 128 128 / 0.2); border-radius: 0.75em; }
+.sg-table-row { display: flex; align-items: center; gap: 1em; min-width: min-content; padding: 0.75em 1.25em; border-top: 1px solid rgb(128 128 128 / 0.14); font-size: 0.875em; line-height: 1.4; }
+/* The head row keeps the rows' font size: the columns are sized in em and must line up */
+.sg-table-row.is-head { border-top-width: 0; background-color: rgb(128 128 128 / 0.08); font-weight: 500; }
+.sg-table-key { flex: 1.4 1 0; min-width: 9em; }
+.sg-table-cell { flex: 1 1 0; min-width: 7.5em; display: flex; align-items: center; gap: 0.5em; }
+
+/* Page sections: a half-size screen in a sealed frame */
+.sg-preview { position: relative; align-self: stretch; aspect-ratio: 16 / 10; overflow: hidden; border: 1px solid rgb(128 128 128 / 0.2); border-radius: 0.75em; }
+.sg-preview-screen { position: absolute; top: 0; left: 0; width: 200%; height: 200%; overflow: hidden; transform: scale(0.5); transform-origin: 0 0; }
+
+/* Other classes: one sealed tile per class that nothing above uses */
+.sg-tiles { align-self: stretch; display: flex; flex-wrap: wrap; gap: 0.75em; }
+.sg-tile { flex: 1 1 12em; max-width: 17em; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 0.5em; padding: 1em; border: 1px solid rgb(128 128 128 / 0.2); border-radius: 0.75em; }
+.sg-tile-box { position: relative; align-self: stretch; height: 3.5em; overflow: hidden; border: 1px solid rgb(128 128 128 / 0.16); border-radius: 0.375em; background-color: rgb(128 128 128 / 0.1); }
+
+/* repo-css: designer-cant — contain keeps fixed, absolute or full-height
+   specimens inside their frame */
+.sg-preview, .sg-tile-box { contain: strict; }
+.sg-theme-frame { contain: paint; }
+
+@media screen and (max-width: 991px) {
+  /* The sidebar becomes a strip of links that scrolls sideways under the nav */
+  .sg-layout { flex-direction: column; align-items: stretch; gap: 0; padding: var(--_layout---nav--height, 4em) 1.25em 5em; }
+  .sg-sidebar { top: var(--_layout---nav--height, 4em); z-index: 5; flex: none; flex-direction: row; align-items: center; gap: 0.25em; margin: 0 -1.25em 3em; padding: 0.75em 1.25em; overflow-x: auto; overflow-y: hidden; background-color: var(--_colors-semantic---background--page, #fff); border-bottom: 1px solid rgb(128 128 128 / 0.3); }
+  .sg-sidebar-title { display: none; }
+  .sg-sidebar-link { flex: none; padding: 0.4em 0.875em; border-left-width: 0; border-radius: 10em; white-space: nowrap; }
+  .sg-sidebar-link.w--current { background-color: rgb(128 128 128 / 0.16); }
+  .sg-sidebar-number { display: none; }
+  .sg-section { padding: 4em 0; scroll-margin-top: calc(var(--_layout---nav--height, 4em) + 4em); }
+  .sg-title { font-size: 3.25em; }
+  .sg-row-meta { top: calc(var(--_layout---nav--height, 4em) + 5em); flex-basis: 12em; }
+}
+@media screen and (max-width: 767px) {
+  .sg-title { font-size: 2.75em; }
+  .sg-section-title { font-size: 1.875em; }
+  .sg-row { flex-direction: column; gap: 1.25em; }
+  .sg-row-meta { position: static; flex: none; }
+  .sg-row-demo { align-self: stretch; }
+  .sg-demo { padding: 1.5em; }
+  .sg-swatch { flex: 1 1 8em; }
+  .sg-glyphs { font-size: 1.75em; }
+  .sg-preview { aspect-ratio: 4 / 5; }
+}

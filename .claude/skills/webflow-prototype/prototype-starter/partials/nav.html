@@ -1,0 +1,15 @@
+<!-- G | Nav W: one Webflow Component, shared by every page. A placeholder,
+     like the starter site's: the project designs the nav and adds its
+     classes to new-classes.css (a class with no CSS fails wf:preflight). -->
+  <div class="g-nav-w" data-nav>
+    <nav class="g-nav" aria-label="Main">
+      <a href="/" aria-label="Home">Logo</a>
+      <div id="nav-menu" data-nav-menu>
+        <a href="/#about">About</a>
+        <a href="/#contact">Contact</a>
+      </div>
+      <button type="button" aria-expanded="false" aria-controls="nav-menu" data-nav-toggle>
+        <span class="sr-only">Menu</span>
+      </button>
+    </nav>
+  </div>

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en" class="is-loading">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Home</title>
+<!-- @include partials/head.html -->
+<script type="module" src="/src/main.ts"></script>
+</head>
+<body>
+<!-- Page shell (conventions.md §1). G | Components sits directly under
+     body in Webflow; the prototype has nothing to put in it. G | Page W is
+     one component in Webflow; main#main is its slot. -->
+<div class="g-page-w">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- @include partials/nav.html -->
+
+  <!-- G | Main W: the Barba container, if transitions are added later -->
+  <div class="g-main-w">
+    <main class="g-main" id="main">
+
+      <!-- Section structure (conventions.md §2) -->
+      <section class="section is-hero" id="top" data-hero>
+        <div class="s-bg" aria-hidden="true">
+          <!-- S Bg Media: <img class="s-bg-media" src="/assets/hero.jpg" alt=""> or a <video> -->
+          <div class="s-bg-overlay"></div>
+        </div>
+        <div class="s-wrapper">
+          <h1 class="d1">Page heading</h1>
+          <p class="body-l">One line that says what the page is for.</p>
+        </div>
+      </section>
+
+      <section class="section" id="about">
+        <div class="s-wrapper">
+          <h2 class="chip">About</h2>
+          <p class="d2">The section's statement.</p>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- @include partials/footer.html -->
+  </div>
+</div>
+</body>
+</html>

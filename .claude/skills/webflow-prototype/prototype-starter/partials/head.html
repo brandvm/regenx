@@ -1,0 +1,25 @@
+<!-- The default font, Geist (Typography Scale › Family/Base), served from
+     public/fonts; its @font-face is in src/css/prototype.css. It is the
+     official file, not Google Fonts': Google's build leaves out the
+     stylistic sets the Body tag style turns on (ss03, ss08). A
+     project that uses another font replaces this line, the @font-face and
+     the variable's value. In Webflow the same file is uploaded in
+     Site settings › Fonts. -->
+<link rel="preload" href="/fonts/Geist-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<!-- Phosphor Icons, regular. PROTOTYPE-ONLY stand-in: on the site the icon
+     font is part of the repo's styles.css (`pnpm phosphor`); here the same
+     pinned stylesheet is linked so "ph ph-<name>" classes draw. Add a
+     weight's stylesheet when the repo bundles it. -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css">
+<!-- Styles as render-blocking links, the way Webflow serves webflow.css in
+     the head, so the first paint is already styled. Order = cascade order:
+     generated Webflow CSS, proposed changes, new classes, then the
+     prototype-only base. -->
+<link rel="stylesheet" href="/src/css/tokens.css">
+<link rel="stylesheet" href="/src/css/webflow.css">
+<link rel="stylesheet" href="/src/css/proposed.css">
+<link rel="stylesheet" href="/src/css/new-classes.css">
+<link rel="stylesheet" href="/src/css/prototype.css">
+<!-- Same safety net as the repo loader's head code: main.ts removes
+     .is-loading when it boots; if it never does, the page shows after 3 s. -->
+<script>setTimeout(function () { document.documentElement.classList.remove('is-loading'); }, 3000);</script>

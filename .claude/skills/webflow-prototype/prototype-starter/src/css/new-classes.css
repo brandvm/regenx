@@ -1,0 +1,16 @@
+/* NEW CLASSES, to create in the Designer
+   ------------------------------------------------------------------
+   Every rule here becomes a Webflow class (names: conventions.md §3), so
+   write only what the Designer can express, bound to existing variables.
+   Group rules by component under a comment; its first line becomes the
+   group's description in CLASSES.md (`pnpm classes`):
+
+   / * Card — a linked card with image, title and facts. * /
+
+   Responsive rules: @media at 991 / 767 / 479px (set at that breakpoint in
+   the Designer). JS state classes (.is-open set by a module) are marked
+   `js-state` in their comment.
+
+   Rules the Designer can't express go at the end, each with the tag it
+   will carry in the repo's styles.css (AGENTS.md › CSS policy):
+   / * repo-css: designer-cant — :has() * /  */

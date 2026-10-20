@@ -21,6 +21,9 @@ importers:
       '@playwright/test':
         specifier: 1.63.0
         version: 1.63.0
+      axe-core:
+        specifier: 4.10.3
+        version: 4.10.3
       esbuild:
         specifier: ^0.28.2
         version: 0.28.2
@@ -311,6 +314,10 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  axe-core@4.10.3:
+    resolution: {integrity: sha512-Xm7bpRXnDSX2YE2YFfBk2FnF0ep6tmG7xPh8iHee8MIcrgq762Nkce856dYtJYLkuIoYZvGfTs/PbZhideTcEg==}
+    engines: {node: '>=4'}
+
   esbuild@0.28.2:
     resolution: {integrity: sha512-HKVLS8dvII+xoKW9kmqxbRKrnWEXfJJr/FZhhJmiqIB0e053QNYFqOBouTMO/k5sID4MvCiUCvv8b9M4h32wIA==}
     engines: {node: '>=18'}
@@ -495,6 +502,8 @@ snapshots:
 
   '@typescript/typescript-win32-x64@7.0.2':
     optional: true
+
+  axe-core@4.10.3: {}
 
   esbuild@0.28.2:
     optionalDependencies:

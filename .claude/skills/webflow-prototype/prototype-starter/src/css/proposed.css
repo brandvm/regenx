@@ -1,0 +1,16 @@
+/* PROPOSED CHANGES TO EXISTING WEBFLOW VARIABLES AND CLASS BINDINGS
+   ------------------------------------------------------------------
+   tokens.css and webflow.css are generated from Webflow and never edited.
+   This file overrides them only where the approved design differs. Each
+   block is one change to approve before it is made in Webflow: a variable
+   value, or which variable a class binds. Nothing here adds a class; new
+   classes live in new-classes.css.
+
+   Format, one block per change, lettered P1, P2…:
+
+   P1 · Typography Scale: tighter tracking for large type.
+        Letter Spacing/Tight −0.03em → −0.04em (design: −4% from 24px up).
+   :root { --_typography-scale---letter-spacing--tight: -0.04em; }
+
+   Breakpoint values go in @media blocks at 991 / 767 / 479px, the
+   Designer's Tablet, Mobile Landscape and Mobile. */
