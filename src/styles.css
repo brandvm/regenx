@@ -18,10 +18,21 @@ html:not(.w-editor) .cms-filter {
   visibility: hidden !important;
 }
 
-html.is-loading,
-html.is-loading body {
+/* repo-css: js-state — the head bootstrap in loader.html adds .is-loading
+   before first paint; src/index.ts removes it when the bundle boots. Lock
+   html only: a locked body becomes the scroll container and un-sticks a
+   sticky header (wf-template 0.7.0). */
+html.is-loading {
   overflow: hidden;
-  height: 100%;
+}
+
+/* repo-css: designer-cant — :where() keeps this at 0-0-0, so a Designer tag
+   style or class still wins. The browser's own sheet gives <button>
+   letter-spacing and word-spacing `normal`, and `font: inherit` doesn't
+   cover them, so text in a button lost its parent's tracking. */
+:where(button) {
+  letter-spacing: inherit;
+  word-spacing: inherit;
 }
 
 /* The supplied scripts have no preloader animation. Release any overlay once
