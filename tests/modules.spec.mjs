@@ -64,3 +64,42 @@ test('marquee stays a static row under reduced motion', async ({ page }) => {
   await expect(row).not.toHaveClass(/is-marquee/);
   expect(errors).toEqual([]);
 });
+
+// The Peptide Therapy disclaimer, as built in Webflow.
+const disclaimer = `<main><h1>Peptide Therapy</h1><a href="/">Home</a></main>
+<div data-modal="peptide-disclaimer" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6)">
+  <div data-modal-panel style="background:#f7f7f7;padding:40px;position:relative">
+    <button type="button" data-modal-close aria-label="Close">×</button>
+    <h2>Important Disclaimer</h2><p>This page provides general information…</p>
+    <label><input type="checkbox" data-disclaimer-agree> I understand</label>
+    <button type="button" data-disclaimer-cancel>Cancel</button>
+    <button type="button" data-disclaimer-continue>Continue</button>
+  </div>
+</div>`;
+
+test('peptide disclaimer opens on load, needs consent, and is remembered once accepted', async ({ page }) => {
+  const errors = await setup(page, disclaimer);
+  const dialog = page.getByRole('dialog', { name: 'Important Disclaimer' });
+  await expect(dialog).toBeVisible();
+  const cont = page.getByRole('button', { name: 'Continue' });
+  await expect(cont).toBeDisabled();
+  await expect(page.locator('main')).toHaveAttribute('inert', '');
+  await page.getByLabel('I understand').check();
+  await expect(cont).toBeEnabled();
+  await cont.click();
+  await expect(dialog).toBeHidden();
+  expect(await page.evaluate(() => localStorage.getItem('rgx-peptide-disclaimer'))).toBe('accepted');
+  expect(new URL(page.url()).hash).toBe('');
+  await page.reload();
+  await page.waitForFunction(() => document.documentElement.classList.contains('rgx-ready'));
+  await expect(page.locator('[data-modal="peptide-disclaimer"]')).toBeHidden();
+  expect(errors).toEqual([]);
+});
+
+test('closing the disclaimer without consent only dismisses it for this visit', async ({ page }) => {
+  await setup(page, disclaimer);
+  await expect(page.getByRole('dialog', { name: 'Important Disclaimer' })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('[data-modal="peptide-disclaimer"]')).toBeHidden();
+  expect(await page.evaluate(() => localStorage.getItem('rgx-peptide-disclaimer'))).toBeNull();
+});

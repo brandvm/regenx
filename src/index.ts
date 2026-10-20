@@ -1,10 +1,12 @@
 import { initAnimation } from './modules/animation';
-import { initSmoothScroll, resizeSmoothScroll } from './modules/smooth-scroll';
+import { getLenis, initSmoothScroll, resizeSmoothScroll } from './modules/smooth-scroll';
 import { initWaveGrid } from './modules/wave-grid';
 import { initMain } from './modules/main';
 import { initEnvironmentSwitcher } from './modules/environment-switcher';
 import { initUniqueFormIds } from './modules/unique-form-ids';
 import { initMarquee } from './modules/marquee';
+import { initModals } from './modules/modal';
+import { initPeptideDisclaimer } from './modules/peptide-disclaimer';
 
 // Each module runs in isolation: one that throws is logged and skipped,
 // and every module after it still initializes.
@@ -30,6 +32,10 @@ async function boot() {
     await run('main', initMain);
     // "As Seen In" logo rows: [data-marquee] (wf-template recipe).
     await run('marquee', initMarquee);
+    // Dialogs built in Webflow ([data-modal], wf-template recipe), then the
+    // Peptide Therapy disclaimer that opens one on load.
+    await run('modal', () => initModals(getLenis()));
+    await run('peptide-disclaimer', initPeptideDisclaimer);
   } finally {
     document.documentElement.classList.remove('is-loading');
     document.documentElement.classList.add('rgx-ready');

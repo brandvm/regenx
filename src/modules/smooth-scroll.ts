@@ -5,6 +5,8 @@ import { gsap, ScrollTrigger } from './animation';
 // exposes the actual instance there, so keep that compatibility in one bridge.
 const runtime = window as unknown as { lenis?: Lenis };
 export function resizeSmoothScroll() { runtime.lenis?.resize?.(); }
+// The page's Lenis instance, for modules that pause scrolling (modal.ts).
+export function getLenis() { return runtime.lenis ?? null; }
 
 export function initSmoothScroll() {
   if (typeof runtime.lenis?.raf === 'function') return;
