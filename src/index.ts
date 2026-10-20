@@ -4,6 +4,7 @@ import { initWaveGrid } from './modules/wave-grid';
 import { initMain } from './modules/main';
 import { initEnvironmentSwitcher } from './modules/environment-switcher';
 import { initUniqueFormIds } from './modules/unique-form-ids';
+import { initMarquee } from './modules/marquee';
 
 // Each module runs in isolation: one that throws is logged and skipped,
 // and every module after it still initializes.
@@ -27,6 +28,8 @@ async function boot() {
     await run('smooth-scroll', initSmoothScroll);
     await run('wave-grid', initWaveGrid);
     await run('main', initMain);
+    // "As Seen In" logo rows: [data-marquee] (wf-template recipe).
+    await run('marquee', initMarquee);
   } finally {
     document.documentElement.classList.remove('is-loading');
     document.documentElement.classList.add('rgx-ready');

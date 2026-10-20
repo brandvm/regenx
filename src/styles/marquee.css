@@ -1,0 +1,33 @@
+/* "As Seen In" logo rows (/services hero, /about). From wf-template
+   recipes/snippets/marquee.css; src/modules/marquee.ts drives it. */
+/* repo-css: js-state — marquee.ts (recipes/snippets) clones the items, sets
+   --marquee-distance (one set, gap included) and --marquee-duration, and
+   adds .is-marquee; the row then runs on one line and loops. Without the
+   class (no script, reduced motion) the row keeps its Designer layout.
+   */
+@keyframes marquee-scroll {
+  to {
+    transform: translate3d(var(--marquee-distance, -50%), 0, 0);
+  }
+}
+
+[data-marquee].is-marquee {
+  flex-wrap: nowrap;
+  width: max-content;
+  animation: marquee-scroll var(--marquee-duration, 40s) linear infinite;
+}
+
+[data-marquee].is-marquee:hover,
+[data-marquee].is-marquee:focus-within,
+[data-marquee].is-marquee-paused {
+  animation-play-state: paused;
+}
+
+/* repo-css: designer-cant — prefers-reduced-motion (the module doesn't
+   start then either; this covers the setting changing while the page is
+   open). */
+@media (prefers-reduced-motion: reduce) {
+  [data-marquee].is-marquee {
+    animation: none !important;
+  }
+}
