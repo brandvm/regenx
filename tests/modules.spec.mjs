@@ -40,7 +40,7 @@ test('duplicate CMS radio ids become unique and labels follow', async ({ page })
 });
 
 // The "As Seen In" logo rows on /services and /about.
-const logoRow = `<div style="overflow:hidden;width:600px"><div data-marquee style="display:flex;flex-wrap:wrap">
+const logoRow = `<div data-marquee-mask style="overflow:hidden;width:600px"><div data-marquee style="display:flex;flex-wrap:wrap">
   ${[1, 2, 3, 4].map((n) => `<div class="service-hero-proof-item" style="flex:none;width:200px;height:100px"><img alt="Logo ${n}"><a href="#" class="service-hero-proof-link"></a></div>`).join('')}
 </div></div>`;
 
@@ -53,6 +53,8 @@ test('marquee clones the logos once, hidden from assistive tech, and loops by on
   await expect(row.locator('[data-marquee-clone] a[tabindex="-1"]')).toHaveCount(4);
   expect(await row.evaluate((el) => el.style.getPropertyValue('--marquee-distance'))).toBe('-800px');
   expect(await row.evaluate((el) => getComputedStyle(el).animationName)).toBe('marquee-scroll');
+  // The wrapper fades both edges while the row runs.
+  expect(await page.locator('[data-marquee-mask]').evaluate((el) => getComputedStyle(el).maskImage)).toContain('linear-gradient');
   expect(errors).toEqual([]);
 });
 
@@ -62,6 +64,7 @@ test('marquee stays a static row under reduced motion', async ({ page }) => {
   const row = page.locator('[data-marquee]');
   await expect(row.locator(':scope > *')).toHaveCount(4);
   await expect(row).not.toHaveClass(/is-marquee/);
+  expect(await page.locator('[data-marquee-mask]').evaluate((el) => getComputedStyle(el).maskImage)).toBe('none');
   expect(errors).toEqual([]);
 });
 

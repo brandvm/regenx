@@ -23,6 +23,14 @@
   animation-play-state: paused;
 }
 
+/* repo-css: designer-cant — mask-image. [data-marquee-mask] is the
+   Designer wrapper that clips the row (Proof Marquee Mask); its left and
+   right edges fade while the row runs. */
+[data-marquee-mask]:has(> .is-marquee) {
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 6em, #000 calc(100% - 6em), transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 6em, #000 calc(100% - 6em), transparent 100%);
+}
+
 /* repo-css: designer-cant — prefers-reduced-motion (the module doesn't
    start then either; this covers the setting changing while the page is
    open). */
