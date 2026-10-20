@@ -1,0 +1,24 @@
+name: pr
+on:
+  pull_request:
+    branches: [master]
+permissions: { contents: read }
+concurrency:
+  group: pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  # The same checks staging runs before it deploys, so a PR shows them before merge.
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with: { name: test-results, path: test-results/playwright, retention-days: 7 }
