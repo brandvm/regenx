@@ -3,21 +3,30 @@ import { initSmoothScroll, resizeSmoothScroll } from './modules/smooth-scroll';
 import { initWaveGrid } from './modules/wave-grid';
 import { initMain } from './modules/main';
 import { initEnvironmentSwitcher } from './modules/environment-switcher';
+import { initUniqueFormIds } from './modules/unique-form-ids';
+
+// Each module runs in isolation: one that throws is logged and skipped,
+// and every module after it still initializes.
+async function run(name: string, init: () => unknown) {
+  try {
+    await init();
+  } catch (error) {
+    console.error(`[RegenX] ${name} failed to initialize`, error);
+  }
+}
 
 async function boot() {
   if (window.__RGX_BOOTED) return;
   window.__RGX_BOOTED = true;
   try {
     if (window.Webflow?.env?.('editor') || window.Webflow?.env?.('design')) return;
-    initEnvironmentSwitcher();
-    await initAnimation();
-    initSmoothScroll();
-    try { initWaveGrid(); } catch (error) {
-      console.warn('[RegenX] WaveGrid could not initialize', error);
-    }
-    initMain();
-  } catch (error) {
-    console.error("[RegenX] Initialization failed", error);
+    await run('environment-switcher', initEnvironmentSwitcher);
+    // Starter fix for markup Webflow publishes (CMS filter radios share an id).
+    await run('unique-form-ids', initUniqueFormIds);
+    await run('animation', initAnimation);
+    await run('smooth-scroll', initSmoothScroll);
+    await run('wave-grid', initWaveGrid);
+    await run('main', initMain);
   } finally {
     document.documentElement.classList.remove('is-loading');
     document.documentElement.classList.add('rgx-ready');

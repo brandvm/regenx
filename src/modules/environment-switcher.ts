@@ -3,10 +3,14 @@
 export function initEnvironmentSwitcher() {
   const config = window.BV;
   if (!/\.webflow\.io$/.test(location.hostname) || !config) return;
+  if (window.Webflow?.env?.('editor') || window.Webflow?.env?.('design')) return;
   if (document.getElementById('rgx-environment')) return;
 
   const isDev = config.source ? config.source === config.devBase : !!config.dev;
-  const fallback = !!config.dev && !isDev;
+  // Staging failed and the footer loader fell back to the pinned release.
+  const releaseFallback = !!config.source
+    && config.source !== config.devBase && config.source !== config.stag;
+  const fallback = (!!config.dev && !isDev) || releaseFallback;
   const current = isDev ? 'Dev' : 'Staging';
   const host = document.createElement('div');
   host.id = 'rgx-environment';
@@ -101,7 +105,10 @@ export function initEnvironmentSwitcher() {
   root.querySelector('.label')!.textContent = current;
   root.querySelector('.dot')!.toggleAttribute('data-dev', isDev);
   launcher.setAttribute('aria-label', `Choose environment (${current})`);
-  launcher.title = fallback ? 'Local dev could not load. Using staging.' : 'Switch between staging and local dev';
+  if (releaseFallback) status.textContent = 'Staging unavailable · using release';
+  launcher.title = releaseFallback ? 'Staging could not load. Using the pinned release.'
+    : fallback ? 'Local dev could not load. Using staging.'
+    : 'Switch between staging and local dev';
 
   function expand(open: boolean, focus = false) {
     launcher.hidden = open;
