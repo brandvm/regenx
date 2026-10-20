@@ -687,6 +687,13 @@ a {
   padding-top: 2rem;
 }
 
+/* repo-css: js-state — catalog-nav.ts marks the category in view
+   (Figma "1V Filters": the active category is black with white text). */
+.services-main-nav-list.is-catalog .services-main-nav-link.is-active {
+  background-color: #000;
+  color: #fff;
+}
+
 /* repo-css: js-state — form-steps.js fills [data-step-summary] with the
    choices made on earlier steps. */
 [data-step-summary] {

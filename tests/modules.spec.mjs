@@ -106,3 +106,24 @@ test('closing the disclaimer without consent only dismisses it for this visit', 
   await expect(page.locator('[data-modal="peptide-disclaimer"]')).toBeHidden();
   expect(await page.evaluate(() => localStorage.getItem('rgx-peptide-disclaimer'))).toBeNull();
 });
+
+// The Medical Catalog sidebar.
+const catalog = `<style>section{height:1200px}</style>
+<div class="services-main-nav-list is-catalog" style="position:fixed;top:0;left:0">
+  <a class="services-main-nav-link" href="#Testosterone-Products">Testosterone Products</a>
+  <a class="services-main-nav-link" href="#Vitamins-Aminos">Vitamins &amp; Aminos</a>
+</div>
+<section><div id="Testosterone-Products"></div>T</section>
+<section><div id="Vitamins-Aminos"></div>V</section>`;
+
+test('catalog sidebar marks the category in view as active', async ({ page }) => {
+  const errors = await setup(page, catalog);
+  const links = page.locator('.services-main-nav-link');
+  await expect(links.nth(0)).toHaveClass(/is-active/);
+  await expect(links.nth(0)).toHaveAttribute('aria-current', 'true');
+  expect(await links.nth(0).evaluate((el) => getComputedStyle(el).backgroundColor)).toBe('rgb(0, 0, 0)');
+  await page.evaluate(() => window.scrollTo(0, 1300));
+  await expect(links.nth(1)).toHaveClass(/is-active/);
+  await expect(links.nth(0)).not.toHaveClass(/is-active/);
+  expect(errors).toEqual([]);
+});

@@ -7,6 +7,7 @@ import { initUniqueFormIds } from './modules/unique-form-ids';
 import { initMarquee } from './modules/marquee';
 import { initModals } from './modules/modal';
 import { initPeptideDisclaimer } from './modules/peptide-disclaimer';
+import { initCatalogNav } from './modules/catalog-nav';
 
 // Each module runs in isolation: one that throws is logged and skipped,
 // and every module after it still initializes.
@@ -36,6 +37,8 @@ async function boot() {
     // Peptide Therapy disclaimer that opens one on load.
     await run('modal', () => initModals(getLenis()));
     await run('peptide-disclaimer', initPeptideDisclaimer);
+    // Medical Catalog: highlight the category in view.
+    await run('catalog-nav', initCatalogNav);
   } finally {
     document.documentElement.classList.remove('is-loading');
     document.documentElement.classList.add('rgx-ready');
