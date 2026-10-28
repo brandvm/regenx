@@ -169,7 +169,9 @@ export const SmartSwiper = (function () {
         grabCursor: true,
         speed: 500,
         breakpoints: {
-          0: { slidesPerView: 1.1, spaceBetween: 16 },
+          // Mobile portrait: the slide width comes from Webflow (277px in Figma).
+          0: { slidesPerView: "auto", spaceBetween: 16 },
+          480: { slidesPerView: 1.1, spaceBetween: 16 },
           768: { slidesPerView: 2.2, spaceBetween: 20 },
           1200: { slidesPerView: 3, spaceBetween: 24 },
         },

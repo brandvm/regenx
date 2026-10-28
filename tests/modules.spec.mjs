@@ -256,3 +256,28 @@ test('accordions do nothing without Webflow', async ({ page }) => {
   await expect(page.locator('#faq1 > .w-dropdown-toggle')).toHaveAttribute('aria-expanded', 'false');
   expect(errors).toEqual([]);
 });
+
+// Product › Other Medications as Webflow publishes it; the 277px slide width
+// at ≤479px is a Designer style, stubbed here.
+const productSlider = `<style>.swiper-slide.product-slider { width: 33.33%; height: 200px; }
+  @media (max-width: 479px) { .swiper-slide.product-slider { width: 277px; } }</style>
+  <div class="product-slider-w" style="width: 343px">
+    <button class="swiper-prev">Previous</button><button class="swiper-next">Next</button>
+    <div class="product-slider-main"><div class="swiper product-slider"><div class="swiper-wrapper product-slider">
+      ${[1, 2, 3, 4].map((n) => `<div class="swiper-slide product-slider">Product ${n}</div>`).join('')}
+    </div></div></div>
+  </div>`;
+
+test('product slider takes its mobile portrait slide width from the Designer', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 800 });
+  const errors = await setup(page, productSlider);
+  const width = () => page.locator('.swiper-slide.product-slider').first().evaluate((el) => el.getBoundingClientRect().width);
+  await expect.poll(width).toBeCloseTo(277, 0);
+  await page.locator('.swiper-next').click();
+  await expect.poll(() => page.locator('.swiper-slide.product-slider').nth(1).evaluate((el) => Math.round(el.getBoundingClientRect().left))).toBe(
+    await page.locator('.product-slider-main').evaluate((el) => Math.round(el.getBoundingClientRect().left)));
+  // From 480px Swiper sizes the slides again (1.1 per view).
+  await page.setViewportSize({ width: 600, height: 800 });
+  await expect.poll(width).toBeCloseTo((343 - 16 * 0.1) / 1.1, 0);
+  expect(errors).toEqual([]);
+});
