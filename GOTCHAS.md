@@ -25,6 +25,21 @@ harvested across all client repos to improve `brandvm/wf-template`.
 
 ## This project
 
+### 2026-10-28 · Component variant styles lose to the base style's breakpoints
+- Area: designer
+- Scope: template-candidate
+- Symptom: Setting a Typography Style mode on `C | Paragraph` at ≤478px
+  also changed paragraphs using the Body LG variant.
+- Cause: Webflow publishes variant styles as
+  `.c-paragraph:where(.w-variant-…)`, so they add no specificity. The base
+  class's breakpoint rule comes later in the CSS and wins over the
+  variant's desktop rule.
+- Fix: when a base style gets a breakpoint override, set the same property
+  on each variant that should differ at that breakpoint (here the Body LG
+  variant's mode at ≤478px). The Body SM variant needed nothing.
+- Status: documented
+- Found by: claude
+
 ### 2026-10-28 · Webflow's body size variable also means "inherit"
 - Area: css
 - Scope: template-candidate
@@ -38,7 +53,11 @@ harvested across all client repos to improve `brandvm/wf-template`.
   paragraph styles instead: `.c-paragraph` default (Typography Style size
   0.875em at ≤478px), plus `text-b` and similar classes. Checked with a
   preview of the 375px scale change (branch mobile-scale-375).
-- Status: open
+  Done 2026-10-28: `C | Paragraph` uses the Typography Style "Body SM" mode
+  at ≤478px (same font, weight, line height and spacing as Body; size
+  0.875em), and the Body LG variant is pinned to its own mode there (see the
+  `:where()` entry above). `text-b` and similar are still 16px.
+- Status: fixed (Webflow, published to staging 2026-10-28)
 - Found by: claude
 
 ### 2026-10-28 · Mobile portrait scale was set for 430px; Figma is 375px
@@ -50,7 +69,9 @@ harvested across all client repos to improve `brandvm/wf-template`.
 - Fix: set to 375 (approved 2026-10-28). It needs Designer changes in the
   same release: the nav no longer fits (logo 186px; Figma 177, pill padding
   14px) and several rows wrap (see the mobile plan, §1).
-- Status: open
+  The Webflow changes were published to staging first (2026-10-28, listed
+  in the mobile plan §1a), then this branch was merged.
+- Status: fixed (merge of mobile-scale-375)
 - Found by: claude
 
 <!-- Add new entries here, newest first. -->

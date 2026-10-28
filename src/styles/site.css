@@ -100,7 +100,8 @@ Place here so it loads after Webflow CSS when added in Head code
 }
 
 /* Mobile Portrait — the Figma mobile frames are 375px wide, so 1rem = 16px at 375.
-   Body text is 14px there: Webflow variable Typography Role › Size › Body = size--14 at this breakpoint. */
+   Body text is 14px there: C | Paragraph uses the Typography Style "Body SM" mode at ≤478px in Webflow
+   (never change Typography Role › Size › Body; see GOTCHAS 2026-10-28). */
 @media screen and (max-width: 479px) {
   :root {
     --size-container-ideal: 375;
