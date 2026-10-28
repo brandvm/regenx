@@ -46,10 +46,11 @@
 }
 
 /* repo-css: designer-cant — mask. Mobile portrait shows one full-width stage
-   with no peek of its neighbours, so the edge fade (and its gutter) is off. */
+   with no peek of its neighbours, so the slider's edge fade (and its gutter)
+   is off. The ruler keeps its 1.5em gutter so the end week labels are not
+   cut in half; its content width, and so the tick positions, are unchanged. */
 @media (max-width: 479px) {
-  [data-therapy-timeline] .therapy-timeline-slider,
-  [data-therapy-timeline] [data-timeline-ruler] {
+  [data-therapy-timeline] .therapy-timeline-slider {
     --timeline-edge-fade: 0px;
   }
 }
