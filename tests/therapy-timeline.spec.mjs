@@ -187,7 +187,7 @@ test('mobile portrait fills the view with each stage and scales the ruler per st
 test('responsive edge masks preserve the week scale and leave navigation unmasked', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   const errors = await setup(page);
-  for (const [width, fadeEm] of [[1440, 6], [991, 4], [600, 1.5], [390, 0]]) {
+  for (const [width, fadeEm, rulerFadeEm = fadeEm] of [[1440, 6], [991, 4], [600, 1.5], [390, 0, 1.5]]) {
     await page.setViewportSize({ width, height: 900 });
     await expectButtons(page, { previous: false, following: width <= 767 });
     await settled(page);
@@ -220,16 +220,16 @@ test('responsive edge masks preserve the week scale and leave navigation unmaske
         navigationMasks,
       };
     });
-    for (const viewport of [masks.slider, masks.ruler]) {
+    for (const [viewport, em] of [[masks.slider, fadeEm], [masks.ruler, rulerFadeEm]]) {
       expect(viewport.mask).toContain('linear-gradient');
       expect(viewport.mask).toContain('rgba(0, 0, 0, 0)');
-      expect(viewport.paddingLeft / viewport.fontSize).toBeCloseTo(fadeEm, 3);
+      expect(viewport.paddingLeft / viewport.fontSize).toBeCloseTo(em, 3);
       expect(viewport.paddingRight).toBeCloseTo(viewport.paddingLeft, 3);
       expect(viewport.left + viewport.paddingLeft).toBeCloseTo(masks.rootLeft, 0);
       expect(viewport.width - viewport.paddingLeft - viewport.paddingRight).toBeCloseTo(masks.rootWidth, 0);
       expect(viewport.overflow).toBe('hidden');
     }
-    expect(masks.slider.mask).toBe(masks.ruler.mask);
+    if (fadeEm === rulerFadeEm) expect(masks.slider.mask).toBe(masks.ruler.mask);
     expect(masks.trackMasks).toEqual(['none', 'none']);
     expect(masks.navigationMasks.every(mask => mask === 'none')).toBe(true);
     expect(g.left).toBeCloseTo(masks.rootLeft, 0);
