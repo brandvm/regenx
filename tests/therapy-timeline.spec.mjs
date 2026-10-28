@@ -157,10 +157,37 @@ test('mobile shows one stage and both button pairs share endpoints and keyboard 
   expect(errors).toEqual([]);
 });
 
+test('mobile portrait fills the view with each stage and scales the ruler per stage', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  const errors = await setup(page, { future: true });
+  const tickAt = week => page.locator(`[data-timeline-week="${week}"]`).evaluate(el => el.getBoundingClientRect().left);
+  const initial = await geometry(page);
+  // Week spans differ (6, 7 and 11 weeks), yet every stage is one full view.
+  for (const s of initial.stages) expect(s.width).toBeCloseTo(initial.width, 0);
+  expect(initial.stages[1].left).toBeGreaterThanOrEqual(initial.left + initial.width - 1);
+  // No fade gutter: nothing of the next stage shows inside the slider box.
+  expect(await page.locator('.therapy-timeline-slider').evaluate(el => el.getBoundingClientRect().right)).toBeLessThanOrEqual(initial.stages[1].left + 1);
+  expect(initial.tick6 - initial.tick0).toBeCloseTo(initial.width, 0);
+  await next(page).first().click();
+  await settled(page);
+  let g = await geometry(page);
+  expect(g.stages[1].left).toBeCloseTo(g.left, 0);
+  expect(g.tick6).toBeCloseTo(g.stages[1].left, 0);
+  expect(await tickAt(13) - g.tick6).toBeCloseTo(g.width, 0);
+  await next(page).first().click();
+  await settled(page);
+  await expectButtons(page, { previous: true, following: false });
+  g = await geometry(page);
+  expect(g.stages[2].left).toBeCloseTo(g.left, 0);
+  expect(await tickAt(13)).toBeCloseTo(g.stages[2].left, 0);
+  expect(await tickAt(24)).toBeCloseTo(g.stages[2].right, 0);
+  expect(errors).toEqual([]);
+});
+
 test('responsive edge masks preserve the week scale and leave navigation unmasked', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   const errors = await setup(page);
-  for (const [width, fadeEm] of [[1440, 6], [991, 4], [390, 1.5]]) {
+  for (const [width, fadeEm] of [[1440, 6], [991, 4], [600, 1.5], [390, 0]]) {
     await page.setViewportSize({ width, height: 900 });
     await expectButtons(page, { previous: false, following: width <= 767 });
     await settled(page);
@@ -214,6 +241,8 @@ test('responsive edge masks preserve the week scale and leave navigation unmaske
       await settled(page);
       await expectButtons(page, { previous: true, following: false });
       expect((await geometry(page)).stages[1].left).toBeCloseTo(g.left, 0);
+      await prev(page).nth(1).click();
+      await settled(page);
     }
   }
   expect(errors).toEqual([]);

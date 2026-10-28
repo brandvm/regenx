@@ -45,6 +45,15 @@
   }
 }
 
+/* repo-css: designer-cant — mask. Mobile portrait shows one full-width stage
+   with no peek of its neighbours, so the edge fade (and its gutter) is off. */
+@media (max-width: 479px) {
+  [data-therapy-timeline] .therapy-timeline-slider,
+  [data-therapy-timeline] [data-timeline-ruler] {
+    --timeline-edge-fade: 0px;
+  }
+}
+
 /* Preserve the native column layout when Swiper's generic display:block rule
    loads after Webflow CSS, so its editable badge/copy gap still applies. */
 [data-therapy-timeline] .therapy-timeline-stage {

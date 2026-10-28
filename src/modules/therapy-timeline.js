@@ -34,8 +34,10 @@ export function createTherapyTimeline(el) {
     else node.setAttribute(name, value);
   }
 
-  function buildTicks(origin, end) {
-    const signature = `${origin}:${end}`;
+  // `stops` is null for a linear ruler, or the stage boundaries when each
+  // stage fills the view (week positions then scale per stage).
+  function buildTicks(origin, end, stops) {
+    const signature = `${origin}:${end}:${stops ? stops.join(",") : "linear"}`;
     if (tickSignature === signature) return;
     tickSignature = signature;
     const fragment = document.createDocumentFragment();
@@ -46,7 +48,7 @@ export function createTherapyTimeline(el) {
       const major = Number.isInteger(week);
       tick.className = `therapy-timeline-tick${major ? " is-major" : ""}`;
       tick.dataset.timelineWeek = String(week);
-      tick.style.left = `${((week - origin) / (end - origin)) * 100}%`;
+      tick.style.left = `${position(week, origin, end, stops) * 100}%`;
       if (major) {
         const label = document.createElement("span");
         label.className = "therapy-timeline-tick-label";
@@ -56,6 +58,14 @@ export function createTherapyTimeline(el) {
       fragment.appendChild(tick);
     }
     track.replaceChildren(fragment);
+  }
+
+  function position(week, origin, end, stops) {
+    if (!stops) return (week - origin) / (end - origin);
+    let index = stops.length - 1;
+    while (index > 0 && week < stops[index]) index--;
+    const finish = stops[index + 1] ?? end;
+    return (index + (week - stops[index]) / (finish - stops[index])) / stops.length;
   }
 
   function prepare() {
@@ -86,6 +96,8 @@ export function createTherapyTimeline(el) {
     const width = el.clientWidth - (parseInt(computed.paddingLeft, 10) || 0) -
       (parseInt(computed.paddingRight, 10) || 0);
     if (width <= 0) return;
+    // Mobile portrait: one stage per view at full width, no peek of the next.
+    const onePerView = window.innerWidth <= 479;
     const unit = width / visibleWeeks;
     root.style.setProperty("--timeline-week-width", `${unit}px`);
     slides.forEach((slide, index) => {
@@ -93,13 +105,17 @@ export function createTherapyTimeline(el) {
         savedWidths.set(slide, slide.style.width);
         savedLabels.set(slide, slide.getAttribute("aria-label"));
       }
-      slide.style.width = `${((boundaries[index + 1] ?? end) - boundaries[index]) * unit}px`;
+      slide.style.width = onePerView
+        ? `${width}px`
+        : `${((boundaries[index + 1] ?? end) - boundaries[index]) * unit}px`;
       const start = number(slide.getAttribute("data-week-start"), boundaries[index]);
       const finish = number(slide.getAttribute("data-week-end"), boundaries[index + 1] ?? end);
       slide.setAttribute("aria-label", `Weeks ${start}–${finish}`);
     });
-    buildTicks(origin, end);
-    track.style.width = `${(end - origin) * unit}px`;
+    buildTicks(origin, end, onePerView ? boundaries : null);
+    track.style.width = onePerView
+      ? `${slides.length * width}px`
+      : `${(end - origin) * unit}px`;
     track.style.transitionTimingFunction = getComputedStyle(wrapper).transitionTimingFunction;
   }
 
