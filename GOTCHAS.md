@@ -25,6 +25,58 @@ harvested across all client repos to improve `brandvm/wf-template`.
 
 ## This project
 
+### 2026-10-28 · Home hero classes are shared with the service heroes
+- Area: designer
+- Scope: project
+- Symptom: After the Home hero was reordered at ≤478px, the TRT, Peptide
+  and Enclomiphene heroes showed the feature list above the visual.
+- Cause: those heroes reuse the `home-hero-*` classes, so the Home
+  `display: contents` and `order` rules reached them too.
+- Fix: `.service-hero-right` order −4 and a new `.line.is_sh-mid` order −3
+  at ≤478px restore their order. Before changing a `home-hero-*` style,
+  check the three service pages as well.
+- Status: fixed (Webflow, 2026-10-28)
+- Found by: claude
+
+### 2026-10-28 · Switching a section's theme on one breakpoint
+- Area: designer
+- Scope: template-candidate
+- Symptom: The Enclomiphene hero needed the light theme and Benefits the
+  dark theme on mobile only; `u-th-dark` is applied as an attribute class
+  on every size.
+- Cause: none; this records the method that worked.
+- Fix: give the section a mobile-only combo (`is_enclo-hero`) and set the
+  theme collection's variable mode on it at `tiny`
+  (`set_style_variable_mode`, `base` = light). The attribute class stays,
+  so tablet and desktop keep their theme.
+- Status: documented
+- Found by: claude
+
+### 2026-10-28 · Rich text child styles through the MCP
+- Area: mcp
+- Scope: template-candidate
+- Symptom: `query_styles` for "rte" returned only `.rte`, not the
+  `.rte h2` / `.rte blockquote` styles.
+- Cause: nested rich-text styles are tag styles named `h2`, `blockquote`
+  and so on; name search doesn't link them to their parent.
+- Fix: find them by property (`query_styles` with `properties`), then
+  update with `style_name: "h2", parent_style_names: ["RTE"]`; the result's
+  `selector` confirms `.rte h2`.
+- Status: documented
+- Found by: claude
+
+### 2026-10-28 · A zero edge fade cut the timeline's end labels
+- Area: css
+- Scope: project
+- Symptom: With one stage per view at ≤479px, the ruler's first and last
+  week labels were cut in half.
+- Cause: the edge fade variable also sets the ruler's gutter; setting it to
+  0 for both layers left the centred end labels no room.
+- Fix: only the slider's fade is 0 (no peek); the ruler keeps 1.5em. Its
+  content width, and so the tick positions, don't depend on the fade.
+- Status: fixed (timeline-ruler-gutter)
+- Found by: claude
+
 ### 2026-10-28 · Webflow Dropdown accordions close each other page-wide
 - Area: js
 - Scope: template-candidate
