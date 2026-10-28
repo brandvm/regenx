@@ -199,3 +199,60 @@ test('snap rows with cards of different heights take the height of the card in v
   expect(await row.evaluate((el) => getComputedStyle(el).overflowY)).toBe('hidden');
   expect(errors).toEqual([]);
 });
+
+// Accordions as Webflow publishes them: `.acc` dropdowns, with a stand-in for
+// the jQuery data and handlers Webflow's dropdown module attaches.
+const accordions = `
+<div class="faqs-w w-dyn-list"><div class="w-dyn-items">
+  ${[1, 2, 3].map((n) => `<div class="w-dyn-item"><div class="acc w-dropdown" id="faq${n}">
+    <div class="w-dropdown-toggle" tabindex="0" aria-expanded="false">Q${n}</div><nav class="w-dropdown-list">A${n}</nav></div></div>`).join('')}
+</div></div>
+<div class="sd-content">
+  ${[1, 2].map((n) => `<div class="acc w-dropdown" id="sd${n}">
+    <div class="w-dropdown-toggle" tabindex="0" aria-expanded="false">S${n}</div><nav class="w-dropdown-list">B${n}</nav></div>`).join('')}
+</div>
+<div class="lab-tests-list" style="display:none">
+  <div class="acc w-dropdown" id="hidden1"><div class="w-dropdown-toggle" aria-expanded="false">H</div><nav class="w-dropdown-list">H</nav></div>
+</div>
+<script>
+  // Webflow binds per dropdown: w-close / focusout on the root, a mouseup
+  // handler on the toggle, and keeps its state in jQuery data.
+  const store = new Map(); const handlers = new Map(); window.log = [];
+  const on = (el, ev, fn) => { if (!handlers.has(el)) handlers.set(el, {}); handlers.get(el)[ev] = fn; };
+  document.querySelectorAll('.acc').forEach((acc) => {
+    const state = { open: false, mouseUpOutside: () => window.log.push('outside-close ' + acc.id) };
+    store.set(acc, state);
+    on(acc, 'w-close.w-dropdown', () => window.log.push('w-close ' + acc.id));
+    on(acc, 'focusout.w-dropdown', () => window.log.push('focusout ' + acc.id));
+    on(acc.firstElementChild, 'mouseup.w-dropdown', () => {
+      state.open = !state.open;
+      acc.firstElementChild.setAttribute('aria-expanded', String(state.open));
+    });
+  });
+  window.jQuery = Object.assign((el) => ({
+    off: (ev) => { delete (handlers.get(el) || {})[ev]; },
+    triggerHandler: (ev) => (handlers.get(el) || {})[ev]?.(),
+  }), { data: (el) => store.get(el) });
+  window.accState = (id) => ({ open: store.get(document.getElementById(id)).open, handlers: Object.keys(handlers.get(document.getElementById(id)) || {}) });
+</script>`;
+
+test('accordions open the first visible item of each group and stop closing each other', async ({ page }) => {
+  const errors = await setup(page, accordions);
+  const state = (id) => page.evaluate((id) => window.accState(id), id);
+  expect((await state('faq1')).open).toBe(true);
+  expect((await state('faq2')).open).toBe(false);
+  expect((await state('sd1')).open).toBe(true);
+  expect((await state('sd2')).open).toBe(false);
+  expect((await state('hidden1')).open).toBe(false);
+  await expect(page.locator('#faq1 > .w-dropdown-toggle')).toHaveAttribute('aria-expanded', 'true');
+  // Webflow's own ways of closing a dropdown from outside are gone.
+  expect((await state('faq2')).handlers).toEqual([]);
+  expect(await page.evaluate(() => { window.jQuery.data(document.getElementById('faq1')).mouseUpOutside(); return window.log; })).toEqual([]);
+  expect(errors).toEqual([]);
+});
+
+test('accordions do nothing without Webflow', async ({ page }) => {
+  const errors = await setup(page, accordions.replace(/<script>[\s\S]*<\/script>/, ''));
+  await expect(page.locator('#faq1 > .w-dropdown-toggle')).toHaveAttribute('aria-expanded', 'false');
+  expect(errors).toEqual([]);
+});

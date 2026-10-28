@@ -16,6 +16,7 @@ import { SmartSwiper } from "./smart-swiper";
 import { SnapDots } from "./snap-dots";
 import { FormSteps } from "./form-steps";
 import { Videos } from "./videos";
+import { Accordions } from "./accordions";
 import { SDMedia } from "./sd-media";
 import { TestimonialVideos } from "./testimonial-videos";
 import { NavOverlay } from "./nav-overlay";
@@ -45,6 +46,7 @@ export function initMain() {
   run("SnapDots", () => SnapDots.init());
   run("FormSteps", () => FormSteps.init());
   run("Videos", () => Videos.init());
+  run("Accordions", () => Accordions.init());
   run("SDMedia", () => SDMedia.init());
   run("TestimonialVideos", () => TestimonialVideos.init());
   run("NavOverlay", () => NavOverlay.init());
