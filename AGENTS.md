@@ -17,7 +17,7 @@ source of agent rules — edit this file, never a copy of it.
 - Production domain: unknown — fill in (production is intentionally
   unconfigured during development)
 - Production release: none yet (`RELEASE = null` in the HEAD snippet; no tags)
-- Webflow MCP: configured in `.mcp.json` (`https://mcp.webflow.com/mcp`)
+- Webflow MCP server: `webflow-regen-x` (`.mcp.json`, `https://mcp.webflow.com/mcp`)
 - Origin: CodeSandbox `regenx-main.css`, `regenx-wave.js`, `regenx-main.js`
   plus global head/footer code, migrated 2026-09-15 (bff85c4).
 
@@ -195,6 +195,25 @@ publishing to a custom domain; roll back with the prior `RELEASE` value.
 Never move a published tag. Never use `@latest` or a branch URL in
 production. Replace placeholder content (timeline preview stages, Lorem Ipsum
 benefit cards) before the first production release.
+Also port wf-template 0.8.0's piece-1 fix to the HEAD snippet first: on a
+release domain it writes the pinned stylesheet into `<head>` so production
+never waits for the staging sheet (template `loader.html`, CHANGELOG 0.8.0).
+It only runs with `RELEASE` set, so it was left out of the 0.8.1 update.
+
+## Webflow MCP connection
+
+Each client repo has its own MCP server name, `webflow-<slug>` in
+`.mcp.json`, so each keeps its own Webflow sign-in on the machine. The
+sign-in (OAuth token) never goes in the repo: these repos are public.
+
+- Use only the server named in Project facts. Never write to Webflow
+  through another client's server or the account-wide claude.ai Webflow
+  connector, which may reach other clients' sites.
+- Before the first write in a session, list the sites the server reaches
+  and check the site ID matches Project facts. A mismatch or extra sites →
+  stop and ask the user to re-authorise with only this site ticked.
+- The cloud (claude.ai/code) can't run the OAuth sign-in; Webflow MCP work
+  happens in a local Claude Code session opened in the workspace.
 
 ## Webflow MCP limits
 

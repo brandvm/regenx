@@ -10,6 +10,11 @@
 @import "./styles/marquee.css";
 @import "./styles/modal.css";
 
+/* Icons. An @import has to come before every rule.
+   repo-css: third-party — Phosphor icon font; `pnpm phosphor` writes the
+   file and chooses the weights (`pnpm phosphor none` removes them). */
+@import "./phosphor.css";
+
 /* Former site-head rules. Designer helper embeds stay visible in the canvas. */
 html:not(.w-editor) .g-embed-code,
 html:not(.w-editor) .w-webflow-badge,

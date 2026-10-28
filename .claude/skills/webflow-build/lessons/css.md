@@ -6,6 +6,17 @@ Harvested from client builds made from this template (`Scope:
 template-candidate` entries in their `GOTCHAS.md`). Module and file names
 refer to the project the lesson came from; Status is that project's.
 
+### 2026-10-19 · A `0fr` grid row still holds its item's padding
+- Area: css
+- Symptom: a dropdown animated with `grid-template-rows: 0fr → 1fr`
+  stopped at 41 px instead of 0 when closed.
+- Cause: a grid item's padding sets its minimum size, so a `0fr` track
+  still holds the padding.
+- Fix: the closed state also sets the item's vertical padding to 0,
+  transitioned with the rows, so the Designer padding returns when open.
+- Status: fixed in that project
+- Found by: claude
+
 ### 2026-10-09 · Measure preloads; font preloads can make it worse
 - Area: css, perf
 - Symptom: font preloads for the heading and body fonts (both

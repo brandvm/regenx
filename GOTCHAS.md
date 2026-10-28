@@ -36,8 +36,10 @@ harvested across all client repos to improve `brandvm/wf-template`.
 - Cause: the script seeds the icon font whenever `src/phosphor.css` is
   missing; there is no way to record "not wanted".
 - Fix: remove the three seeds after each run (done for 0.5.1 and 0.7.1).
-  The template could skip seeds listed in `.wf-template.json`.
-- Status: open
+  From 0.8.1, `pnpm phosphor none` instead: it leaves a comment-only
+  `src/phosphor.css` (and its import), which builds to nothing, and the
+  script only seeds when that file is missing.
+- Status: fixed (template 0.8.1 update)
 - Found by: claude
 
 ### 2026-09-30 · Public pages requested localhost
