@@ -62,6 +62,19 @@
   opacity: 1;
 }
 
+/* repo-css: third-party — Swiper stretches every slide to the tallest card.
+   On mobile portrait each card keeps its own height (Figma), and the pill
+   becomes a round 8px dot. */
+@media (max-width: 479px) {
+  [data-benefit-slider] .swiper-wrapper {
+    align-items: flex-start;
+  }
+
+  [data-benefit-slider] .sb-benefit-pagination .swiper-pagination-bullet-active {
+    width: .5em;
+  }
+}
+
 [data-benefit-slider] .swiper-pagination-bullet:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 3px;

@@ -25,6 +25,48 @@ harvested across all client repos to improve `brandvm/wf-template`.
 
 ## This project
 
+### 2026-10-28 · Scroll-snap rows: a moved card and a tall card
+- Area: js
+- Scope: template-candidate
+- Symptom: On the Home Diagnosis row the dots pointed at the wrong cards,
+  and short cards had ~450px of empty panel under them.
+- Cause: Webflow puts the lab panel card last with `order: 99`, so markup
+  order is not screen order; and a flex row is as tall as its tallest card
+  (920px), whatever card is in view.
+- Fix: `snap-dots.ts` sorts cards by their on-screen position, and rows
+  marked `autoHeight` take the height of the card in view (`overflow-y:
+  hidden` while they do), like Swiper's autoHeight.
+- Status: fixed (mobile-sliders)
+- Found by: claude
+
+### 2026-10-28 · Turn a scroll interaction off per breakpoint through the MCP
+- Area: mcp
+- Scope: template-candidate
+- Symptom: The pinned process scroll and the About hero scroll needed to be
+  off on mobile only; the plan assumed a Designer-only change.
+- Cause: none; this records the method that worked.
+- Fix: `data_interactions_tool › update_interaction` with
+  `conditionalPlayback: [{type: "breakpoint", breakpoints: ["tiny"],
+  behavior: "dont-animate"}]`. "dont-animate" leaves elements at their CSS
+  state (track transform none). "skip-to-end" would have applied end values
+  (the hero header at opacity 0). Then undo the pin in the styles at the
+  same breakpoint (section height auto, wrapper not sticky).
+- Status: documented
+- Found by: claude
+
+### 2026-10-28 · The Contact form's "blank" box is a live reCAPTCHA
+- Area: designer
+- Scope: project
+- Symptom: About 130px of empty space on Contact step 2 in mobile captures.
+- Cause: Webflow's reCAPTCHA v2 element (304×78 checkbox iframe, live site
+  key) plus 24px pane gaps. It renders blank in headless browsers. The page
+  also loads Cloudflare Turnstile.
+- Fix: none. Hiding the element breaks submissions if reCAPTCHA
+  validation is on in Site settings › Forms. On 2026-10-28 the user chose
+  to keep reCAPTCHA, so the space stays. Don't hide it.
+- Status: won't fix (keep reCAPTCHA, user decision 2026-10-28)
+- Found by: claude
+
 ### 2026-10-28 · Component variant styles lose to the base style's breakpoints
 - Area: designer
 - Scope: template-candidate

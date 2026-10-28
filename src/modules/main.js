@@ -13,6 +13,7 @@ import { FooterNav } from "./footer-nav";
 import { CompareTable } from "./compare-table";
 import { TabGraphics } from "./tab-graphics";
 import { SmartSwiper } from "./smart-swiper";
+import { SnapDots } from "./snap-dots";
 import { FormSteps } from "./form-steps";
 import { Videos } from "./videos";
 import { SDMedia } from "./sd-media";
@@ -41,6 +42,7 @@ export function initMain() {
   run("CompareTable", () => CompareTable.init());
   run("TabGraphics", () => TabGraphics.init());
   run("SmartSwiper", () => SmartSwiper.init());
+  run("SnapDots", () => SnapDots.init());
   run("FormSteps", () => FormSteps.init());
   run("Videos", () => Videos.init());
   run("SDMedia", () => SDMedia.init());
