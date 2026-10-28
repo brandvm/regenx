@@ -25,6 +25,37 @@ harvested across all client repos to improve `brandvm/wf-template`.
 
 ## This project
 
+### 2026-10-28 · Webflow Dropdown accordions close each other page-wide
+- Area: js
+- Scope: template-candidate
+- Symptom: "first item open in every FAQ block" could not be done: opening
+  one `.acc` closed every other open accordion on the page, and a click
+  anywhere or moving focus away closed it too.
+- Cause: `.acc` is a Webflow Dropdown. On open, Webflow sends
+  `w-close.w-dropdown` to every other dropdown, closes on `focusout`, and
+  binds a document `mouseUpOutside` closer. A script on the Product
+  template (probably Finsweet) also re-runs Webflow's setup after boot,
+  which binds them again and resets the open panels' IX2 styles.
+- Fix: `accordions.ts` keeps Webflow in charge of clicks, keys, IX2 and
+  `aria-expanded`, and only unbinds those three closers for `.acc` (nav
+  dropdowns untouched). It opens the first visible item per group through
+  Webflow's own toggle handler, and repeats both after every re-run of the
+  dropdown module's `ready`.
+- Status: fixed (acc-first-open)
+- Found by: claude
+
+### 2026-10-28 · A component instance can't take a mobile-only class
+- Area: designer
+- Scope: project
+- Symptom: Home Diagnosis "View Full List of Lab Test" could not be hidden
+  at ≤478px only.
+- Cause: it is a `C | Button` instance; Webflow puts no classes on
+  instances, and the component's Visibility prop hides it on every size.
+- Fix: none yet. Options: a wrapper (structure change), a mobile visibility
+  prop on the component, or a repo CSS override (needs approval).
+- Status: open
+- Found by: claude
+
 ### 2026-10-28 · A grid child's per-element order beats every class order
 - Area: designer
 - Scope: template-candidate
