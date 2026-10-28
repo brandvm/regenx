@@ -65,8 +65,11 @@ export const SmartSwiper = (function () {
       // Slide widths come from Webflow; benefit-slider.js adds loop copies
       // and one pagination bullet per authored card.
       benefit: true,
+      // One card per view on mobile portrait (Figma); from 480px the slide
+      // widths come from Webflow again. Swiper applies only the largest
+      // matching breakpoint, so each one repeats slidesPerView.
       opts: {
-        slidesPerView: "auto",
+        slidesPerView: 1,
         centeredSlides: true,
         spaceBetween: 16,
         loop: true,
@@ -74,7 +77,8 @@ export const SmartSwiper = (function () {
         grabCursor: true,
         speed: 735,
         breakpoints: {
-          768: { spaceBetween: 24 },
+          480: { slidesPerView: "auto", spaceBetween: 16 },
+          768: { slidesPerView: "auto", spaceBetween: 24 },
         },
         a11y: {
           containerMessage: "Enclomiphene benefits",

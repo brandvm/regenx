@@ -88,7 +88,7 @@ async function centredOffset(page) {
   });
 }
 
-for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
+for (const viewport of [{ width: 1440, height: 900 }, { width: 600, height: 900 }]) {
   test(`benefit slider centres a looping card with pagination at ${viewport.width}px`, async ({ page }) => {
     await page.setViewportSize(viewport);
     const { errors, warnings } = await setup(page);
@@ -131,6 +131,36 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 
     expect(errors).toEqual([]);
   });
 }
+
+test('benefit slider shows one card per view with round dots on mobile portrait', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const { errors, warnings } = await setup(page);
+  const slider = active(page).locator('.sb-benefit-slider');
+  // Give one card more content than the others: on mobile it may not
+  // stretch its neighbours.
+  await active(page).locator('.swiper-slide:not([data-benefit-clone]) h3').nth(1)
+    .evaluate(el => { el.style.height = '400px'; });
+  await slider.evaluate(el => el.swiper.update());
+
+  const layout = await slider.evaluate(el => {
+    const box = el.getBoundingClientRect();
+    const active = el.querySelector('.swiper-slide-active').getBoundingClientRect();
+    const heights = [...el.querySelectorAll('.swiper-slide:not([data-benefit-clone])')].map(s => Math.round(s.getBoundingClientRect().height));
+    return { full: Math.abs(active.width - box.width) < 2, heights };
+  });
+  expect(layout.full).toBe(true);
+  expect(new Set(layout.heights).size).toBeGreaterThan(1);
+  expect(await centredOffset(page)).toBeLessThan(2);
+
+  const bullets = active(page).locator('.swiper-pagination-bullet');
+  const sizes = await bullets.evaluateAll(els => els.map(b => Math.round(b.getBoundingClientRect().width)));
+  expect(new Set(sizes).size).toBe(1);
+
+  await bullets.nth(2).click();
+  await expect.poll(() => slider.evaluate(el => el.swiper.realIndex)).toBe(2);
+  expect(warnings).toEqual([]);
+  expect(errors).toEqual([]);
+});
 
 test('benefit slider in a hidden tab initializes when the tab opens', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });

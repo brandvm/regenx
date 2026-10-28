@@ -127,3 +127,75 @@ test('catalog sidebar marks the category in view as active', async ({ page }) =>
   await expect(links.nth(0)).not.toHaveClass(/is-active/);
   expect(errors).toEqual([]);
 });
+
+// A mobile card row as Webflow styles it at ≤478px: a scroll-snap row whose
+// cards are wider than half the row.
+const snapRow = (width) => `<style>
+  .why-main { display: flex; gap: 12px; width: ${width}px; overflow-x: auto; scroll-snap-type: x mandatory; }
+  .why-item { flex: none; width: 296px; height: 200px; scroll-snap-align: start; background: #ddd; }
+</style>
+<section style="display:flex;flex-direction:column;gap:48px">
+  <div class="why-main">${[1, 2, 3, 4].map((n) => `<div class="why-item">Card ${n}</div>`).join('')}</div>
+</section>`;
+
+test('snap dots add one dot per card to a row that scrolls, and follow it', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 800 });
+  const errors = await setup(page, snapRow(343));
+  const dots = page.locator('.snap-dot');
+  await expect(dots).toHaveCount(4);
+  await expect(dots.nth(0)).toHaveAttribute('aria-current', 'true');
+  await expect(dots.nth(2)).toHaveAttribute('aria-label', 'Go to card 3 of 4');
+
+  await dots.nth(2).click();
+  await expect.poll(() => page.locator('.why-main').evaluate((el) => el.scrollLeft)).toBeGreaterThan(600);
+  await expect(dots.nth(2)).toHaveAttribute('aria-current', 'true');
+  await expect(dots.nth(0)).not.toHaveAttribute('aria-current', 'true');
+
+  // The dots sit 1.5rem under the row, whatever gap the row's parent uses.
+  const space = await page.evaluate(() => ({
+    gap: document.querySelector('.snap-dots').getBoundingClientRect().top
+      - document.querySelector('.why-main').getBoundingClientRect().bottom,
+    rem: parseFloat(getComputedStyle(document.documentElement).fontSize),
+  }));
+  expect(Math.round(space.gap)).toBe(Math.round(space.rem * 1.5));
+  expect(errors).toEqual([]);
+});
+
+test('snap dots follow the order cards are shown in, not the markup order', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 800 });
+  const errors = await setup(page, snapRow(343).replace('<div class="why-item">Card 1</div>', '<div class="why-item" style="order:99">Card 1</div>'));
+  const dots = page.locator('.snap-dot');
+  await expect(dots).toHaveCount(4);
+  await dots.nth(3).click();
+  await expect.poll(() => page.locator('.why-item').first().evaluate((el) => {
+    const row = el.parentElement.getBoundingClientRect();
+    return Math.round(el.getBoundingClientRect().right - row.right);
+  })).toBeLessThanOrEqual(1);
+  await expect(dots.nth(3)).toHaveAttribute('aria-current', 'true');
+  expect(errors).toEqual([]);
+});
+
+test('snap dots stay away from a row that fits, and leave when it stops scrolling', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const errors = await setup(page, snapRow(1400));
+  await expect(page.locator('.snap-dots')).toHaveCount(0);
+
+  await page.locator('.why-main').evaluate((el) => { el.style.width = '343px'; });
+  await expect(page.locator('.snap-dot')).toHaveCount(4);
+  await page.locator('.why-main').evaluate((el) => { el.style.width = '1400px'; });
+  await expect(page.locator('.snap-dots')).toHaveCount(0);
+  expect(errors).toEqual([]);
+});
+
+test('snap rows with cards of different heights take the height of the card in view', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 800 });
+  const errors = await setup(page, snapRow(343).replace(/why-main/g, 'diagnosis-main').replace(/why-item/g, 'diagnosis-card')
+    .replace('<div class="diagnosis-card">Card 2</div>', '<div class="diagnosis-card" style="height:600px">Card 2</div>')
+    .replace('.diagnosis-main {', '.diagnosis-main { align-items: flex-start;'));
+  const row = page.locator('.diagnosis-main');
+  await expect.poll(() => row.evaluate((el) => el.getBoundingClientRect().height)).toBe(200);
+  await page.locator('.snap-dot').nth(1).click();
+  await expect.poll(() => row.evaluate((el) => el.getBoundingClientRect().height)).toBe(600);
+  expect(await row.evaluate((el) => getComputedStyle(el).overflowY)).toBe('hidden');
+  expect(errors).toEqual([]);
+});

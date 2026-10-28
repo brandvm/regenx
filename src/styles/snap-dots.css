@@ -1,0 +1,56 @@
+/* Mobile card rows (Why Men Choose, Diagnosis, Clinical Cases). Webflow owns
+   the scroll-snap row and the card sizes at ≤478px; these rules cover the
+   dots snap-dots.ts adds and the scrollbar the Designer can't hide in Safari. */
+
+/* repo-css: js-state — built by snap-dots.ts only while a row overflows. */
+.snap-dots {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  gap: .5rem;
+}
+
+/* The row takes the height of the card in view; taller cards stay inside it
+   instead of scrolling it vertically. */
+.is-snap-auto-height {
+  overflow-y: hidden;
+  transition: height 400ms cubic-bezier(.64, .05, 0, 1);
+}
+
+.snap-dot {
+  width: .5rem;
+  height: .5rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background-color: currentColor;
+  opacity: .24;
+  cursor: pointer;
+  transition: opacity 240ms cubic-bezier(.64, .05, 0, 1);
+}
+
+.snap-dot[aria-current="true"] {
+  opacity: 1;
+}
+
+.snap-dot:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+/* repo-css: designer-cant — ::-webkit-scrollbar; Webflow's scrollbar-width
+   doesn't reach Safari. */
+@media (max-width: 479px) {
+  .why-main::-webkit-scrollbar,
+  .diagnosis-main::-webkit-scrollbar,
+  .clinical-case-main::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .is-snap-auto-height,
+  .snap-dot {
+    transition-duration: 0ms;
+  }
+}
