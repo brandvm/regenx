@@ -51,9 +51,10 @@ harvested across all client repos to improve `brandvm/wf-template`.
   at ≤478px only.
 - Cause: it is a `C | Button` instance; Webflow puts no classes on
   instances, and the component's Visibility prop hides it on every size.
-- Fix: none yet. Options: a wrapper (structure change), a mobile visibility
-  prop on the component, or a repo CSS override (needs approval).
-- Status: open
+- Fix: `C | Button` got a second variant, "Hide on mobile" (a copy of
+  Base with `display: none` at ≤478px), and this instance uses it. Use the
+  same variant for any other button that should be hidden on mobile only.
+- Status: fixed (Webflow, 2026-10-28)
 - Found by: claude
 
 ### 2026-10-28 · A grid child's per-element order beats every class order
