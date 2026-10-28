@@ -25,6 +25,35 @@ harvested across all client repos to improve `brandvm/wf-template`.
 
 ## This project
 
+### 2026-10-28 · A grid child's per-element order beats every class order
+- Area: designer
+- Scope: template-candidate
+- Symptom: `.sd-media` ignored any `order` set on its class at ≤478px
+  when reordering the service detail blocks.
+- Cause: Webflow writes a grid child's placement as an ID rule
+  (`#w-node-…{order:-9999}` in the ≤991px query) once it has been moved
+  in the grid; IDs beat classes.
+- Fix: order the other pieces around it: heading −10001, accordion
+  −10000 (or −9998 to sit after the media), CTA 0. The parents use
+  `display: contents` through mobile-only combos (`is_sd`), so the
+  site-wide header classes stay untouched.
+- Status: documented
+- Found by: claude
+
+### 2026-10-28 · A mobile-only difference in a shared component variant
+- Area: designer
+- Scope: template-candidate
+- Symptom: three service detail accordions needed a left circle icon on
+  mobile, while TRT Why keeps the right "+"; all four used the same
+  `C | Accordion` "Normal" variant.
+- Cause: variant styles are per variant, not per instance.
+- Fix: duplicate the variant (desktop styles come along unchanged), give
+  the copy its ≤478px styles, and switch only the instances that need it
+  (`set_component_instance_prop_values` on the Type prop). Desktop and
+  tablet stay identical.
+- Status: documented
+- Found by: claude
+
 ### 2026-10-28 · Scroll-snap rows: a moved card and a tall card
 - Area: js
 - Scope: template-candidate
