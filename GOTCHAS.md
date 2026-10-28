@@ -25,6 +25,34 @@ harvested across all client repos to improve `brandvm/wf-template`.
 
 ## This project
 
+### 2026-10-28 · Webflow's body size variable also means "inherit"
+- Area: css
+- Scope: template-candidate
+- Symptom: Setting Typography Role › Size › Body to 14px (0.875rem) at
+  mobile portrait shrank every heading to 14px too.
+- Cause: Webflow's text components use that variable as their "1em":
+  `.c-heading h2`, `.c-paragraph p` and similar are `font-size:
+  var(--_typography-role---size--body)`, and the scale steps are `em`. A rem
+  value pins every one of them; an em value below 1 compounds when nested.
+- Fix: leave the body role at 1em. Make body copy 14px through the
+  paragraph styles instead: `.c-paragraph` default (Typography Style size
+  0.875em at ≤478px), plus `text-b` and similar classes. Checked with a
+  preview of the 375px scale change (branch mobile-scale-375).
+- Status: open
+- Found by: claude
+
+### 2026-10-28 · Mobile portrait scale was set for 430px; Figma is 375px
+- Area: css
+- Scope: project
+- Symptom: At 375px everything rendered at 87% of the Figma mobile frames
+  (H2 27.9 vs 32, gutter 13.95 vs 16, button labels 10.5 vs 12).
+- Cause: `--size-container-ideal: 430` in the ≤479px block of site.css.
+- Fix: set to 375 (approved 2026-10-28). It needs Designer changes in the
+  same release: the nav no longer fits (logo 186px; Figma 177, pill padding
+  14px) and several rows wrap (see the mobile plan, §1).
+- Status: open
+- Found by: claude
+
 <!-- Add new entries here, newest first. -->
 
 ### 2026-10-20 · update-skills re-adds the Phosphor seeds every run
