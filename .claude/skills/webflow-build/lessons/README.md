@@ -6,18 +6,20 @@ of them every session.
 
 | File | Covers | Entries |
 | --- | --- | --- |
-| [mcp.md](mcp.md) | Webflow MCP and API: What the Webflow MCP tools (element and WHTML builders, styles, variables, components, CMS) do differently from what you would expect, and the workaround for each. | 59 |
+| [mcp.md](mcp.md) | Webflow MCP and API: What the Webflow MCP tools (element and WHTML builders, styles, variables, components, CMS) do differently from what you would expect, and the workaround for each. | 61 |
 | [designer.md](designer.md) | Designer and canvas: How the Designer, the canvas and publishing behave: combos, components, tag styles, forms, grids, empty elements. | 27 |
-| [css.md](css.md) | Repo CSS: Repo CSS against the Designer: cascade, focus, fixed children, overflow. | 14 |
-| [js.md](js.md) | JavaScript modules: Modules, GSAP, Lenis, Barba, Finsweet and Webflow's own scripts. | 22 |
+| [css.md](css.md) | Repo CSS: Repo CSS against the Designer: cascade, focus, fixed children, overflow. | 15 |
+| [js.md](js.md) | JavaScript modules: Modules, GSAP, Lenis, Barba, Finsweet and Webflow's own scripts. | 27 |
 | [loader-release-ci.md](loader-release-ci.md) | Loader, release and CI: The three snippets, releases with jsDelivr tags, and the CI checks. | 13 |
 
 ## Titles
 
 **Webflow MCP and API** ([mcp.md](mcp.md))
 
+- Replacing a font through the API moves it to another host
+- The MCP can't prove a CMS field is unused
 - Upload a local file as an asset without a public URL
-- `set_attributes` works on DOM elements, fails on Image elements
+- `set_attributes` on Image elements: `loading` works, `crossorigin` and `sizes` fail
 - `publish_site` wants custom domain IDs, and counts toward the 1/min limit
 - Only one collection can take breakpoint auto-modes
 - Style MCP rejects variables on row-gap / column-gap
@@ -108,6 +110,7 @@ of them every session.
 
 **Repo CSS** ([css.md](css.md))
 
+- A `0fr` grid row still holds its item's padding
 - Measure preloads; font preloads can make it worse
 - Horizontal scrollers drag vertically
 - Template focus rule overrides Designer focus states on inputs
@@ -125,6 +128,11 @@ of them every session.
 
 **JavaScript modules** ([js.md](js.md))
 
+- Bundled GSAP plugins register themselves on Webflow's `window.gsap`
+- Lazy ScrollTrigger builds: hidden and re-rendered trigger elements
+- Reserving space for an async form: when to let go
+- Finsweet list nesting fetches every item's page at load
+- Deferring GTM: what it buys and what it costs
 - Barba: forms dead after a page change; stale head and current links
 - Pins created out of page order are measured in the wrong place
 - Barba ignores a root `custom` rule when `to` or `from` is set

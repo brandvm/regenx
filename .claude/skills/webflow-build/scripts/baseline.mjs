@@ -49,14 +49,15 @@ for (const route of paths(cfg, routes)) {
     const old = fs.readFileSync(file);
     const oldH = old.readUInt32BE(20); // PNG IHDR height (device scale 1)
     const [f, y0, y1] = await pixelDiff(b, old, png);
-    const flag = f > threshold || oldH !== h;
+    const newH = png.readUInt32BE(20); // compare PNG to PNG; h is the pre-scroll height
+    const flag = f > threshold || oldH !== newH;
     if (flag) {
       changed++;
       const out = outDir('baseline');
       fs.writeFileSync(path.join(out, `${size[0]}-${slug(route)}-before.png`), old);
       fs.writeFileSync(path.join(out, `${size[0]}-${slug(route)}-after.png`), png);
     }
-    console.log(`${flag ? 'CHANGED' : 'same   '}  ${route.padEnd(24)} @${size[0]}  height ${oldH}→${h}  ${(f * 100).toFixed(1)}% pixels${f > 0 ? ` (rows ${y0}–${y1})` : ''}`);
+    console.log(`${flag ? 'CHANGED' : 'same   '}  ${route.padEnd(24)} @${size[0]}  height ${oldH}→${newH}  ${(f * 100).toFixed(1)}% pixels${f > 0 ? ` (rows ${y0}–${y1})` : ''}`);
   }
 }
 await b.close();

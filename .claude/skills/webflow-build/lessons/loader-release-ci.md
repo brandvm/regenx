@@ -133,7 +133,22 @@ refer to the project the lesson came from; Status is that project's.
   `@x.y.z` ≠ `RELEASE`. Its cost: a release changes two strings, and the
   canvas shows the release CSS. Hiding `body` until the CSS loads delays
   LCP, so don't use it on a site where PageSpeed matters.
-- Status: open
+- Status: fixed in the template's loader.html, 0.8.0 (piece 1 must be
+  re-pasted). Shipped fix: on a release domain piece 1 `document.write`s the
+  release `<link>` into `<head>` (parser-inserted, so it holds first paint
+  in every browser) and a MutationObserver re-points `#wfc-css` (2a) at the
+  same file as the parser inserts it — before 2b runs, so 2b's swap is a
+  no-op. A first version that only re-pointed 2a was live for an hour on
+  one site and regressed: once its href changes, 2a no longer holds the
+  parser, so pages painted before the repo CSS and re-laid out when the
+  type scale arrived (CLS 0.17 phone, 0.31 desktop). Chrome reports a
+  `<body>` stylesheet as `renderBlockingStatus: "non-blocking"` either
+  way, so test with paint timing: `tests/environment-switcher.spec.mjs`
+  delays the release sheet 1 s and requires first paint after it. The
+  look-ahead scanner may still request the 2a staging sheet; it no longer
+  holds the page. Re-pointing 2a removed the old jsDelivr fallback (a
+  failed swap kept the staging sheet), so the written link's `onerror`
+  puts 2a back on staging; a second test blocks jsDelivr.
 - Found by: claude
 
 ### 2026-10-09 · A parity check on settled pages misses layout shifts

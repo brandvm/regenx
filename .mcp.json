@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "webflow": {
+    "webflow-regen-x": {
       "type": "http",
       "url": "https://mcp.webflow.com/mcp"
     }

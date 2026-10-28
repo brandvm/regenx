@@ -89,30 +89,66 @@ export function loadAttribute(name: string): Promise<unknown> {
   return entry.loading;
 }
 
-// Registered attributes this page uses: any element with an fs-<name>…
-// attribute, as the CDN loader's auto mode detects them.
-function usedOnPage(): string[] {
+// Elements carrying each registered attribute this page uses (any
+// fs-<name>… attribute, as the CDN loader's auto mode detects them).
+function usedOnPage(): Map<string, Element[]> {
   const names = new Set(Object.keys(registry));
-  const found = new Set<string>();
+  const found = new Map<string, Element[]>();
   for (const el of document.querySelectorAll('*')) {
     for (const attr of el.getAttributeNames()) {
       const name = attr.match(/^fs-([^-]+)/)?.[1];
-      if (name && names.has(name)) found.add(name);
+      if (!name || !names.has(name)) continue;
+      const list = found.get(name) ?? [];
+      if (list[list.length - 1] !== el) list.push(el);
+      found.set(name, list);
     }
   }
-  return [...found];
+  return found;
+}
+
+// An attribute starts once any of its elements comes within two screens of
+// the viewport, or on the first scroll/pointer/key input. List nesting fetches
+// every nested item's page (seven item pages, ~340 KB, on one home page), and
+// at load that competed with the hero image and font.
+const NEAR = '200% 0px';
+const INPUTS = ['scroll', 'pointerdown', 'keydown', 'touchstart'] as const;
+
+// Attributes still waiting to start; resetFinsweet() cancels them so a page
+// transition doesn't start one on the next page or keep old nodes observed.
+const waiting = new Set<() => void>();
+
+function startWhenNear(name: string, elements: Element[]) {
+  let started = false;
+  const cancel = () => {
+    started = true;
+    waiting.delete(cancel);
+    observer.disconnect();
+    INPUTS.forEach((type) => window.removeEventListener(type, start));
+  };
+  const start = () => {
+    if (started) return;
+    cancel();
+    void loadAttribute(name);
+  };
+  waiting.add(cancel);
+  const observer = new IntersectionObserver((entries) => {
+    if (entries.some((entry) => entry.isIntersecting)) start();
+  }, { rootMargin: NEAR });
+  elements.forEach((el) => observer.observe(el));
+  INPUTS.forEach((type) => window.addEventListener(type, start, { once: true, passive: true }));
 }
 
 export function initFinsweet() {
   if (!Object.keys(registry).length) return;
   // Deferred a microtask so modules that run after this one can still set
   // attributes the Finsweet init must see.
-  void Promise.resolve().then(() => usedOnPage().forEach((name) => void loadAttribute(name)));
+  void Promise.resolve().then(() => usedOnPage().forEach((elements, name) => startWhenNear(name, elements)));
 }
 
-// For page transitions: destroy every started attribute so the next page's
-// markup gets fresh instances.
+// For page transitions: cancel attributes still waiting to start and destroy
+// every started one, so the next page's markup gets fresh instances.
 export function resetFinsweet() {
+  waiting.forEach((cancel) => cancel());
   const w = window as FinsweetWindow;
   if (w.FinsweetAttributes && !Array.isArray(w.FinsweetAttributes)) {
     w.FinsweetAttributes.destroy();

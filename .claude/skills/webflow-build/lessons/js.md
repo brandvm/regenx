@@ -6,6 +6,91 @@ Harvested from client builds made from this template (`Scope:
 template-candidate` entries in their `GOTCHAS.md`). Module and file names
 refer to the project the lesson came from; Status is that project's.
 
+### 2026-10-20 · Bundled GSAP plugins register themselves on Webflow's `window.gsap`
+- Area: js
+- Symptom: with the bundle running after Webflow's GSAP, the bundled
+  ScrollTrigger's triggers showed up in `window.ScrollTrigger.getAll()`,
+  and a stub `window.gsap` received 5 `registerPlugin` calls.
+- Cause: GSAP's ESM plugin files (ScrollTrigger, Observer, CustomEase) end
+  with `_getGSAP() && gsap.registerPlugin(Plugin)`, and `_getGSAP()` falls
+  back to `window.gsap`. Importing them registers the bundled plugin on
+  Webflow's core and replaces `window.ScrollTrigger` under IX3 and any page
+  code that uses it. gsap-core itself stays private.
+- Fix: one entry point (`src/lib/gsap.ts`) that hides `window.gsap` while
+  the plugins evaluate — `gsap-hide` → plugins → `gsap-restore`, relying on
+  ES module evaluation order — and registers them on the bundled core.
+  Never import `gsap/…` anywhere else. Test it with a stub `window.gsap`
+  that counts `registerPlugin` calls.
+- Status: fixed in that project
+- Found by: claude
+
+### 2026-10-20 · Lazy ScrollTrigger builds: hidden and re-rendered trigger elements
+- Area: js
+- Symptom: a scroll-scrubbed card in a CMS template stayed at its
+  from-state (scale 0.5); IX3 had scrubbed it to 1. An earlier build
+  created all 78 triggers with start = end = 0.
+- Cause: the template holds 78 copies of the block (a CMS list) and shows
+  one. (1) A hidden element's 0×0 rect counted as "near the viewport", so
+  it was built while hidden and measured as 0/0. (2) Finsweet List
+  re-rendered the list after start-up, so the IntersectionObserver kept
+  watching detached nodes and never fired for the visible one. IX3
+  avoided both with a body ResizeObserver and by resolving targets again.
+- Fix: build at once only elements with a layout box near the viewport;
+  re-query each selector on every scan (a WeakSet of nodes already seen);
+  re-scan and `ScrollTrigger.refresh()` when the body height changes
+  (debounced) and on `window.load`. Regression test: a list that
+  re-renders after start-up.
+- Status: fixed in that project
+- Found by: claude
+
+### 2026-10-20 · Reserving space for an async form: when to let go
+- Area: js, perf
+- Symptom: mobile CLS 0.276 from a HubSpot form pushing the page down.
+  Reserving its height fixed most runs, but releasing on `:empty` made it
+  0.355, releasing on HubSpot's `onFormReady` gave 0.467 in 1 of 10 runs,
+  and with HubSpot blocked (ad blockers) releasing the empty space shifted
+  the page by ~0.28 every time.
+- Cause: HubSpot inserts its wrapper before the fields render, and
+  `onFormReady` can fire before they reach their final height. A blocked
+  form never fills the space, so any release is a shift.
+- Fix: keep the reservation until a ResizeObserver sees the rendered form
+  at least as tall as the reserved space (or on submit). If the script
+  fails or nothing renders in 8 s, keep the space and show contact details
+  in it (email, phone). CLS 0 in all runs, form loading or blocked.
+- Status: fixed in that project
+- Found by: claude
+
+### 2026-10-20 · Finsweet list nesting fetches every item's page at load
+- Area: js, perf
+- Symptom: a home page fetched seven case-study pages (~340 KB of HTML)
+  right after load, competing with the hero image and font on phones.
+- Cause: `fs-list-nest` loads each item's page to read the nested list,
+  and the recipe started every attribute the page uses at once, even for
+  a list far below the fold.
+- Fix: the Finsweet recipe (0.8.0) starts each attribute when one of its
+  elements comes within two screens of the viewport, or on the first
+  scroll, pointer or key input. Lists near the top still start at once.
+- Status: fixed in the template's recipe, 0.8.0
+- Found by: claude
+
+### 2026-10-20 · Deferring GTM: what it buys and what it costs
+- Area: js, perf
+- Symptom: GA4, Google Ads and the HubSpot tracker (all loaded by GTM)
+  cost 160–300 ms of main-thread blocking on Lighthouse mobile, the main
+  gap between a site's live score and its staging score (staging fired no
+  tags).
+- Fix: in site head code, push `gtm.start` at once but load `gtm.js` on the
+  first scroll, pointerdown, pointermove, keydown or touchstart, or 3.5 s
+  after `window.load`, whichever comes first. Mobile TBT went to 0–10 ms;
+  dataLayer events queue until GTM arrives.
+- Cost: a visitor who leaves within ~3.5 s without touching the page is
+  not counted (no page_view, no remarketing hit). Phone-link clicks and
+  form submits are interactions, so their conversions still fire. It is
+  the client's call: agree it before shipping, and keep the standard
+  snippet in the repo's docs for an easy undo.
+- Status: documented
+- Found by: claude
+
 ### 2026-10-16 · Barba: forms dead after a page change; stale head and current links
 - Area: js
 - Symptom: comparing a direct load with arriving by transition:
@@ -118,8 +203,14 @@ refer to the project the lesson came from; Status is that project's.
     power4.inOut); custom eases are SVG paths in a 160 box (y down);
   - most triggers have `clamp: true` → `start: "clamp(top bottom)"`;
   - **no ease** on a step means GSAP's default `power1.out`, not linear;
-  - `tt`: 0 to, 1 from, 2 fromTo, 3 set; `null` = current value; no
-    `position` = append;
+  - `tt`: 0 to, 1 from, 2 fromTo, 3 set; `null` = current value;
+  - **no `position` = 0, not append**: IX3's runtime places every action
+    at `timing.position ?? 0`, so actions without one run together. It
+    also skips an action with no properties (no spacer), adds
+    `force3D: true`, and uses 0.5 s when no duration is given — the
+    published chunk omits a default duration and every action marked
+    hidden in the Designer (an interaction whose actions are all hidden
+    still loads IX3 and gates the page: delete it);
   - `conditionalPlayback` `dont-animate` per breakpoint → `matchMedia`;
   - IX3's SplitText uses `span`s with `gsap_split_word/letter/line`
     classes, splits words as inline blocks (no line break at hyphens) and
@@ -128,14 +219,16 @@ refer to the project the lesson came from; Status is that project's.
   Load interactions (hero, page header) are better as CSS `@keyframes`
   gated on `html:not(.w-mod-ix3)`: they start at first paint instead of
   after IX3's `visibility:hidden` gate (the main mobile LCP cost). Bundled
-  GSAP never overwrites Webflow's `window.gsap` (it only installs when none
-  exists), so the module can stay off while `window.gsap !== gsap` — no
-  double animation before the cutover. Build timelines lazily
+  gsap-core never overwrites Webflow's `window.gsap` (it only installs when
+  none exists), so the module can stay off while `window.gsap !== gsap` — no
+  double animation before the cutover. Its plugins are different: see
+  "Bundled GSAP plugins register themselves on Webflow's `window.gsap`". Build timelines lazily
   (IntersectionObserver one screen ahead) and batch one
   `ScrollTrigger.refresh()` after each build. Verifying by blocking IX3 on
   staging with Playwright is only approximate: Webflow also writes IX3
   start styles inline, so check the real cutover on staging by eye.
-- Status: code done in the project; cutover pending
+- Status: cut over in a second project (0 differences on 7 page/width
+  pairs); the `position` rule above was corrected there
 - Found by: claude
 
 ### 2026-10-09 · Finsweet recipe: keep it out of index.js
