@@ -2,13 +2,29 @@
 // marked active (black, per Figma "1V Filters"). The links are Webflow
 // section links in .services-main-nav-list.is-catalog; Webflow gives
 // same-page section links no current state of its own.
+// A block marked [data-catalog-hide-empty] (New Products) is hidden, with its
+// sidebar link, while its Collection List has no items: Webflow can't hide an
+// element on an empty list.
 const ACTIVE = 'is-active';
 
 export function initCatalogNav() {
   const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('.services-main-nav-list.is-catalog a[href^="#"]'));
+  const targetOf = (link: HTMLAnchorElement) => document.getElementById(decodeURIComponent(link.hash.slice(1)));
+
+  document.querySelectorAll<HTMLElement>('[data-catalog-hide-empty]').forEach((block) => {
+    if (block.querySelector('.w-dyn-item')) return;
+    block.style.display = 'none';
+    links.forEach((link) => {
+      const target = targetOf(link);
+      if (target && block.contains(target)) link.style.display = 'none';
+    });
+  });
+
+  // Hidden blocks and links (empty, or hidden in Webflow) take no part.
   const pairs = links
-    .map((link) => ({ link, target: document.getElementById(decodeURIComponent(link.hash.slice(1))) }))
-    .filter((p): p is { link: HTMLAnchorElement; target: HTMLElement } => !!p.target);
+    .map((link) => ({ link, target: targetOf(link) }))
+    .filter((p): p is { link: HTMLAnchorElement; target: HTMLElement } =>
+      !!p.target && p.link.getClientRects().length > 0 && p.target.getClientRects().length > 0);
   if (!pairs.length) return;
 
   const setActive = (active: HTMLAnchorElement) => {

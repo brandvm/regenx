@@ -128,6 +128,31 @@ test('catalog sidebar marks the category in view as active', async ({ page }) =>
   expect(errors).toEqual([]);
 });
 
+// New Products (empty Collection List) comes first in the sidebar and is
+// hidden, with its link; a later empty list without the marker stays.
+const catalogWithNew = `<style>section{height:1200px}</style>
+<div class="services-main-nav-list is-catalog" style="position:fixed;top:0;left:0">
+  <a class="services-main-nav-link" href="#New">New Products</a>
+  <a class="services-main-nav-link" href="#Most-Prescribed">Most Prescribed</a>
+  <a class="services-main-nav-link" href="#ED-Medications">ED Medications</a>
+</div>
+<section data-catalog-hide-empty><div id="New"></div><div class="w-dyn-list"><div class="w-dyn-empty">No items found.</div></div></section>
+<section data-catalog-hide-empty><div id="Most-Prescribed"></div><div class="w-dyn-list"><div class="w-dyn-items"><div class="w-dyn-item">MP</div></div></div></section>
+<section><div id="ED-Medications"></div><div class="w-dyn-list"><div class="w-dyn-empty">No items found.</div></div></section>`;
+
+test('catalog sidebar hides an empty New Products block and its link', async ({ page }) => {
+  const errors = await setup(page, catalogWithNew);
+  const links = page.locator('.services-main-nav-link');
+  await expect(page.locator('section').nth(0)).toBeHidden();
+  await expect(links.nth(0)).toBeHidden();
+  await expect(page.locator('section').nth(2)).toBeVisible();
+  await expect(links.nth(1)).toHaveClass(/is-active/);
+  await page.evaluate(() => window.scrollTo(0, 1300));
+  await expect(links.nth(2)).toHaveClass(/is-active/);
+  await expect(links.nth(0)).not.toHaveClass(/is-active/);
+  expect(errors).toEqual([]);
+});
+
 // A mobile card row as Webflow styles it at ≤478px: a scroll-snap row whose
 // cards are wider than half the row.
 const snapRow = (width) => `<style>
