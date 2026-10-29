@@ -25,6 +25,21 @@ harvested across all client repos to improve `brandvm/wf-template`.
 
 ## This project
 
+### 2026-10-29 · display: contents drops the box's own background
+- Area: designer
+- Scope: template-candidate
+- Symptom: After the mobile Home hero reorder, the video lost its light
+  frosted card; the user reported "the light background" was gone.
+- Cause: `.home-hero-card` was set to `display: contents` so its children
+  could be ordered among the hero's other pieces. A `display: contents`
+  element renders no box, so its background, border, padding and radius
+  disappear along with it.
+- Fix: keep the card a box and give the card itself the `order` (−4), so it
+  still sits in the same place in the mobile order with its children inside.
+  Use `display: contents` only on wrappers that have no visible styling.
+- Status: fixed (Webflow, 2026-10-29)
+- Found by: claude
+
 ### 2026-10-28 · Home hero classes are shared with the service heroes
 - Area: designer
 - Scope: project
@@ -153,7 +168,9 @@ harvested across all client repos to improve `brandvm/wf-template`.
 - Fix: `snap-dots.ts` sorts cards by their on-screen position, and rows
   marked `autoHeight` take the height of the card in view (`overflow-y:
   hidden` while they do), like Swiper's autoHeight.
-- Status: fixed (mobile-sliders)
+- Status: fixed (mobile-sliders). Diagnosis and Cases sliders reverted in Webflow
+  2026-10-29 (user): the rows stack again, so `snap-dots.ts` binds nothing there
+  (it only binds a row that scrolls sideways). Why rows keep their dots.
 - Found by: claude
 
 ### 2026-10-28 · Turn a scroll interaction off per breakpoint through the MCP
@@ -168,7 +185,9 @@ harvested across all client repos to improve `brandvm/wf-template`.
   state (track transform none). "skip-to-end" would have applied end values
   (the hero header at opacity 0). Then undo the pin in the styles at the
   same breakpoint (section height auto, wrapper not sticky).
-- Status: documented
+- Status: documented. The process scroll rule was removed again 2026-10-29
+  (user): it animates on mobile as originally. `update_interaction` with
+  `conditionalPlayback: null` clears it. The About hero rule is still on.
 - Found by: claude
 
 ### 2026-10-28 · The Contact form's "blank" box is a live reCAPTCHA
@@ -216,7 +235,9 @@ harvested across all client repos to improve `brandvm/wf-template`.
   at ≤478px (same font, weight, line height and spacing as Body; size
   0.875em), and the Body LG variant is pinned to its own mode there (see the
   `:where()` entry above). `text-b` and similar are still 16px.
-- Status: fixed (Webflow, published to staging 2026-10-28)
+- Status: reverted 2026-10-29 (user): with the scale back at 430, `C | Paragraph`
+  uses its default Body mode again (13.95px at 375, 16px at 430), the Body LG pin
+  and the Form Pane | Note 1em are removed.
 - Found by: claude
 
 ### 2026-10-28 · Mobile portrait scale was set for 430px; Figma is 375px
