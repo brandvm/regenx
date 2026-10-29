@@ -230,7 +230,11 @@ harvested across all client repos to improve `brandvm/wf-template`.
   14px) and several rows wrap (see the mobile plan, §1).
   The Webflow changes were published to staging first (2026-10-28, listed
   in the mobile plan §1a), then this branch was merged.
-- Status: fixed (merge of mobile-scale-375)
+  2026-10-29: reverted to 430 at the user's request (branch mobile-scale-430).
+  The Webflow mobile styles from the plan were sized for 375, so every
+  em/rem value among them now renders at 87% at 375 (e.g. paragraphs
+  "Body SM" 0.875em → 12.2px, nav logo 11.0625em → 154px).
+- Status: reverted (user decision 2026-10-29)
 - Found by: claude
 
 <!-- Add new entries here, newest first. -->
