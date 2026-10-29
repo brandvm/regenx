@@ -69,7 +69,10 @@ export function createTherapyTimeline(el) {
         const step = perWeek >= 16 ? 0.25 : perWeek >= 4 ? 1 : labelStep;
         const last = index === stops.length - 1;
         for (let week = from; week < to || (last && week === to); week += step) {
-          add(week, week === from || (Number.isInteger(week - from) && (week - from) % labelStep === 0 && to - week >= labelStep / 2));
+          // The ruler's final week is always labelled; a regular label too
+          // close before it is dropped so the two never overlap.
+          const end = last && week === to;
+          add(week, week === from || end || (Number.isInteger(week - from) && (week - from) % labelStep === 0 && to - week >= (last ? labelStep : labelStep / 2)));
         }
         if (last && (to - from) % step) add(to, true);
       });

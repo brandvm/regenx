@@ -523,6 +523,7 @@ test('a second timeline with equal stages, dots and month stages leaves the firs
   g = await trt(page);
   for (const s of g.stages) expect(s.width).toBeCloseTo(g.width, 0);
   expect(g.minGap).toBeGreaterThanOrEqual(20);
+  await expect(page.locator('#trt [data-timeline-week="52"] .therapy-timeline-tick-label')).toHaveText('52');
   // The resize keeps the position (the end); back to the first stage, then step on.
   await page.locator('#trt [data-timeline-pagination] .swiper-pagination-bullet').first().click();
   await expect.poll(async () => (await trt(page)).animating).toBe(false);
