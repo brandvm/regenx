@@ -489,6 +489,10 @@ export const SmartSwiper = (function () {
       opts.speed = reduceMotion ? 0 : THERAPY_TIMELINE_SPEED;
     }
 
+    // An empty Collection List publishes no wrapper (Medical Catalog › New
+    // Products while no product is marked new): nothing to slide.
+    if (!el.querySelector(".swiper-wrapper")) return;
+
     // Loop needs slides on BOTH sides of the fan at all times. The Enclomiphene
     // and Peptide tabs only carry 6 products — fewer than the fan shows — so
     // loop there can only ever run out mid-drag. Rewind instead: same wrap
