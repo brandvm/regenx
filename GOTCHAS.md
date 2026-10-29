@@ -49,6 +49,10 @@ harvested across all client repos to improve `brandvm/wf-template`.
   theme collection's variable mode on it at `tiny`
   (`set_style_variable_mode`, `base` = light). The attribute class stays,
   so tablet and desktop keep their theme.
+  Also set `color` on the combo to the Text Color/Dark variable at the same
+  breakpoint: `u-th-dark` does that itself, a mode switch alone does not, so
+  on a section without `u-th-dark` the text keeps inheriting black from the
+  page (Enclomiphene Benefits rendered black on black until 2026-10-29).
 - Status: documented
 - Found by: claude
 
