@@ -9,7 +9,7 @@ const stage = (start, end) => `
     <p>Editable milestone description for weeks ${start}–${end}.</p>
   </div>`;
 
-function fixture({ future = false, neighbor = false } = {}) {
+function fixture({ future = false, neighbor = false, second = false } = {}) {
   return `
     <section data-therapy-timeline data-timeline-origin="0" data-timeline-weeks="12">
       <header><h2>Peptide Therapy Results Timeline</h2>
@@ -27,6 +27,19 @@ function fixture({ future = false, neighbor = false } = {}) {
         <div class="therapy-timeline-ruler" data-timeline-ruler><div class="therapy-timeline-ruler-track" data-timeline-ruler-track></div></div>
       </div>
     </section>
+    ${second ? `<section id="trt" data-therapy-timeline data-timeline-origin="0" data-timeline-weeks="18" data-timeline-stages="3">
+      <header><h2>TRT Response TimeLine</h2>
+        <button type="button" data-timeline-prev aria-label="Previous stage">←</button>
+        <button type="button" data-timeline-next aria-label="Next stage">→</button>
+      </header>
+      <div class="therapy-timeline-panel">
+        <div class="swiper therapy-timeline-slider" aria-label="TRT milestones"><div class="swiper-wrapper therapy-timeline-track">
+          ${stage(1, 6)}${stage(6, 12)}${stage(12, 18)}${stage(18, 26)}${stage(26, 52)}
+        </div></div>
+        <div class="therapy-timeline-ruler" data-timeline-ruler><div class="therapy-timeline-ruler-track" data-timeline-ruler-track></div></div>
+        <div class="dots" data-timeline-pagination></div>
+      </div>
+    </section>` : ''}
     ${neighbor ? `<div class="s-wrapper card-row-carousel">
       <button class="swiper-prev">Previous cards</button><button class="swiper-next">Next cards</button>
       <div class="swiper card-row-slider"><div class="swiper-wrapper">
@@ -65,8 +78,8 @@ async function setup(page, options = {}) {
   await page.evaluate(() => { window.Webflow = { env: () => false, push: fn => fn() }; });
   await page.addScriptTag({ content: js });
   await expect(page.locator('html')).toHaveClass(/rgx-ready/);
-  await expect.poll(() => page.locator('.therapy-timeline-slider').evaluate(el => !!el.swiper)).toBe(true);
-  await expect(page.locator('[data-timeline-week="6"]')).toHaveCount(1);
+  await expect.poll(() => page.locator('.therapy-timeline-slider').first().evaluate(el => !!el.swiper)).toBe(true);
+  await expect(page.locator('[data-therapy-timeline]').first().locator('[data-timeline-week="6"]')).toHaveCount(1);
   return errors;
 }
 
@@ -459,3 +472,66 @@ test('destroying and refreshing a timeline restores one working ruler and naviga
   await expectButtons(page, { previous: false, following: true });
   expect(errors).toEqual([]);
 });
+
+// A second timeline on the page (TRT): equal-width stages, month stages on
+// the week scale, and Swiper dots. The Peptide timeline above it is unchanged.
+async function trt(page) {
+  return page.evaluate(() => {
+    const root = document.querySelector('#trt');
+    const slider = root.querySelector('.therapy-timeline-slider');
+    const style = getComputedStyle(slider);
+    const width = slider.clientWidth - Math.trunc(parseFloat(style.paddingLeft) || 0) - Math.trunc(parseFloat(style.paddingRight) || 0);
+    const left = slider.getBoundingClientRect().left + (parseFloat(style.paddingLeft) || 0);
+    const stages = [...slider.querySelectorAll('.therapy-timeline-stage')].map(el => el.getBoundingClientRect());
+    const tick = week => root.querySelector(`[data-timeline-week="${week}"]`)?.getBoundingClientRect().left;
+    // Visible label spacing inside each stage of the ruler.
+    const labels = [...root.querySelectorAll('.therapy-timeline-tick-label')].map(l => ({ week: +l.textContent, x: l.getBoundingClientRect().left }));
+    let minGap = Infinity;
+    for (let i = 1; i < labels.length; i++) minGap = Math.min(minGap, labels[i].x - labels[i - 1].x);
+    return { width, left, stages: stages.map(r => ({ left: r.left, width: r.width })), tick: { 6: tick(6), 26: tick(26), 52: tick(52) },
+      bullets: root.querySelectorAll('[data-timeline-pagination] .swiper-pagination-bullet').length,
+      label: slider.getAttribute('aria-label'), minGap, animating: slider.swiper.animating };
+  });
+}
+
+test('a second timeline with equal stages, dots and month stages leaves the first unchanged', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const errors = await setup(page, { second: true });
+  await expect.poll(() => page.locator('#trt .therapy-timeline-slider').evaluate(el => !!el.swiper)).toBe(true);
+  // Peptide: still two milestones on its 12-week scale, no dots.
+  const first = await geometry(page);
+  expect(first.stages[0].width).toBeCloseTo(first.width / 2, 0);
+  expect(await page.locator('section:not(#trt) .swiper-pagination-bullet').count()).toBe(0);
+  // TRT: three equal stages per view; one dot per position (3 positions).
+  let g = await trt(page);
+  for (const s of g.stages) expect(s.width).toBeCloseTo(g.width / 3, 0);
+  expect(g.bullets).toBe(3);
+  expect(g.label).toBe('TRT milestones');
+  expect(g.tick[6]).toBeCloseTo(g.stages[1].left, 0);
+  expect(g.minGap).toBeGreaterThanOrEqual(20);
+  // The last dot shows the 6- and 12-month stages; the Peptide slider does not move.
+  await page.locator('#trt [data-timeline-pagination] .swiper-pagination-bullet').last().click();
+  await expect.poll(async () => (await trt(page)).animating).toBe(false);
+  g = await trt(page);
+  expect(g.stages[4].left + g.stages[4].width).toBeCloseTo(g.left + g.width, 0);
+  expect(g.tick[26]).toBeCloseTo(g.stages[4].left, 0);
+  expect(g.tick[52]).toBeCloseTo(g.stages[4].left + g.stages[4].width, 0);
+  expect((await geometry(page)).stages[0].left).toBeCloseTo(first.stages[0].left, 0);
+  // Mobile portrait: one stage per view, one dot per stage, readable ruler.
+  await page.setViewportSize({ width: 375, height: 812 });
+  await expect.poll(async () => (await trt(page)).bullets).toBe(5);
+  g = await trt(page);
+  for (const s of g.stages) expect(s.width).toBeCloseTo(g.width, 0);
+  expect(g.minGap).toBeGreaterThanOrEqual(20);
+  await expect(page.locator('#trt [data-timeline-week="52"] .therapy-timeline-tick-label')).toHaveText('52');
+  // The resize keeps the position (the end); back to the first stage, then step on.
+  await page.locator('#trt [data-timeline-pagination] .swiper-pagination-bullet').first().click();
+  await expect.poll(async () => (await trt(page)).animating).toBe(false);
+  await page.locator('#trt [data-timeline-next]').first().click();
+  await expect.poll(async () => (await trt(page)).animating).toBe(false);
+  g = await trt(page);
+  expect(g.stages[1].left).toBeCloseTo(g.left, 0);
+  expect(g.tick[6]).toBeCloseTo(g.left, 0);
+  expect(errors).toEqual([]);
+});
+

@@ -34,28 +34,48 @@ export function createTherapyTimeline(el) {
     else node.setAttribute(name, value);
   }
 
-  // `stops` is null for a linear ruler, or the stage boundaries when each
-  // stage fills the view (week positions then scale per stage).
-  function buildTicks(origin, end, stops) {
-    const signature = `${origin}:${end}:${stops ? stops.join(",") : "linear"}`;
+  // `stops` is null for a linear ruler, or the stage boundaries when stages
+  // have equal widths (week positions then scale per stage). `stagePx` is the
+  // width of one stage; there, labels and minor ticks thin out where a long
+  // stage packs many weeks into one width, so the numbers never overlap.
+  function buildTicks(origin, end, stops, stagePx) {
+    const signature = `${origin}:${end}:${stops ? stops.join(",") : "linear"}:${Math.round(stagePx || 0)}`;
     if (tickSignature === signature) return;
     tickSignature = signature;
     const fragment = document.createDocumentFragment();
-    // Keep unexpectedly large editor-entered ranges from creating huge DOMs.
-    const step = end - origin <= 250 ? 0.25 : Math.ceil((end - origin) / 1000);
-    for (let week = origin; week <= end; week += step) {
+    const add = (week, labelled) => {
       const tick = document.createElement("span");
       const major = Number.isInteger(week);
       tick.className = `therapy-timeline-tick${major ? " is-major" : ""}`;
       tick.dataset.timelineWeek = String(week);
       tick.style.left = `${position(week, origin, end, stops) * 100}%`;
-      if (major) {
+      if (major && labelled) {
         const label = document.createElement("span");
         label.className = "therapy-timeline-tick-label";
         label.textContent = String(week);
         tick.appendChild(label);
       }
       fragment.appendChild(tick);
+    };
+    if (!stops) {
+      // Keep unexpectedly large editor-entered ranges from creating huge DOMs.
+      const step = end - origin <= 250 ? 0.25 : Math.ceil((end - origin) / 1000);
+      for (let week = origin; week <= end; week += step) add(week, true);
+    } else {
+      stops.forEach((from, index) => {
+        const to = stops[index + 1] ?? end;
+        const perWeek = stagePx / (to - from);
+        const labelStep = [1, 2, 4, 5, 10, 13, 26, 52].find((n) => n * perWeek >= 28) || to - from;
+        const step = perWeek >= 16 ? 0.25 : perWeek >= 4 ? 1 : labelStep;
+        const last = index === stops.length - 1;
+        for (let week = from; week < to || (last && week === to); week += step) {
+          // The ruler's final week is always labelled; a regular label too
+          // close before it is dropped so the two never overlap.
+          const end = last && week === to;
+          add(week, week === from || end || (Number.isInteger(week - from) && (week - from) % labelStep === 0 && to - week >= (last ? labelStep : labelStep / 2)));
+        }
+        if (last && (to - from) % step) add(to, true);
+      });
     }
     track.replaceChildren(fragment);
   }
@@ -96,8 +116,16 @@ export function createTherapyTimeline(el) {
     const width = el.clientWidth - (parseInt(computed.paddingLeft, 10) || 0) -
       (parseInt(computed.paddingRight, 10) || 0);
     if (width <= 0) return;
-    // Mobile portrait: one stage per view at full width, no peek of the next.
-    const onePerView = window.innerWidth <= 479;
+    // Equal stages: mobile portrait always shows one stage at full width (no
+    // peek); a timeline with data-timeline-stages shows that many per view
+    // (at most two below 992px) instead of sizing stages by their weeks.
+    const stagesAttr = number(root.getAttribute("data-timeline-stages"), 0);
+    const perView = window.innerWidth <= 479
+      ? 1
+      : stagesAttr >= 1
+        ? Math.min(Math.floor(stagesAttr), window.innerWidth <= 991 ? 2 : Infinity, slides.length)
+        : 0;
+    const stagePx = perView ? width / perView : 0;
     const unit = width / visibleWeeks;
     root.style.setProperty("--timeline-week-width", `${unit}px`);
     slides.forEach((slide, index) => {
@@ -105,16 +133,16 @@ export function createTherapyTimeline(el) {
         savedWidths.set(slide, slide.style.width);
         savedLabels.set(slide, slide.getAttribute("aria-label"));
       }
-      slide.style.width = onePerView
-        ? `${width}px`
+      slide.style.width = perView
+        ? `${stagePx}px`
         : `${((boundaries[index + 1] ?? end) - boundaries[index]) * unit}px`;
       const start = number(slide.getAttribute("data-week-start"), boundaries[index]);
       const finish = number(slide.getAttribute("data-week-end"), boundaries[index + 1] ?? end);
       slide.setAttribute("aria-label", `Weeks ${start}–${finish}`);
     });
-    buildTicks(origin, end, onePerView ? boundaries : null);
-    track.style.width = onePerView
-      ? `${slides.length * width}px`
+    buildTicks(origin, end, perView ? boundaries : null, stagePx);
+    track.style.width = perView
+      ? `${slides.length * stagePx}px`
       : `${(end - origin) * unit}px`;
     track.style.transitionTimingFunction = getComputedStyle(wrapper).transitionTimingFunction;
   }

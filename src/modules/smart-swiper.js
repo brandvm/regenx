@@ -34,6 +34,8 @@ export const SmartSwiper = (function () {
       navNext: "[data-timeline-next]",
       navAll: true,
       timeline: true,
+      // Optional dots: a [data-timeline-pagination] element in the section.
+      pagination: { el: "[data-timeline-pagination]", clickable: true },
       opts: {
         slidesPerView: "auto",
         spaceBetween: 0,
@@ -49,7 +51,8 @@ export const SmartSwiper = (function () {
         observeSlideChildren: false,
         a11y: {
           containerRole: "region",
-          containerMessage: "Peptide therapy results timeline",
+          // Each slider keeps its own authored aria-label (one per page section).
+          containerMessage: null,
           containerRoleDescriptionMessage: "carousel",
           itemRoleDescriptionMessage: "timeline phase",
           slideLabelMessage: null,
