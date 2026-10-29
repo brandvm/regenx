@@ -282,6 +282,22 @@ test('accordions do nothing without Webflow', async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
+// An empty Collection List in a product slider, as Webflow publishes it.
+const emptyProductSlider = `<div class="product-slider-w">
+    <div class="product-slider-main"><div class="swiper product-slider w-dyn-list">
+      <div class="w-dyn-empty"><div>No items found.</div></div>
+    </div></div>
+  </div>`;
+
+test('an empty product slider is left alone without errors', async ({ page }) => {
+  const logged = [];
+  page.on('console', (msg) => { if (msg.type() === 'error') logged.push(msg.text()); });
+  const errors = await setup(page, emptyProductSlider);
+  await expect(page.locator('.swiper.product-slider')).not.toHaveClass(/swiper-initialized/);
+  expect(errors).toEqual([]);
+  expect(logged).toEqual([]);
+});
+
 // Product › Other Medications as Webflow publishes it; the 277px slide width
 // at ≤479px is a Designer style, stubbed here.
 const productSlider = `<style>.swiper-slide.product-slider { width: 33.33%; height: 200px; }
