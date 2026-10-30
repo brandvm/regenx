@@ -37,7 +37,7 @@ harvested across all client repos to improve `brandvm/wf-template`.
 - Fix: keep the card a box and give the card itself the `order` (−4), so it
   still sits in the same place in the mobile order with its children inside.
   Use `display: contents` only on wrappers that have no visible styling.
-- Status: fixed (Webflow, 2026-10-29)
+- Status: harvested into wf-template 0.9.0; fixed (Webflow, 2026-10-29)
 - Found by: claude
 
 ### 2026-10-28 · Home hero classes are shared with the service heroes
@@ -68,7 +68,7 @@ harvested across all client repos to improve `brandvm/wf-template`.
   breakpoint: `u-th-dark` does that itself, a mode switch alone does not, so
   on a section without `u-th-dark` the text keeps inheriting black from the
   page (Enclomiphene Benefits rendered black on black until 2026-10-29).
-- Status: documented
+- Status: harvested into wf-template 0.9.0; documented
 - Found by: claude
 
 ### 2026-10-28 · Rich text child styles through the MCP
@@ -81,7 +81,7 @@ harvested across all client repos to improve `brandvm/wf-template`.
 - Fix: find them by property (`query_styles` with `properties`), then
   update with `style_name: "h2", parent_style_names: ["RTE"]`; the result's
   `selector` confirms `.rte h2`.
-- Status: documented
+- Status: harvested into wf-template 0.9.0; documented
 - Found by: claude
 
 ### 2026-10-28 · A zero edge fade cut the timeline's end labels
@@ -112,7 +112,7 @@ harvested across all client repos to improve `brandvm/wf-template`.
   dropdowns untouched). It opens the first visible item per group through
   Webflow's own toggle handler, and repeats both after every re-run of the
   dropdown module's `ready`.
-- Status: fixed (acc-first-open)
+- Status: harvested into wf-template 0.9.0; fixed (acc-first-open)
 - Found by: claude
 
 ### 2026-10-28 · A component instance can't take a mobile-only class
@@ -140,7 +140,7 @@ harvested across all client repos to improve `brandvm/wf-template`.
   −10000 (or −9998 to sit after the media), CTA 0. The parents use
   `display: contents` through mobile-only combos (`is_sd`), so the
   site-wide header classes stay untouched.
-- Status: documented
+- Status: harvested into wf-template 0.9.0; documented
 - Found by: claude
 
 ### 2026-10-28 · A mobile-only difference in a shared component variant
@@ -154,7 +154,7 @@ harvested across all client repos to improve `brandvm/wf-template`.
   the copy its ≤478px styles, and switch only the instances that need it
   (`set_component_instance_prop_values` on the Type prop). Desktop and
   tablet stay identical.
-- Status: documented
+- Status: harvested into wf-template 0.9.0; documented
 - Found by: claude
 
 ### 2026-10-28 · Scroll-snap rows: a moved card and a tall card
@@ -168,7 +168,7 @@ harvested across all client repos to improve `brandvm/wf-template`.
 - Fix: `snap-dots.ts` sorts cards by their on-screen position, and rows
   marked `autoHeight` take the height of the card in view (`overflow-y:
   hidden` while they do), like Swiper's autoHeight.
-- Status: fixed (mobile-sliders). Diagnosis and Cases sliders reverted in Webflow
+- Status: harvested into wf-template 0.9.0; fixed (mobile-sliders). Diagnosis and Cases sliders reverted in Webflow
   2026-10-29 (user): the rows stack again, so `snap-dots.ts` binds nothing there
   (it only binds a row that scrolls sideways). Why rows keep their dots.
 - Found by: claude
@@ -185,7 +185,7 @@ harvested across all client repos to improve `brandvm/wf-template`.
   state (track transform none). "skip-to-end" would have applied end values
   (the hero header at opacity 0). Then undo the pin in the styles at the
   same breakpoint (section height auto, wrapper not sticky).
-- Status: documented. The process scroll rule was removed again 2026-10-29
+- Status: harvested into wf-template 0.9.0; documented. The process scroll rule was removed again 2026-10-29
   (user): it animates on mobile as originally. `update_interaction` with
   `conditionalPlayback: null` clears it. The About hero rule is still on.
 - Found by: claude
@@ -215,7 +215,7 @@ harvested across all client repos to improve `brandvm/wf-template`.
 - Fix: when a base style gets a breakpoint override, set the same property
   on each variant that should differ at that breakpoint (here the Body LG
   variant's mode at ≤478px). The Body SM variant needed nothing.
-- Status: documented
+- Status: harvested into wf-template 0.9.0; documented
 - Found by: claude
 
 ### 2026-10-28 · Webflow's body size variable also means "inherit"
@@ -235,7 +235,7 @@ harvested across all client repos to improve `brandvm/wf-template`.
   at ≤478px (same font, weight, line height and spacing as Body; size
   0.875em), and the Body LG variant is pinned to its own mode there (see the
   `:where()` entry above). `text-b` and similar are still 16px.
-- Status: reverted 2026-10-29 (user): with the scale back at 430, `C | Paragraph`
+- Status: harvested into wf-template 0.9.0; reverted 2026-10-29 (user): with the scale back at 430, `C | Paragraph`
   uses its default Body mode again (13.95px at 375, 16px at 430), the Body LG pin
   and the Form Pane | Note 1em are removed.
 - Found by: claude
