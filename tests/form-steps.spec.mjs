@@ -7,11 +7,14 @@ const fixture = `
 <div data-form-steps><form id="consultation">
   <span data-step-label></span><p data-step-err hidden>Select a therapy</p>
   <div data-step="1" class="form-pane">
-    <div data-step-required>
-      <label><input type="checkbox" name="therapy" value="trt">TRT</label>
-      <label><input type="checkbox" name="therapy" value="peptide">Peptide</label>
+    <div class="form-pane-main" data-step-required>
+      <div role="group" aria-label="Therapies of interest">
+        <label><input type="checkbox" name="therapy" value="trt">TRT</label>
+        <label><input type="checkbox" name="therapy" value="peptide">Peptide</label>
+      </div>
+      <label><input type="radio" name="situation" value="second">Second opinion</label>
+      <label><input type="radio" name="situation" value="other">Other</label>
     </div>
-    <label><input type="radio" name="situation" value="other">Other</label>
     <div class="form-action">
       <button type="button" class="button-link" data-step-back>Back</button>
       <button type="button" class="button-link" data-step-next>Next</button>
@@ -73,8 +76,6 @@ for (const width of [1440, 390]) test(`form navigation and live validation at ${
   await expect(page.locator('[data-step="1"] [data-step-back]')).toBeHidden();
   await expect(next).toBeDisabled();
   await expect(submit).toBeDisabled();
-  await page.getByLabel('Other', { exact: true }).check();
-  await expect(next).toBeDisabled();
   await page.getByLabel('TRT', { exact: true }).check();
   await expect(next).toBeEnabled();
   await page.getByLabel('TRT', { exact: true }).uncheck();
@@ -175,6 +176,28 @@ test('every required group is checked and stale submit attributes cannot unlock 
   await page.getByRole('button', { name: 'Next', exact: true }).click();
   await fillContact(page);
   await expect(page.locator('[type="submit"]')).toBeDisabled();
+});
+
+// Contact step 1 (client rule, 2026-10-30): one checkbox or one radio is
+// enough, in any mix; the situation radios are a single choice.
+test('step 1 accepts a radio alone, a checkbox alone or both', async ({ page }) => {
+  const errors = await setup(page);
+  const next = page.getByRole('button', { name: 'Next', exact: true });
+  await expect(next).toBeDisabled();
+  await page.getByLabel('Second opinion', { exact: true }).check();
+  await expect(next).toBeEnabled();
+  await page.getByLabel('Other', { exact: true }).check();
+  await expect(page.getByLabel('Second opinion', { exact: true })).not.toBeChecked();
+  await page.getByLabel('TRT', { exact: true }).check();
+  await page.getByLabel('Peptide', { exact: true }).check();
+  await expect(next).toBeEnabled();
+  await page.getByLabel('TRT', { exact: true }).uncheck();
+  await page.getByLabel('Peptide', { exact: true }).uncheck();
+  await expect(next).toBeEnabled();
+  await next.click();
+  await expect(page.locator('[data-step-label]')).toHaveText('Step 2 of 2');
+  await expect(page.locator('[data-step="2"] [data-step-summary] .form-step-summary-item')).toHaveText(['other']);
+  expect(errors).toEqual([]);
 });
 
 test('step 2 repeats the choices made in step 1 and follows changes', async ({ page }) => {
