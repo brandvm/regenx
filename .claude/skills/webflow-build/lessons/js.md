@@ -6,6 +6,82 @@ Harvested from client builds made from this template (`Scope:
 template-candidate` entries in their `GOTCHAS.md`). Module and file names
 refer to the project the lesson came from; Status is that project's.
 
+### 2026-10-29 · Never start the LCP element from opacity 0
+- Area: perf, js
+- Symptom: a home page scored 80 on mobile PageSpeed: LCP 4.0 s, of which
+  3 s render delay, and the LCP element was the hero H1. With the intro
+  loader replaced by a CSS entrance (`@keyframes` from `opacity: 0` at
+  first paint), LCP went to 4.5 s although FCP was 2.8 s.
+- Cause: an element painted at opacity 0 isn't an LCP candidate. With an
+  intro loader (which Lighthouse always sees: every run is a first visit)
+  LCP waited for the hero to fade in after the curtain; with the CSS
+  entrance the opacity animation runs on the compositor, so the H1 was
+  only counted after the animation, not at its first frame. A covered but
+  painted element does count.
+- Fix: the LCP element only moves (`y`) under a loader, never fades; an
+  entrance without a loader starts from a partial opacity (0.6) with a
+  small rise. Mobile went to 93 (LCP 2.7–3.1 s) and the reveal looks the
+  same. Check which element is the LCP in the Lighthouse report before
+  designing an entrance.
+- Status: fixed in that project
+- Found by: claude
+
+### 2026-10-29 · Finsweet List 2.7: what the markup needs on Webflow
+- Area: js
+- Symptom: (1) a custom empty message (`fs-list-element="empty"` outside
+  the Collection List) showed all the time, with and without matches;
+  (2) checks from a script saw Finsweet never start in a hidden browser
+  pane.
+- Cause: (1) Finsweet 2.7 finds that element but toggles only the list's
+  own Empty State; (2) the recipe starts an attribute when its elements
+  come near the viewport or on the first scroll, pointer or key input, and
+  a hidden pane gives neither.
+- Fix: (1) a small module shows the custom message only while the list
+  has no items; give it a hidden start state in Webflow so it doesn't
+  flash. (2) In checks, scroll or move the pointer first. Works as
+  documented (2.7.1 source, checked on staging): `fs-list-element="list"`,
+  `fs-list-load="more"` and `fs-list-itemsperpage` on the Collection List;
+  a custom Show more with `fs-list-element="pagination-next"` + instance
+  (hidden when all are shown); filters on the Form element (submit is
+  prevented, so Webflow's form handler doesn't run); search
+  `fs-list-field="*"`; a sort select's initial value is applied on start,
+  so the list is sorted without a native sort.
+- Status: fixed in that project
+- Found by: claude
+
+### 2026-10-28 · Webflow Dropdown accordions close each other page-wide
+- Area: js
+- Symptom: "first item open in every FAQ block" couldn't be done: opening
+  one accordion built from Webflow Dropdowns closed every other one on the
+  page, and a click anywhere or moving focus away closed it too.
+- Cause: on open, Webflow sends `w-close.w-dropdown` to every other
+  dropdown, closes on `focusout`, and binds a document `mouseUpOutside`
+  closer. A script that re-runs Webflow's setup after boot (Finsweet can)
+  binds them again and resets the open panels' IX2 styles.
+- Fix: a module that leaves Webflow in charge of clicks, keys, IX2 and
+  `aria-expanded`, and only unbinds those three closers for the accordion
+  class (nav dropdowns untouched). It opens the first visible item per
+  group through Webflow's own toggle handler, and repeats both after every
+  re-run of the dropdown module's `ready`. For a new build, an accordion
+  that isn't a Dropdown avoids all of this.
+- Status: fixed in that project
+- Found by: claude
+
+### 2026-10-28 · Scroll-snap rows: markup order isn't screen order, and the row is as tall as its tallest card
+- Area: js
+- Symptom: a mobile scroll-snap row's dots pointed at the wrong cards, and
+  short cards had ~450px of empty panel under them.
+- Cause: one card was moved last with `order` in Webflow, so markup order
+  is not screen order; and a flex row is as tall as its tallest card,
+  whatever card is in view.
+- Fix: the dots module sorts cards by their on-screen position, and rows
+  marked for it take the height of the card in view (`overflow-y: hidden`
+  while they do), like Swiper's `autoHeight`. Bind only a row that
+  actually scrolls sideways, so a row that stacks at a breakpoint gets
+  nothing.
+- Status: fixed in that project
+- Found by: claude
+
 ### 2026-10-20 · Bundled GSAP plugins register themselves on Webflow's `window.gsap`
 - Area: js
 - Symptom: with the bundle running after Webflow's GSAP, the bundled

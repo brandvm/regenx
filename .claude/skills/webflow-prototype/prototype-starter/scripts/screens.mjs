@@ -3,7 +3,7 @@
 //   pnpm screens [/path …] [--shots-all]
 // Pages: the ones given, else every index.html in the prototype. The dev
 // server is used if it runs, started for the run if not.
-// - At the check widths (the repo config's `widths`, else 1440, 820, 390):
+// - At the check widths (the repo config's `widths`, else 1440, 820, 667, 390):
 //   a full-page screenshot in .screens/<page>-<width>.png.
 // - At those and a sweep from 2560 down to 360 (the common laptop widths
 //   and both sides of every Webflow breakpoint): every element whose right

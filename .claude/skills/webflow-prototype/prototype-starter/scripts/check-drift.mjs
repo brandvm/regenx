@@ -54,8 +54,21 @@ function parse(css) {
 }
 const VARS = '(variables)';
 const isVar = (p) => p.startsWith('--_');
-// Split a value on spaces that are not inside brackets.
-const parts = (v) => v.match(/(?:[^\s(]+(?:\([^)]*\))?)+/g) ?? [];
+// Split a value on spaces that are not inside brackets, and after a closing
+// bracket that a value follows directly: Webflow publishes shorthands as
+// `var(--_a)var(--_b)` and `var(--_a).625em`, with no space.
+function parts(v) {
+  const out = [];
+  let cur = '', depth = 0;
+  for (const ch of v) {
+    if (!depth && /\s/.test(ch)) { if (cur) out.push(cur); cur = ''; continue; }
+    if (!depth && cur.endsWith(')') && ch !== ',') { out.push(cur); cur = ''; }
+    if (ch === '(') depth++; else if (ch === ')') depth--;
+    cur += ch;
+  }
+  if (cur) out.push(cur);
+  return out;
+}
 const SIDES = ['top', 'right', 'bottom', 'left'];
 const CORNERS = ['top-left', 'top-right', 'bottom-right', 'bottom-left'];
 const four = (p) => [p[0], p[1] ?? p[0], p[2] ?? p[0], p[3] ?? p[1] ?? p[0]];
