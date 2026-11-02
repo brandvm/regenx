@@ -171,6 +171,11 @@
   cursor: pointer;
 }
 
+.catalog-filters-icon {
+  font-size: 1.143rem;
+  line-height: 1;
+}
+
 .catalog-filters-badge {
   display: inline-grid;
   place-items: center;

@@ -82,6 +82,9 @@ test('catalog: counts on the category tabs and headings, total under search', as
 
 test('catalog: the Filters sheet narrows by form and hides empty groups', async ({ page }) => {
   const errors = await setup(page, catalog());
+  await expect(page.locator('.catalog-filters-button .ri-equalizer-line')).toHaveCount(1);
+  await expect(page.locator('.catalog-filters-button .ri-arrow-down-s-line')).toHaveCount(1);
+  await expect(page.locator('.catalog-filters-button')).toHaveAccessibleName('Filters');
   await page.locator('.catalog-filters-button').click();
   const sheet = page.locator('[data-modal="catalog-filters"]');
   await expect(sheet).toBeVisible();
