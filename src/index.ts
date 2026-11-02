@@ -8,6 +8,8 @@ import { initMarquee } from './modules/marquee';
 import { initModals } from './modules/modal';
 import { initPeptideDisclaimer } from './modules/peptide-disclaimer';
 import { initCatalogNav } from './modules/catalog-nav';
+import { initCatalogList } from './modules/catalog-list';
+import { initLabTests } from './modules/lab-tests';
 
 // Each module runs in isolation: one that throws is logged and skipped,
 // and every module after it still initializes.
@@ -33,6 +35,10 @@ async function boot() {
     await run('main', initMain);
     // "As Seen In" logo rows: [data-marquee] (wf-template recipe).
     await run('marquee', initMarquee);
+    // Medical Catalog phone list and Lab Panel search. Before the modals:
+    // catalog-list builds the Filters sheet as a [data-modal].
+    await run('catalog-list', initCatalogList);
+    await run('lab-tests', initLabTests);
     // Dialogs built in Webflow ([data-modal], wf-template recipe), then the
     // Peptide Therapy disclaimer that opens one on load.
     await run('modal', () => initModals(getLenis()));
