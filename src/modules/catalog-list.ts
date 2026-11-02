@@ -131,7 +131,9 @@ export function initCatalogList() {
     filtersButton.type = 'button';
     filtersButton.className = 'catalog-filters-button';
     filtersButton.setAttribute('data-modal-open', 'catalog-filters');
-    filtersButton.innerHTML = '<span class="catalog-filters-label">Filters</span><span class="catalog-filters-badge" hidden></span>';
+    // Remix Icon (loaded by the global Embed), as in the Figma button:
+    // sliders, label, count badge, chevron.
+    filtersButton.innerHTML = '<i class="catalog-filters-icon ri-equalizer-line" aria-hidden="true"></i><span class="catalog-filters-label">Filters</span><span class="catalog-filters-badge" hidden></span><i class="catalog-filters-icon ri-arrow-down-s-line" aria-hidden="true"></i>';
     toolbar.appendChild(filtersButton);
 
     const sheet = document.createElement('div');
