@@ -42,8 +42,10 @@ export function initCatalogNav() {
     const line = window.innerHeight / 3;
     let current = pairs[0];
     for (const pair of pairs) {
-      // The anchor marks the start of its product block.
+      // The anchor marks the start of its product block. A block hidden by
+      // the phone search (catalog-list.ts) has no box and doesn't count.
       const block = pair.target.parentElement ?? pair.target;
+      if (!block.getClientRects().length) continue;
       if (block.getBoundingClientRect().top <= line) current = pair;
     }
     setActive(current.link);

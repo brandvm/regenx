@@ -25,6 +25,22 @@ harvested across all client repos to improve `brandvm/wf-template`.
 
 ## This project
 
+### 2026-11-02 · Catalog cards: nested lists and late pages
+- Area: js
+- Scope: template-candidate
+- Symptom: On the phone catalog list, counts were inflated in tests and
+  only the first 20 of 61 cards got a row toggle on staging.
+- Cause: (1) each product card holds its strengths as a nested Collection
+  List, so `.w-dyn-items > .w-dyn-item` also matched strength rows;
+  (2) with `fs-list-load="all"` Finsweet fetches the later pages after
+  boot, so cards set up at init missed them.
+- Fix: `catalog-list.ts` takes only items that hold a `.product-card`
+  directly, and sets up cards again from a MutationObserver on each list.
+  Totals count unique product links (Most Prescribed and the ED/Hair
+  extra categories repeat products).
+- Status: fixed (catalog-mobile-list)
+- Found by: claude
+
 ### 2026-11-02 · update-skills from 0.8.1 adds a broken pack-template script
 - Area: ci
 - Scope: template-candidate
