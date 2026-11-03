@@ -38,7 +38,7 @@ harvested across all client repos to improve `brandvm/wf-template`.
   directly, and sets up cards again from a MutationObserver on each list.
   Totals count unique product links (Most Prescribed and the ED/Hair
   extra categories repeat products).
-- Status: fixed (catalog-mobile-list)
+- Status: harvested into wf-template 0.15.0; fixed (catalog-mobile-list)
 - Found by: claude
 
 ### 2026-10-29 · display: contents drops the box's own background
