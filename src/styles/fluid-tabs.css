@@ -1,27 +1,37 @@
 /* Folder tabs ([data-fluid-tabs], TRT benefits). Webflow's `is-fluid` combos
    own the link layout, the black panel and its padding, and reset everything
    at ≤767px, where the tabs stay a stacked list. fluid-tabs.ts adds .fluid-tab
-   and sets --fluid-l/--fluid-r/--fluid-bg plus data-fluid-edge/-dir.
+   and sets --fluid-l/--fluid-r/--fluid-bg plus data-fluid-dir.
 
-   repo-css: js-state — the shape, its position and the panel corner follow
-   the open tab, which the script tracks. */
+   Nothing here runs on a timer of its own: the panel keeps its rounded
+   corners, and the shape reaches down behind the panel by one panel radius,
+   so over the first or last link it fills that corner and uncovers it as it
+   slides away. The outer join is clipped at the panel's edge rather than
+   faded. Corner and joins therefore move exactly with the shape.
+
+   repo-css: js-state — the shape and its position follow the open tab, which
+   the script tracks. */
 @media (min-width: 768px) {
   [data-fluid-tabs] {
     --fluid-r-tab: 1em;          /* tab's rounded top corners (Figma 16) */
     --fluid-r-join: 1.5em;       /* concave join into the panel (Figma 24) */
-    --fluid-r-panel: 2.5em;      /* panel corners (Figma 40) */
+    --fluid-r-panel: 2.5em;      /* = the panel's corner radius in Webflow (Figma 40) */
     --fluid-fast: 420ms;
     --fluid-slow: 620ms;
   }
 
+  /* Clip sideways only, so the outer join stops at the panel edge while the
+     shape can still reach down behind the panel. */
   [data-fluid-tabs] .w-tab-menu {
     position: relative;
+    overflow-x: clip;
+    overflow-y: visible;
   }
 
   [data-fluid-tabs] .fluid-tab {
     position: absolute;
     top: 0;
-    bottom: 0;
+    bottom: calc(-1 * var(--fluid-r-panel));
     left: var(--fluid-l, 0);
     right: var(--fluid-r, 0);
     z-index: 0;
@@ -40,23 +50,20 @@
     transition: left var(--fluid-fast) var(--ease-bbs), right var(--fluid-slow) var(--ease-bbs) 40ms;
   }
 
-  [data-fluid-tabs].is-fluid-instant .fluid-tab,
-  [data-fluid-tabs].is-fluid-instant .fluid-tab::before,
-  [data-fluid-tabs].is-fluid-instant .fluid-tab::after,
-  [data-fluid-tabs].is-fluid-instant .w-tab-content {
+  [data-fluid-tabs].is-fluid-instant .fluid-tab {
     transition: none;
   }
 
   /* repo-css: designer-cant — radial-gradient corners curve the tab into the
-     panel; the outer one is dropped where the tab meets the panel edge. */
+     panel, sitting on the panel's top edge (one panel radius above the
+     shape's bottom). */
   [data-fluid-tabs] .fluid-tab::before,
   [data-fluid-tabs] .fluid-tab::after {
     content: "";
     position: absolute;
-    bottom: 0;
+    bottom: var(--fluid-r-panel);
     width: var(--fluid-r-join);
     height: var(--fluid-r-join);
-    transition: opacity 200ms ease;
   }
 
   [data-fluid-tabs] .fluid-tab::before {
@@ -67,24 +74,6 @@
   [data-fluid-tabs] .fluid-tab::after {
     left: 100%;
     background: radial-gradient(circle at 100% 0, transparent var(--fluid-r-join), var(--fluid-bg, #000) calc(var(--fluid-r-join) + 0.5px));
-  }
-
-  [data-fluid-tabs][data-fluid-edge="start"] .fluid-tab::before,
-  [data-fluid-tabs][data-fluid-edge="end"] .fluid-tab::after {
-    opacity: 0;
-  }
-
-  /* Square the panel's top corner under a first or last tab. */
-  [data-fluid-tabs].is-fluid-ready .w-tab-content {
-    transition: border-top-left-radius var(--fluid-fast) var(--ease-bbs), border-top-right-radius var(--fluid-fast) var(--ease-bbs);
-  }
-
-  [data-fluid-tabs][data-fluid-edge="start"] .w-tab-content {
-    border-top-left-radius: 0;
-  }
-
-  [data-fluid-tabs][data-fluid-edge="end"] .w-tab-content {
-    border-top-right-radius: 0;
   }
 
   /* benefit-slider.css pins benefit-tab labels to the left for the stacked

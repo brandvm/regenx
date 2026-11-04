@@ -2,9 +2,10 @@
 // Webflow owns the links, the panel colour and the spacing; this adds one
 // shape behind the open link that joins the panel with concave corners and
 // slides to the next link. Its leading edge moves first and the trailing edge
-// follows, so the tab stretches and settles instead of jumping. The panel's
-// top corner under a first or last tab goes square so the two read as one.
-// Styles live in styles/fluid-tabs.css and apply from 768px up only.
+// follows, so the tab stretches and settles instead of jumping. The shape
+// also fills the panel's top corner under a first or last tab (see the CSS),
+// so corner and tab always move together. Styles live in
+// styles/fluid-tabs.css and apply from 768px up only.
 
 const ROOT = '[data-fluid-tabs]';
 
@@ -37,7 +38,6 @@ function bind(root: HTMLElement) {
     root.classList.toggle('is-fluid-instant', !animate);
     root.style.setProperty('--fluid-l', `${left}px`);
     root.style.setProperty('--fluid-r', `${right}px`);
-    root.dataset.fluidEdge = left < 1 ? 'start' : right < 1 ? 'end' : 'middle';
     lastLeft = left;
   };
 
