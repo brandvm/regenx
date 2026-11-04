@@ -196,15 +196,21 @@ export function initMcCatalog() {
   // --- Tabs: jump to the group (the anchors sit in the hidden card list)
   // and mark the group in view.
   const groupFor = (link: HTMLAnchorElement) => groups.find((g) => g.id === decodeURIComponent(link.hash.slice(1)));
-  const offset = () => (document.querySelector<HTMLElement>('.nav, .navbar, header')?.getBoundingClientRect().height ?? 0) + 16;
+  // Under the fixed nav (.g-nav-w). A number, not the element: Lenis
+  // overshot when given the element and an offset.
+  const offset = () => (document.querySelector<HTMLElement>('.g-nav-w')?.getBoundingClientRect().height ?? 0) + 16;
   tabs.forEach((link) => link.addEventListener('click', (event) => {
     const g = groupFor(link);
     if (!g || !mq.matches || g.el.classList.contains(HIDDEN)) return;
+    // Webflow's own section-link scroll (delegated on the document) would
+    // also run and aim at the hidden anchor.
     event.preventDefault();
+    event.stopPropagation();
     setActive(link);
+    const top = g.el.getBoundingClientRect().top + window.scrollY - offset();
     const lenis = getLenis();
-    if (lenis) lenis.scrollTo(g.el, { offset: -offset() });
-    else window.scrollTo({ top: g.el.getBoundingClientRect().top + window.scrollY - offset(), behavior: 'smooth' });
+    if (lenis) lenis.scrollTo(top);
+    else window.scrollTo({ top, behavior: 'smooth' });
   }));
 
   let current: HTMLAnchorElement | null = null;
