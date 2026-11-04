@@ -10,7 +10,7 @@
 // Each list's later pages are fetched here (see loadPages), cards Finsweet
 // adds are picked up too, and rows are never removed: Finsweet re-renders a
 // list on every search, so the search here filters the rows on its own.
-import { getLenis } from './smooth-scroll';
+import { getLenis, resizeSmoothScroll } from './smooth-scroll';
 
 const MOBILE = '(max-width: 767px)';
 const PAGE = 5; // rows a group shows before Show more
@@ -115,6 +115,8 @@ export function initMcCatalog() {
       icon.classList.toggle('ri-add-line', !open);
       icon.classList.toggle('ri-subtract-line', open);
       head.setAttribute('aria-expanded', String(open));
+      resized = true;
+      schedule();
     };
     head.addEventListener('click', toggle);
     head.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
@@ -190,6 +192,7 @@ export function initMcCatalog() {
     });
     if (total) total.textContent = `${counted.size} medication${counted.size === 1 ? '' : 's'}`;
     empty?.classList.toggle(HIDDEN, counted.size > 0);
+    resized = true;
     schedule();
   }
 
@@ -241,10 +244,16 @@ export function initMcCatalog() {
     if (pick) setActive(pick);
   }
 
+  // Lenis keeps the page height it measured at boot; rows change it.
+  let resized = false;
   let frame = 0;
   function schedule() {
     if (frame) return;
-    frame = requestAnimationFrame(() => { frame = 0; spy(); });
+    frame = requestAnimationFrame(() => {
+      frame = 0;
+      if (resized) { resized = false; resizeSmoothScroll(); }
+      spy();
+    });
   }
 
   const mq = window.matchMedia(MOBILE);
