@@ -1,0 +1,102 @@
+/* Folder tabs ([data-fluid-tabs], TRT benefits). Webflow's `is-fluid` combos
+   own the link layout, the black panel and its padding, and reset everything
+   at ≤767px, where the tabs stay a stacked list. fluid-tabs.ts adds .fluid-tab
+   and sets --fluid-l/--fluid-r/--fluid-bg plus data-fluid-edge/-dir.
+
+   repo-css: js-state — the shape, its position and the panel corner follow
+   the open tab, which the script tracks. */
+@media (min-width: 768px) {
+  [data-fluid-tabs] {
+    --fluid-r-tab: 1em;          /* tab's rounded top corners (Figma 16) */
+    --fluid-r-join: 1.5em;       /* concave join into the panel (Figma 24) */
+    --fluid-r-panel: 2.5em;      /* panel corners (Figma 40) */
+    --fluid-fast: 420ms;
+    --fluid-slow: 620ms;
+  }
+
+  [data-fluid-tabs] .w-tab-menu {
+    position: relative;
+  }
+
+  [data-fluid-tabs] .fluid-tab {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--fluid-l, 0);
+    right: var(--fluid-r, 0);
+    z-index: 0;
+    border-radius: var(--fluid-r-tab) var(--fluid-r-tab) 0 0;
+    background-color: var(--fluid-bg, #000);
+    pointer-events: none;
+    transition: left var(--fluid-slow) var(--ease-bbs), right var(--fluid-slow) var(--ease-bbs);
+  }
+
+  /* The edge in the direction of travel leads; the other one follows. */
+  [data-fluid-tabs][data-fluid-dir="right"] .fluid-tab {
+    transition: right var(--fluid-fast) var(--ease-bbs), left var(--fluid-slow) var(--ease-bbs) 40ms;
+  }
+
+  [data-fluid-tabs][data-fluid-dir="left"] .fluid-tab {
+    transition: left var(--fluid-fast) var(--ease-bbs), right var(--fluid-slow) var(--ease-bbs) 40ms;
+  }
+
+  [data-fluid-tabs].is-fluid-instant .fluid-tab,
+  [data-fluid-tabs].is-fluid-instant .fluid-tab::before,
+  [data-fluid-tabs].is-fluid-instant .fluid-tab::after,
+  [data-fluid-tabs].is-fluid-instant .w-tab-content {
+    transition: none;
+  }
+
+  /* repo-css: designer-cant — radial-gradient corners curve the tab into the
+     panel; the outer one is dropped where the tab meets the panel edge. */
+  [data-fluid-tabs] .fluid-tab::before,
+  [data-fluid-tabs] .fluid-tab::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    width: var(--fluid-r-join);
+    height: var(--fluid-r-join);
+    transition: opacity 200ms ease;
+  }
+
+  [data-fluid-tabs] .fluid-tab::before {
+    right: 100%;
+    background: radial-gradient(circle at 0 0, transparent var(--fluid-r-join), var(--fluid-bg, #000) calc(var(--fluid-r-join) + 0.5px));
+  }
+
+  [data-fluid-tabs] .fluid-tab::after {
+    left: 100%;
+    background: radial-gradient(circle at 100% 0, transparent var(--fluid-r-join), var(--fluid-bg, #000) calc(var(--fluid-r-join) + 0.5px));
+  }
+
+  [data-fluid-tabs][data-fluid-edge="start"] .fluid-tab::before,
+  [data-fluid-tabs][data-fluid-edge="end"] .fluid-tab::after {
+    opacity: 0;
+  }
+
+  /* Square the panel's top corner under a first or last tab. */
+  [data-fluid-tabs].is-fluid-ready .w-tab-content {
+    transition: border-top-left-radius var(--fluid-fast) var(--ease-bbs), border-top-right-radius var(--fluid-fast) var(--ease-bbs);
+  }
+
+  [data-fluid-tabs][data-fluid-edge="start"] .w-tab-content {
+    border-top-left-radius: 0;
+  }
+
+  [data-fluid-tabs][data-fluid-edge="end"] .w-tab-content {
+    border-top-right-radius: 0;
+  }
+
+  /* benefit-slider.css pins benefit-tab labels to the left for the stacked
+     mobile list; folder tabs centre them as in Figma. */
+  [data-fluid-tabs] .w-tab-link {
+    justify-content: center;
+  }
+
+  /* The open label sits on the dark shape; Webflow's tabs script sets
+     .w--current, a state the MCP can't style (Designer "Current" state). */
+  [data-fluid-tabs] .w-tab-link.w--current {
+    background-color: transparent;
+    color: var(--fluid-on-bg, #fff);
+  }
+}
