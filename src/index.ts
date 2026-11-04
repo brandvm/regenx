@@ -9,6 +9,7 @@ import { initPeptideDisclaimer } from './modules/peptide-disclaimer';
 import { initCatalogNav } from './modules/catalog-nav';
 import { initCatalogList } from './modules/catalog-list';
 import { initLabTests } from './modules/lab-tests';
+import { initMcCatalog } from './modules/mc-catalog';
 
 // Each module runs in isolation: one that throws is logged and skipped,
 // and every module after it still initializes.
@@ -43,6 +44,9 @@ async function boot() {
     await run('peptide-disclaimer', initPeptideDisclaimer);
     // Medical Catalog: highlight the category in view.
     await run('catalog-nav', initCatalogNav);
+    // Medication Catalog, new phone UI (/design/medication-catalog). After
+    // catalog-nav, which hides the empty New block.
+    await run('mc-catalog', initMcCatalog);
   } finally {
     document.documentElement.classList.remove('is-loading');
     document.documentElement.classList.add('rgx-ready');
