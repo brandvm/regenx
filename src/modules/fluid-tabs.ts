@@ -119,7 +119,18 @@ function bind(root: HTMLElement) {
     render();
   };
 
+  // The outline takes the panel's Webflow colour. The CSS makes the panel
+  // transparent once .is-fluid-ready is on, so lift that for the read. On
+  // phones the panel has no fill (and no outline); keep the last colour.
+  const readFill = () => {
+    root.classList.remove('is-fluid-ready');
+    const bg = getComputedStyle(content).backgroundColor;
+    root.classList.add('is-fluid-ready');
+    if (bg && bg !== 'transparent' && !/^rgba\(.*,\s*0\)$/.test(bg)) path.setAttribute('fill', bg);
+  };
+
   const measure = () => {
+    readFill();
     const rootBox = root.getBoundingClientRect();
     const menuBox = menu.getBoundingClientRect();
     const contentBox = content.getBoundingClientRect();
