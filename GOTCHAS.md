@@ -25,6 +25,21 @@ harvested across all client repos to improve `brandvm/wf-template`.
 
 ## This project
 
+### 2026-11-04 · On-page Dev/Staging switcher is not needed
+- Area: js
+- Scope: template-candidate
+- Symptom: The bottom-left Dev/Staging pill sat over every staging page,
+  showed in client screenshots and design reviews (it overlapped content in
+  mobile captures), and needed its own tests and README section.
+- Cause: The pill only wraps the `?bv-dev=1` / `?bv-dev=0` URL flags that
+  the loader already handles (with localStorage persistence and fallback to
+  staging). Nobody used the pill instead of the flags.
+- Fix: Removed `src/modules/environment-switcher.ts`, its boot call, its
+  tests and README section. Dev mode is unchanged: `?bv-dev=1` / `?bv-dev=0`.
+  Suggest wf-template drops the module too.
+- Status: fixed (remove-env-switcher); suggested to wf-template
+- Found by: human
+
 ### 2026-11-02 · Catalog cards: nested lists and late pages
 - Area: js
 - Scope: template-candidate

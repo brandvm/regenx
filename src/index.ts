@@ -2,7 +2,6 @@ import { initAnimation } from './modules/animation';
 import { getLenis, initSmoothScroll, resizeSmoothScroll } from './modules/smooth-scroll';
 import { initWaveGrid } from './modules/wave-grid';
 import { initMain } from './modules/main';
-import { initEnvironmentSwitcher } from './modules/environment-switcher';
 import { initUniqueFormIds } from './modules/unique-form-ids';
 import { initMarquee } from './modules/marquee';
 import { initModals } from './modules/modal';
@@ -26,7 +25,6 @@ async function boot() {
   window.__RGX_BOOTED = true;
   try {
     if (window.Webflow?.env?.('editor') || window.Webflow?.env?.('design')) return;
-    await run('environment-switcher', initEnvironmentSwitcher);
     // Starter fix for markup Webflow publishes (CMS filter radios share an id).
     await run('unique-form-ids', initUniqueFormIds);
     await run('animation', initAnimation);
