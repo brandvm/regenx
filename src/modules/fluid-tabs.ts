@@ -14,8 +14,8 @@ const ROOT = '[data-fluid-tabs]';
 
 // Stiffness (1/s²) and damping ratio. Leading edge: quick with a hint of
 // overshoot; trailing edge: softer, fully damped.
-const LEAD = { k: 230, zeta: 0.82 };
-const TRAIL = { k: 150, zeta: 1 };
+const LEAD = { k: 320, zeta: 0.8 };
+const TRAIL = { k: 210, zeta: 1 };
 
 type Edge = { pos: number; vel: number; target: number };
 
