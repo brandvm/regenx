@@ -14,6 +14,7 @@ import { CompareTable } from "./compare-table";
 import { TabGraphics } from "./tab-graphics";
 import { SmartSwiper } from "./smart-swiper";
 import { SnapDots } from "./snap-dots";
+import { FluidTabs } from "./fluid-tabs";
 import { FormSteps } from "./form-steps";
 import { Videos } from "./videos";
 import { Accordions } from "./accordions";
@@ -44,6 +45,7 @@ export function initMain() {
   run("TabGraphics", () => TabGraphics.init());
   run("SmartSwiper", () => SmartSwiper.init());
   run("SnapDots", () => SnapDots.init());
+  run("FluidTabs", () => FluidTabs.init());
   run("FormSteps", () => FormSteps.init());
   run("Videos", () => Videos.init());
   run("Accordions", () => Accordions.init());

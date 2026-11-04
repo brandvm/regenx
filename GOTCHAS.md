@@ -25,6 +25,34 @@ harvested across all client repos to improve `brandvm/wf-template`.
 
 ## This project
 
+### 2026-11-04 · MCP can't style a tab link's "Current" state
+- Area: mcp
+- Scope: template-candidate
+- Symptom: Building the TRT folder tabs, the open label had to turn white on
+  the black tab. `data_style_tool > update_style` rejects `pseudo: "current"`
+  (only hover/active/focus/nth-child/before/after… are accepted).
+- Cause: The MCP exposes CSS pseudo-classes, not Webflow's own states
+  (Current), which Webflow writes as `.w--current`.
+- Fix: The colour sits in `src/styles/fluid-tabs.css` under
+  `[data-fluid-tabs] .w-tab-link.w--current` (js-state; Webflow's tabs script
+  toggles the class). Without the MCP, set it in the Designer's Current state.
+- Status: open (MCP limit)
+- Found by: claude
+
+### 2026-11-04 · Claude's browser pane can't load `?bv-dev=1` assets
+- Area: loader
+- Scope: template-candidate
+- Symptom: With `?bv-dev=1` on staging in the desktop app's browser pane,
+  `window.BV.dev` was true but CSS/JS still came from GitHub Pages.
+- Cause: The pane blocks requests from the https staging page to
+  `http://localhost:3000` (local-network access), so the loader's fallback
+  to staging kicks in, silently.
+- Fix: Test there by injecting the built CSS and an IIFE build of the module
+  (`npx esbuild src/modules/x.ts --bundle --format=iife`) with the JS tool,
+  or use a normal Chrome window and allow the local-network prompt.
+- Status: open (environment)
+- Found by: claude
+
 ### 2026-11-04 · On-page Dev/Staging switcher is not needed
 - Area: js
 - Scope: template-candidate
