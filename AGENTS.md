@@ -82,7 +82,7 @@ neutralizers, sets the 1680px fluid `:root` font-size scale and reads
 
 ## Read before changing integration
 
-- `README.md` — install, dev mode and environment switcher, Webflow install,
+- `README.md` — install, dev mode, Webflow install,
   staging deploy, feature notes (contact form, therapy timeline, benefits
   slider), source map, production plan.
 - `loader.html` — three marked pieces (`START HEAD` / `START EMBED` /
@@ -114,7 +114,7 @@ neutralizers, sets the 1680px fluid `:root` font-size scale and reads
 - `src/index.ts` boots once (`__RGX_BOOTED`), skips the editor/design mode,
   waits for `Webflow.push` so Webflow wires tabs/dropdowns first, then runs
   each module through `run()` (one that throws is logged, the rest still
-  start): the environment switcher, `unique-form-ids` (CMS filter radios
+  start): `unique-form-ids` (CMS filter radios
   publish the same id), `animation.ts` (shares Webflow's GSAP with packaged
   fallbacks), Lenis, WaveGrid and `main.js`. It always releases the loading
   state in `finally`.
@@ -179,8 +179,8 @@ to GitHub Pages. Failed Playwright reports are uploaded as an artifact.
 
 Dev mode: `https://regen-x.webflow.io/?bv-dev=1` loads assets from
 `http://localhost:3000` (allow the local-network-access prompt), `?bv-dev=0`
-returns to staging; the choice persists on the staging origin. The bundle's
-bottom-left Dev/Staging pill switches modes on `*.webflow.io`. If local CSS
+returns to staging; the choice persists on the staging origin. There is no
+on-page switcher (removed 2026-11-04); use the URL flags. If local CSS
 or JS fails, both fall back to staging. For another device, deploy to
 staging.
 

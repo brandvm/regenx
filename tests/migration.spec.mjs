@@ -243,67 +243,12 @@ for (const reduced of [false, true]) test(`carousel autoplay override respects r
   expect(errors).toEqual([]);
 });
 
-test('environment switcher changes modes while preserving the current URL',async({page})=>{
-  const {errors}=await setup(page,{url:'https://regen-x.webflow.io/services?tab=peptide#products'});
-  await page.getByRole('button',{name:'Choose environment (Staging)'}).click();
-  await expect(page.getByRole('button',{name:'Staging',exact:true})).toHaveAttribute('aria-pressed','true');
-  await page.getByRole('button',{name:'Dev',exact:true}).click();
-  await expect(page).toHaveURL('https://regen-x.webflow.io/services?tab=peptide&bv-dev=1#products');
-  await expect(page.getByRole('button',{name:'Choose environment (Dev)'})).toBeVisible();
-  expect(await page.evaluate(()=>window.BV.source)).toBe(dev);
-  await page.getByRole('button',{name:'Choose environment (Dev)'}).click();
-  await page.getByRole('button',{name:'Staging',exact:true}).click();
-  await expect(page).toHaveURL('https://regen-x.webflow.io/services?tab=peptide&bv-dev=0#products');
-  await expect(page.getByRole('button',{name:'Choose environment (Staging)'})).toBeVisible();
-  expect(await page.evaluate(()=>localStorage.getItem('bv-dev'))).toBe('0');
-  expect(errors).toEqual([]);
-});
-
-test('environment switcher supports keyboard dismissal and outside clicks',async({page})=>{
-  await setup(page);
-  const launcher=page.getByRole('button',{name:'Choose environment (Staging)'});
-  await launcher.focus();
-  await page.keyboard.press('Enter');
-  await expect(page.getByRole('button',{name:'Staging',exact:true})).toBeFocused();
-  await page.keyboard.press('Escape');
-  await expect(launcher).toBeFocused();
-  await expect(page.getByRole('group',{name:'Code environment'})).toBeHidden();
-  await launcher.click();
-  await page.locator('h1').click();
-  await expect(launcher).toBeVisible();
-  await expect(page.getByRole('group',{name:'Code environment'})).toBeHidden();
-});
-
-test('environment switcher reflects local fallback and can clear the dev preference',async({page})=>{
-  await setup(page,{url:'https://regen-x.webflow.io/?bv-dev=1',fail:u=>u.startsWith(dev)});
-  await page.getByRole('button',{name:'Choose environment (Staging)'}).click();
-  await expect(page.getByRole('status')).toHaveText('Dev unavailable · using staging');
-  await expect(page.getByRole('button',{name:'Staging',exact:true})).toHaveAttribute('aria-pressed','true');
-  await page.getByRole('button',{name:'Staging',exact:true}).click();
-  await expect(page).toHaveURL('https://regen-x.webflow.io/?bv-dev=0');
-  await page.getByRole('button',{name:'Choose environment (Staging)'}).click();
-  await expect(page.getByRole('status')).toBeHidden();
-});
-
-test('environment selection works without browser storage',async({page})=>{
-  await setup(page,{blockedStorage:true});
-  await page.getByRole('button',{name:'Choose environment (Staging)'}).click();
-  await page.getByRole('button',{name:'Dev',exact:true}).click();
-  await expect(page.getByRole('button',{name:'Choose environment (Dev)'})).toBeVisible();
-  expect(await page.evaluate(()=>window.BV.source)).toBe(dev);
-});
-
-for(const [label,url,editor] of [
-  ['production','https://regenx.example/',false],
-  ['localhost','http://localhost:3000/fixture',false],
-  ['editor','https://regen-x.webflow.io/',true],
-]) test(`environment switcher is absent on ${label}`,async({page})=>{
-  await setup(page,{url,editor});
-  // Production's loader is deliberately unconfigured; still exercise the guard
-  // with an explicitly loaded bundle, as a future production release would.
-  if(label==='production') await page.addScriptTag({content:js});
+test('staging has no environment switcher; ?bv-dev still switches sources',async({page})=>{
+  const {errors}=await setup(page,{url:'https://regen-x.webflow.io/?bv-dev=1'});
   await expect(page.locator('html')).toHaveClass(/rgx-ready/);
   await expect(page.locator('#rgx-environment')).toHaveCount(0);
+  expect(await page.evaluate(()=>window.BV.source)).toBe(dev);
+  expect(errors).toEqual([]);
 });
 
 test('staging reuses the Embed stylesheet, then refreshes it after load without a gap',async({page})=>{
@@ -338,8 +283,6 @@ test('with a release set, staging falls back to the pinned release',async({page}
   await expect(page.locator('html')).toHaveClass(/rgx-ready/);
   expect(await page.evaluate(()=>window.BV.source)).toBe(prod);
   await expect(page.locator('#bv-css')).toHaveAttribute('href',prod+'styles.css');
-  await page.getByRole('button',{name:'Choose environment (Staging)'}).click();
-  await expect(page.getByRole('status')).toHaveText('Staging unavailable · using release');
   expect(errors).toEqual([]);
 });
 

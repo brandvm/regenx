@@ -20,15 +20,7 @@ Allow the browser's local-network access prompt if it appears. The page stays on
 Webflow; its custom assets come from `http://localhost:3000`. Saving source files
 reloads that page. The local server serves JS/CSS, not a copy of the Webflow site.
 
-On `*.webflow.io`, a small **Staging** or **Dev** pill sits in the bottom-left
-corner. Click it to open the segmented switcher, then choose a mode. The page
-reloads and remembers your choice. The control starts collapsed, fades when idle,
-and collapses when you click elsewhere or press Escape. If the local server is
-unavailable, it shows **Staging** as the actual source and explains the fallback
-when expanded. Start `pnpm dev` and click **Dev** to retry.
-
-The control is included in the bundle, so existing Webflow snippets do not need
-updating. It is hidden outside `.webflow.io`, in the editor, and when printing.
+There is no on-page switcher: use the URL flags below.
 
 - `?bv-dev=1` enables local assets and persists on the staging origin.
 - `?bv-dev=0` returns to staging assets.
@@ -225,7 +217,6 @@ carousel observer reuse, including sliders added after initialization.
 | `src/index.ts` | Wait for DOM/Webflow, boot once, release the loading state |
 | `src/modules/animation.ts` | Share Webflow GSAP/plugins with packaged fallbacks |
 | `src/modules/smooth-scroll.ts` | Original vertical + responsive horizontal Lenis setup |
-| `src/modules/environment-switcher.ts` | Compact staging-only Dev / Staging control |
 | `src/modules/unique-form-ids.ts` | Unique ids for CMS filter radios (wf-template starter) |
 | `src/modules/main.js` | Imports the site features and initializes each in isolation |
 | `src/modules/debug.js`, `page-ready.js` | `?debug=1` diagnostics; the page-unlocked signal |
