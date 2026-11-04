@@ -808,6 +808,12 @@ a {
   content: ", "
 }
 
+/* repo-css: designer-cant — :has(); a product hero fact bound to an empty
+   CMS field (e.g. no Sub-Category) would leave its bullet icon alone. */
+.product-hero-intro-term:has(> .w-dyn-bind-empty) {
+  display: none;
+}
+
 
 .sd-media {
   display: grid;
