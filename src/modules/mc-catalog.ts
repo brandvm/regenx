@@ -7,9 +7,9 @@
 // MC Row Body Is Closed, MC Group Is Hidden, MC Show More Is Hidden, MC Tab
 // Line Is Active). Only the total is counted (client comment, Nov 2026).
 //
-// Finsweet loads the later pages of each list after boot and re-renders a
-// list on every search, so new cards are picked up as they arrive and rows
-// are never removed: the search here filters the rows on its own.
+// Each list's later pages are fetched here (see loadPages), cards Finsweet
+// adds are picked up too, and rows are never removed: Finsweet re-renders a
+// list on every search, so the search here filters the rows on its own.
 import { getLenis } from './smooth-scroll';
 
 const MOBILE = '(max-width: 767px)';
@@ -118,24 +118,55 @@ export function initMcCatalog() {
     };
     head.addEventListener('click', toggle);
     head.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
-    return { el, key: `${name}|${sub}`, haystack: `${name} ${sub} ${desc}`.toLowerCase() };
+    // Two products can share a name and strength (Testosterone Cypionate in
+    // two oils): the description tells them apart.
+    return { el, key: `${name}|${sub}|${desc}`, haystack: `${name} ${sub} ${desc}`.toLowerCase() };
   }
 
   // A product card is a list item or a slide, not the strengths list inside
   // it. A card already shown in its group (Finsweet re-renders) is skipped.
-  function collect() {
+  function add(g: Group, root: ParentNode) {
     let added = false;
-    groups.forEach((g) => {
-      g.block.querySelectorAll<HTMLElement>('.w-dyn-item > .product-card').forEach((card) => {
-        const row = rowFrom(card);
-        if (!row || g.seen.has(row.key)) return;
-        g.seen.add(row.key);
-        g.rows.push(row);
-        g.el.insertBefore(row.el, g.more);
-        added = true;
-      });
+    root.querySelectorAll<HTMLElement>('.w-dyn-item > .product-card').forEach((card) => {
+      const row = rowFrom(card);
+      if (!row || g.seen.has(row.key)) return;
+      g.seen.add(row.key);
+      g.rows.push(row);
+      g.el.insertBefore(row.el, g.more);
+      added = true;
     });
-    if (added) update();
+    return added;
+  }
+  function collect() {
+    if (groups.map((g) => add(g, g.block)).some(Boolean)) update();
+  }
+
+  // Finsweet loads a list's later pages only once the list nears the
+  // viewport, and the card lists are hidden on phones, so the rows fetch
+  // them here: follow each block's Next link, take the same block (by its
+  // anchor id) from that page, until there is no Next.
+  async function loadPages(g: Group) {
+    let next = g.block.querySelector<HTMLAnchorElement>('.w-pagination-next[href]')?.href;
+    const seen = new Set<string>();
+    while (next && !seen.has(next)) {
+      seen.add(next);
+      const html = await fetch(next, { credentials: 'same-origin' }).then((r) => (r.ok ? r.text() : ''));
+      if (!html) return;
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      const block = doc.getElementById(g.id)?.closest('.product-block, .product-slider-w');
+      if (!block) return;
+      if (add(g, block)) update();
+      const href = block.querySelector('.w-pagination-next')?.getAttribute('href');
+      next = href ? new URL(href, next).href : undefined;
+    }
+  }
+  let loading = false;
+  function loadAll() {
+    if (loading || !mq.matches) return;
+    loading = true;
+    groups.filter((g) => g.id).forEach((g) => {
+      loadPages(g).catch((error) => console.warn('[RegenX] mc-catalog: a page failed to load', error));
+    });
   }
 
   function update() {
@@ -215,7 +246,8 @@ export function initMcCatalog() {
   section.querySelectorAll('.product-block-list .w-dyn-items').forEach((items) => observer.observe(items, { childList: true }));
   search?.addEventListener('input', update);
   window.addEventListener('scroll', schedule, { passive: true });
-  mq.addEventListener('change', schedule);
+  mq.addEventListener('change', () => { loadAll(); schedule(); });
   collect();
   update();
+  loadAll();
 }
