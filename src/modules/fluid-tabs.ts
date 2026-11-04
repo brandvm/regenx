@@ -2,22 +2,26 @@
 // Webflow owns the links, the panel colour and the spacing; this adds one
 // shape behind the open link that joins the panel with concave corners and
 // slides to the next link. Each edge of the shape is a spring: the edge in
-// the direction of travel is stiffer, so it leads and the tab stretches a
-// little, then the trailing edge catches up and both settle. Springs keep the
-// velocity continuous (no ease-in stall or mid-move burst) and retarget
-// smoothly when another tab is clicked mid-move. The shape also fills the
+// the direction of travel sets off first and the trailing edge follows a
+// beat later on the same spring, so the tab stretches a little and both
+// edges settle together (a softer trailing spring would creep at the end).
+// Springs keep the velocity continuous (no ease-in stall or mid-move burst)
+// and retarget smoothly when another tab is clicked mid-move. The shape also fills the
 // panel's top corner under a first or last tab (see the CSS), so corner and
 // tab always move together. Styles live in styles/fluid-tabs.css and apply
 // from 768px up only.
 
 const ROOT = '[data-fluid-tabs]';
 
-// Stiffness (1/s²) and damping ratio. Leading edge: quick with a hint of
-// overshoot; trailing edge: softer, fully damped.
-const LEAD = { k: 320, zeta: 0.8 };
-const TRAIL = { k: 210, zeta: 1 };
+// Stiffness (1/s²) and damping ratio. Leading edge: a hint of overshoot;
+// trailing edge: just under critical so it lands without creeping.
+const LEAD = { k: 300, zeta: 0.82 };
+const TRAIL = { k: 300, zeta: 0.95 };
+const TRAIL_DELAY = 70; // ms before the trailing edge sets off
 
-type Edge = { pos: number; vel: number; target: number };
+// `goal` is where the edge is heading; `target` is what its spring pulls to
+// right now (the trailing edge only takes up its goal after TRAIL_DELAY).
+type Edge = { pos: number; vel: number; target: number; goal: number };
 
 const reduceMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 
@@ -33,11 +37,12 @@ function bind(root: HTMLElement) {
 
   // Edges measured from the menu's left: `left` of the shape and its `right`
   // edge (not CSS right), so both move the same way.
-  const left: Edge = { pos: 0, vel: 0, target: 0 };
-  const right: Edge = { pos: 0, vel: 0, target: 0 };
+  const left: Edge = { pos: 0, vel: 0, target: 0, goal: 0 };
+  const right: Edge = { pos: 0, vel: 0, target: 0, goal: 0 };
   let width = 0;
   let frame = 0;
   let last = 0;
+  let trailAt = 0;
   let movingRight = true;
 
   const render = () => {
@@ -58,9 +63,11 @@ function bind(root: HTMLElement) {
     // Clamp the step so a background tab or a long frame can't overshoot.
     const dt = Math.min(0.032, (now - last) / 1000 || 0.016);
     last = now;
+    const trail = movingRight ? left : right;
+    if (now >= trailAt) trail.target = trail.goal;
     step(left, movingRight ? TRAIL : LEAD, dt);
     step(right, movingRight ? LEAD : TRAIL, dt);
-    if (settled(left) && settled(right)) {
+    if (trail.target === trail.goal && settled(left) && settled(right)) {
       left.pos = left.target; right.pos = right.target;
       left.vel = right.vel = 0;
       frame = 0;
@@ -81,18 +88,22 @@ function bind(root: HTMLElement) {
     root.style.setProperty('--fluid-bg', getComputedStyle(content).backgroundColor);
     width = box.width;
     const newLeft = tab.left - box.left;
-    movingRight = newLeft >= left.target;
-    left.target = newLeft;
-    right.target = tab.right - box.left;
+    movingRight = newLeft >= left.goal;
+    left.goal = newLeft;
+    right.goal = tab.right - box.left;
 
     if (!animate || reduceMotion()) {
       cancelAnimationFrame(frame);
       frame = 0;
-      left.pos = left.target; right.pos = right.target;
+      left.pos = left.target = left.goal;
+      right.pos = right.target = right.goal;
       left.vel = right.vel = 0;
       render();
       return;
     }
+    // The leading edge heads off now; the trailing one after a beat.
+    (movingRight ? right : left).target = (movingRight ? right : left).goal;
+    trailAt = performance.now() + TRAIL_DELAY;
     if (!frame) {
       last = performance.now();
       frame = requestAnimationFrame(tick);
