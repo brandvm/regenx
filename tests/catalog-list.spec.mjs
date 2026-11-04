@@ -70,11 +70,10 @@ test('catalog: phones get compact rows that open in place', async ({ page }) => 
   expect(errors).toEqual([]);
 });
 
-test('catalog: counts on the category tabs and headings, total under search', async ({ page }) => {
+test('catalog: only the total is counted, no numbers on tabs or headings', async ({ page }) => {
   const errors = await setup(page, catalog());
-  await expect(page.locator('a[href="#Most-Prescribed"] .catalog-count')).toHaveText('(2)');
-  await expect(page.locator('a[href="#Testosterone-Products"] .catalog-count')).toHaveText('(3)');
-  await expect(page.locator('#Testosterone-Products ~ .section-header h2 .catalog-count')).toHaveText('3');
+  await expect(page.locator('a[href="#Most-Prescribed"]')).toHaveText(/^\s*Most Prescribed\s*$/);
+  await expect(page.locator('#Testosterone-Products ~ .section-header h2')).not.toContainText(/\d/);
   // Each product once, wherever it is listed.
   await expect(page.locator('.catalog-total')).toHaveText('7 medications');
   expect(errors).toEqual([]);
@@ -88,7 +87,7 @@ test('catalog: the Filters sheet narrows by form and hides empty groups', async 
   await page.locator('.catalog-filters-button').click();
   const sheet = page.locator('[data-modal="catalog-filters"]');
   await expect(sheet).toBeVisible();
-  await expect(sheet.locator('label', { hasText: 'Injection' }).locator('.catalog-sheet-option-count')).toHaveText('5');
+  await expect(sheet.locator('label', { hasText: 'Injection' })).toHaveText(/^\s*Injection\s*$/);
   // Known forms with no product on the page get no option.
   await expect(sheet.locator('label', { hasText: 'Troche' })).toBeHidden();
   await sheet.locator('label', { hasText: 'Capsule' }).click();
@@ -101,7 +100,7 @@ test('catalog: the Filters sheet narrows by form and hides empty groups', async 
   await expect(page.locator('.product-block', { hasText: 'Glutathione' })).toBeHidden();
   await expect(page.locator('a[href="#Vitamins-Aminos"]')).toBeHidden();
   await expect(page.locator('a[href="#Most-Prescribed"]')).toBeHidden();
-  await expect(page.locator('.catalog-filters-badge')).toHaveText('1');
+  await expect(page.locator('.catalog-filters-button')).toHaveText(/^\s*Filters\s*$/);
   await expect(page.locator('.catalog-total')).toHaveText('1 medication');
   expect(errors).toEqual([]);
 });
@@ -143,7 +142,6 @@ test('catalog: cards Finsweet adds after boot become rows too, counted once', as
   }, card('Methylcobalamin', '1mg/mL', 'Injection'));
   const row = page.locator('.product-card', { hasText: 'Methylcobalamin' });
   await expect(row.locator('.catalog-row-toggle')).toHaveCount(1);
-  await expect(page.locator('a[href="#Vitamins-Aminos"] .catalog-count')).toHaveText('(4)');
   await expect(page.locator('.catalog-total')).toHaveText('8 medications');
   expect(errors).toEqual([]);
 });
@@ -162,7 +160,6 @@ test('catalog: desktop keeps the full cards', async ({ page }) => {
   const row = page.locator('.product-card', { hasText: 'Anastrozole Capsule' });
   await expect(row.locator('.product-card-info > p')).toBeVisible();
   await expect(row.locator('.catalog-row-toggle')).toBeHidden();
-  await expect(page.locator('.catalog-count').first()).toBeHidden();
   await expect(page.locator('.catalog-toolbar')).toBeHidden();
   expect(errors).toEqual([]);
 });
@@ -184,14 +181,14 @@ const lab = `<div class="lab-tests"><div class="lab-tests-nav">
     ${group('Metabolic-Panel', 'Metabolic Panel', ['CMP (Comprehensive Metabolic Panel)', 'Cortisol'])}
   </div></div>`;
 
-test('lab panel: search narrows biomarkers, counts follow, Enter does not submit', async ({ page }) => {
+test('lab panel: search narrows biomarkers without counts, Enter does not submit', async ({ page }) => {
   const errors = await setup(page, lab);
-  await expect(page.locator('a[href="#Male-Hormone-Panel"] .lab-tests-count')).toHaveText('(3)');
+  await expect(page.locator('a[href="#Male-Hormone-Panel"]')).toHaveText(/^\s*Male Hormone Panel\s*$/);
   const input = page.locator('.search-form-input');
   await input.fill('testo');
   await expect(page.locator('.acc', { hasText: 'Estradiol' })).toBeHidden();
   await expect(page.locator('.acc', { hasText: 'Free Testosterone' })).toBeVisible();
-  await expect(page.locator('a[href="#Male-Hormone-Panel"] .lab-tests-count')).toHaveText('(2)');
+  await expect(page.locator('a[href="#Male-Hormone-Panel"]')).not.toContainText(/\d/);
   await expect(page.locator('.lab-tests-group', { hasText: 'Cortisol' })).toBeHidden();
   await expect(page.locator('a[href="#Metabolic-Panel"]')).toBeHidden();
   await input.press('Enter');
@@ -204,8 +201,8 @@ test('lab panel: search narrows biomarkers, counts follow, Enter does not submit
   expect(errors).toEqual([]);
 });
 
-test('lab panel: counts are phone-only', async ({ page }) => {
+test('lab panel: no counts on desktop either', async ({ page }) => {
   const errors = await setup(page, lab, 1440);
-  await expect(page.locator('.lab-tests-count').first()).toBeHidden();
+  await expect(page.locator('.lab-tests-nav-link').first()).not.toContainText(/\d/);
   expect(errors).toEqual([]);
 });

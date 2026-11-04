@@ -1,8 +1,10 @@
 // Medical Catalog on phones (Figma "Proposal · Catalog & Lab Panel filters",
 // client reference superpower.com/biomarkers): the product blocks read as one
-// grouped list. Each card is a compact row that opens in place, the category
-// chips and headings carry counts, groups with no match hide while searching,
-// and a Filters sheet narrows the list by medication form.
+// grouped list. Each card is a compact row that opens in place, groups with
+// no match hide while searching, and a Filters sheet narrows the list by
+// medication form. Only the total ("58 medications") is counted: the client
+// asked for no numbers beside tabs, headings or filter options (Figma
+// comment, Marshall Stein, Nov 2026).
 //
 // Everything visual hangs off [data-catalog-compact] on the section, which is
 // set only at ≤767px, so desktop and a page without the bundle keep the
@@ -23,17 +25,6 @@ type Group = { block: HTMLElement; links: HTMLAnchorElement[]; heading: HTMLElem
 type SwiperLike = { enable?: () => void; disable?: () => void; update?: () => void };
 
 const text = (el: Element | null | undefined) => (el?.textContent ?? '').replace(/\s+/g, ' ').trim();
-
-function countSpan(host: Element | null, cls: string) {
-  if (!host) return null;
-  let span = host.querySelector<HTMLElement>(`:scope > .${cls}`);
-  if (!span) {
-    span = document.createElement('span');
-    span.className = cls;
-    host.appendChild(span);
-  }
-  return span;
-}
 
 export function initCatalogList() {
   const found = document.querySelector<HTMLElement>('.s-medical-catelog');
@@ -132,8 +123,8 @@ export function initCatalogList() {
     filtersButton.className = 'catalog-filters-button';
     filtersButton.setAttribute('data-modal-open', 'catalog-filters');
     // Remix Icon (loaded by the global Embed), as in the Figma button:
-    // sliders, label, count badge, chevron.
-    filtersButton.innerHTML = '<i class="catalog-filters-icon ri-equalizer-line" aria-hidden="true"></i><span class="catalog-filters-label">Filters</span><span class="catalog-filters-badge" hidden></span><i class="catalog-filters-icon ri-arrow-down-s-line" aria-hidden="true"></i>';
+    // sliders, label, chevron.
+    filtersButton.innerHTML = '<i class="catalog-filters-icon ri-equalizer-line" aria-hidden="true"></i><span class="catalog-filters-label">Filters</span><i class="catalog-filters-icon ri-arrow-down-s-line" aria-hidden="true"></i>';
     toolbar.appendChild(filtersButton);
 
     const sheet = document.createElement('div');
@@ -146,7 +137,7 @@ export function initCatalogList() {
     sheet.innerHTML = `<div class="catalog-sheet-panel" data-modal-panel>
       <div class="catalog-sheet-head"><h2 class="catalog-sheet-title">Filters</h2><button type="button" class="catalog-sheet-clear">Clear all</button></div>
       <fieldset class="catalog-sheet-group"><legend class="catalog-sheet-legend">Medication form</legend>
-      ${list.map((f) => `<label class="catalog-sheet-option"><input type="checkbox" value="${f.replace(/"/g, '&quot;')}"><span class="catalog-sheet-option-label">${f}</span><span class="catalog-sheet-option-count"></span></label>`).join('')}
+      ${list.map((f) => `<label class="catalog-sheet-option"><input type="checkbox" value="${f.replace(/"/g, '&quot;')}"><span class="catalog-sheet-option-label">${f}</span></label>`).join('')}
       </fieldset>
       <button type="button" class="catalog-sheet-apply" data-modal-close></button>
     </div>`;
@@ -203,13 +194,7 @@ export function initCatalogList() {
       });
       const hide = compact && n === 0;
       g.block.classList.toggle(HIDDEN, hide);
-      g.links.forEach((link) => {
-        link.classList.toggle(HIDDEN, hide);
-        const span = countSpan(link.querySelector('.body-sm') ?? link, 'catalog-count');
-        if (span) span.textContent = `(${n})`;
-      });
-      const span = countSpan(g.heading, 'catalog-count');
-      if (span) span.textContent = String(n);
+      g.links.forEach((link) => link.classList.toggle(HIDDEN, hide));
     });
     const anyShown = groups.some((g) => !isRetired(g) && !g.block.classList.contains(HIDDEN));
     const shown = seen.size;
@@ -219,25 +204,11 @@ export function initCatalogList() {
     const title = empty.querySelector('.catalog-empty-title');
     if (title) title.textContent = q ? `No medications match “${q}”` : 'No medications match these filters';
 
-    // Form counts follow the search, so a box never promises results that
-    // aren't there.
     boxes.forEach((box) => {
-      const ids = new Set<string | HTMLElement>();
-      groups.filter((g) => !isRetired(g)).forEach((g) => itemsOf(g)
-        .filter((item) => !item.classList.contains(SEARCH_HIDDEN) && formOf(item) === box.value)
-        .forEach((item) => ids.add(productOf(item))));
-      const n = ids.size;
-      const count = box.parentElement?.querySelector('.catalog-sheet-option-count');
-      if (count) count.textContent = String(n);
       const option = box.closest<HTMLElement>('.catalog-sheet-option');
       if (option) option.hidden = !forms.has(box.value) && !box.checked;
     });
     if (applyButton) applyButton.textContent = `Show ${shown} result${shown === 1 ? '' : 's'}`;
-    const badge = filtersButton?.querySelector<HTMLElement>('.catalog-filters-badge');
-    if (badge) {
-      badge.hidden = selected.size === 0;
-      badge.textContent = String(selected.size);
-    }
   }
 
   let frame = 0;

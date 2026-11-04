@@ -57,7 +57,6 @@
    catalog-list.ts; they show only in the compact state. */
 .catalog-row-toggle,
 .catalog-row-form,
-.catalog-count,
 .catalog-toolbar {
   display: none;
 }
@@ -106,12 +105,6 @@
 [data-catalog-compact] .catalog-row-form {
   display: block;
   font-size: 0.857rem;
-  opacity: 0.56;
-}
-
-[data-catalog-compact] .catalog-count {
-  display: inline;
-  margin-left: 0.25em;
   opacity: 0.56;
 }
 
@@ -180,22 +173,6 @@
 .catalog-filters-icon {
   font-size: 1rem;
   line-height: 1;
-}
-
-.catalog-filters-badge {
-  display: inline-grid;
-  place-items: center;
-  min-width: 1.25rem;
-  height: 1.25rem;
-  padding: 0 0.3rem;
-  border-radius: 1rem;
-  background: #000;
-  color: #fff;
-  font-size: 0.688rem;
-}
-
-.catalog-filters-badge[hidden] {
-  display: none;
 }
 
 /* repo-css: js-state — the Filters bottom sheet, a [data-modal]
@@ -284,11 +261,6 @@
   flex: 1;
 }
 
-.catalog-sheet-option-count {
-  font-size: 0.75rem;
-  opacity: 0.56;
-}
-
 /* repo-css: designer-cant — :checked on a script-built checkbox. */
 .catalog-sheet-option input {
   appearance: none;
@@ -375,20 +347,10 @@
   display: none !important;
 }
 
-/* repo-css: js-state — Lab Panel counts and the active tab are phone-only;
+/* repo-css: js-state — the Lab Panel active tab is phone-only;
    desktop keeps its look. The row itself (sticky, sideways) is a Webflow
    breakpoint style on .lab-tests-nav-list. */
-.lab-tests-count {
-  display: none;
-}
-
 @media (max-width: 767px) {
-  .lab-tests-count {
-    display: inline;
-    margin-left: 0.25em;
-    opacity: 0.56;
-  }
-
   .lab-tests-nav-link.is-active {
     box-shadow: inset 0 -2px 0 currentColor;
   }

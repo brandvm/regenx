@@ -1,11 +1,11 @@
 // Lab Panel › "Biomarkers We Test" (Figma "Proposal · Catalog & Lab Panel
 // filters"). The "Search Test..." box in Webflow had nothing behind it: it
 // now narrows the biomarker accordions by name, hides groups with no match
-// (and their nav links), and shows a message when nothing matches. Each nav
-// link and group heading carries its count; on phones the nav is a sticky
-// row of tabs (Webflow breakpoint styles) whose tab for the group in view is
-// marked active and scrolled into sight. Desktop looks as before: the counts
-// and the active tab are styled for phones only (lab-tests.css).
+// (and their nav links), and shows a message when nothing matches. No counts
+// beside links or headings (client, Figma comment Nov 2026). On phones the
+// nav is a sticky row of tabs (Webflow breakpoint styles) whose tab for the
+// group in view is marked active and scrolled into sight; the active tab is
+// styled for phones only.
 
 const HIDDEN = 'is-lab-hidden';
 const ACTIVE = 'is-active';
@@ -13,17 +13,6 @@ const ACTIVE = 'is-active';
 type Group = { root: HTMLElement; items: HTMLElement[]; heading: HTMLElement | null; links: HTMLAnchorElement[] };
 
 const text = (el: Element | null | undefined) => (el?.textContent ?? '').replace(/\s+/g, ' ').trim();
-
-function countSpan(host: Element | null) {
-  if (!host) return null;
-  let span = host.querySelector<HTMLElement>(':scope > .lab-tests-count');
-  if (!span) {
-    span = document.createElement('span');
-    span.className = 'lab-tests-count';
-    host.appendChild(span);
-  }
-  return span;
-}
 
 export function initLabTests() {
   const root = document.querySelector<HTMLElement>('.lab-tests');
@@ -68,13 +57,7 @@ export function initLabTests() {
         if (match) n += 1;
       });
       g.root.classList.toggle(HIDDEN, n === 0);
-      g.links.forEach((link) => {
-        link.classList.toggle(HIDDEN, n === 0);
-        const span = countSpan(link.querySelector('.lab-tests-nav-label .body-sm') ?? link);
-        if (span) span.textContent = `(${n})`;
-      });
-      const span = countSpan(g.heading);
-      if (span) span.textContent = String(n);
+      g.links.forEach((link) => link.classList.toggle(HIDDEN, n === 0));
       if (n) any = true;
     });
     empty.hidden = any;
