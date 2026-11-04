@@ -141,8 +141,14 @@
   display: none;
 }
 
+/* repo-css: js-state — compact catalog (phones, portrait and landscape): the
+   category chips are text only; their Webflow icons show from tablet up. */
+[data-catalog-compact] .services-main-nav-list.is-catalog [data-catalog-icon] {
+  display: none;
+}
+
 /* repo-css: js-state — result count + Filters button under the search bar
-   (catalog-list.ts); phones only. */
+   (catalog-list.ts); phones only. Sizes follow body text (0.875rem). */
 [data-catalog-compact] .catalog-toolbar {
   display: flex;
   align-self: stretch;
@@ -153,7 +159,7 @@
 }
 
 .catalog-total {
-  font-size: 1rem;
+  font-size: 0.875rem;
   opacity: 0.56;
 }
 
@@ -167,12 +173,12 @@
   background: #fff;
   color: inherit;
   font: inherit;
-  font-size: 1rem;
+  font-size: 0.875rem;
   cursor: pointer;
 }
 
 .catalog-filters-icon {
-  font-size: 1.143rem;
+  font-size: 1rem;
   line-height: 1;
 }
 
@@ -185,7 +191,7 @@
   border-radius: 1rem;
   background: #000;
   color: #fff;
-  font-size: 0.786rem;
+  font-size: 0.688rem;
 }
 
 .catalog-filters-badge[hidden] {
@@ -201,6 +207,7 @@
   display: flex;
   align-items: flex-end;
   background: rgba(0, 0, 0, 0.4);
+  font-size: 0.875rem;
 }
 
 .catalog-sheet-panel {
@@ -227,7 +234,7 @@
 
 .catalog-sheet-title {
   margin: 0;
-  font-size: 1.571rem;
+  font-size: 1.25rem;
   font-weight: 400;
 }
 
@@ -252,7 +259,7 @@
 
 .catalog-sheet-legend {
   padding: 0.75rem 0 0.25rem;
-  font-size: 0.786rem;
+  font-size: 0.688rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   opacity: 0.56;
@@ -264,7 +271,7 @@
   gap: 0.75rem;
   padding: 0.857rem 0;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  font-size: 1.143rem;
+  font-size: 0.875rem;
   font-weight: 400;
   cursor: pointer;
 }
@@ -278,7 +285,7 @@
 }
 
 .catalog-sheet-option-count {
-  font-size: 1rem;
+  font-size: 0.75rem;
   opacity: 0.56;
 }
 
@@ -287,12 +294,12 @@
   appearance: none;
   -webkit-appearance: none;
   flex: none;
-  width: 1.429rem;
-  height: 1.429rem;
+  width: 1.25rem;
+  height: 1.25rem;
   margin: 0;
   border: 1px solid rgba(0, 0, 0, 0.3);
   border-radius: 0.286rem;
-  background: #fff center / 1rem no-repeat;
+  background: #fff center / 0.875rem no-repeat;
   cursor: pointer;
 }
 
