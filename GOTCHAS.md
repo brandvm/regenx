@@ -25,6 +25,25 @@ harvested across all client repos to improve `brandvm/wf-template`.
 
 ## This project
 
+### 2026-11-04 · Finsweet "load all" skips a hidden list; Lenis keeps its boot height
+- Area: js
+- Scope: template-candidate
+- Symptom: The new phone rows on /design/medication-catalog showed 6 cards
+  per category (total 30, not 58), and the tabs didn't scroll past the
+  first screen. The live /medical-catalog also only has the first 6 cards
+  per category on phones until a list is scrolled near.
+- Cause: (1) `fs-list-load="all"` only fetches a list's later pages once
+  the list nears the viewport; the card lists are `display: none` on
+  phones there, so they never load. (2) Lenis measured the page height at
+  boot (limit 1019px) and clamps `scrollTo` to it after JS adds content.
+- Fix: `mc-catalog.ts` follows each block's `.w-pagination-next` link
+  itself and takes the same block (by anchor id) from each page; it calls
+  `resizeSmoothScroll()` whenever rows change. Scroll to a number, not an
+  element plus offset (Lenis overshot). Webflow's delegated section-link
+  scroll also fired on the tabs: `stopPropagation()`.
+- Status: fixed (mc-catalog-rows)
+- Found by: claude
+
 ### 2026-11-04 · MCP can't style a tab link's "Current" state
 - Area: mcp
 - Scope: template-candidate
