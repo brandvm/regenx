@@ -322,3 +322,14 @@ test('product slider takes its mobile portrait slide width from the Designer', a
   await expect.poll(width).toBeCloseTo((343 - 16 * 0.1) / 1.1, 0);
   expect(errors).toEqual([]);
 });
+
+// G | Footer's "Back to Top" button, published as a plain <button id="toTop">.
+test('back to top button scrolls the page to the top', async ({ page }) => {
+  const errors = await setup(page, `<div style="height:4000px"></div>
+    <button id="toTop" aria-label="Back to Top">Top</button>`);
+  await page.evaluate(() => window.scrollTo(0, 3000));
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(2000);
+  await page.locator('#toTop').click();
+  await expect.poll(() => page.evaluate(() => window.scrollY), { timeout: 5000 }).toBe(0);
+  expect(errors).toEqual([]);
+});
