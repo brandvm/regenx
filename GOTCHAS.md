@@ -25,6 +25,23 @@ harvested across all client repos to improve `brandvm/wf-template`.
 
 ## This project
 
+### 2026-11-05 · MCP can't link a component instance to "Current item"
+- Area: mcp
+- Scope: template-candidate
+- Symptom: Blog cards (`C | Blog Card` Blog Link) and peptide "View
+  Details" buttons (`C | Button` Button Link) inside CMS lists link to `#`.
+  `set_component_instance_prop_values` rejects `link_mode:
+  "collectionPage"` (only url/email/phone/popover/modal), the instance
+  exposes no link binding source, and plain Link elements inside the nav's
+  blog card list expose no link setting either.
+- Cause: The MCP has no way to write Webflow's "Collection page → Current
+  <item>" link target.
+- Fix: Set it in the Designer on each instance: select it, Blog Link /
+  Button Link → Collection page → Current Insight / Current Product. Static
+  targets (pages, URLs, anchors) work through `set_link` and prop values.
+- Status: open (MCP limit)
+- Found by: claude
+
 ### 2026-11-04 · Finsweet "load all" skips a hidden list; Lenis keeps its boot height
 - Area: js
 - Scope: template-candidate
