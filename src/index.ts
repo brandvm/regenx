@@ -10,6 +10,7 @@ import { initCatalogNav } from './modules/catalog-nav';
 import { initCatalogList } from './modules/catalog-list';
 import { initLabTests } from './modules/lab-tests';
 import { initMcCatalog } from './modules/mc-catalog';
+import { initBackToTop } from './modules/back-to-top';
 
 // Each module runs in isolation: one that throws is logged and skipped,
 // and every module after it still initializes.
@@ -47,6 +48,8 @@ async function boot() {
     // Medication Catalog, new phone UI (/design/medication-catalog). After
     // catalog-nav, which hides the empty New block.
     await run('mc-catalog', initMcCatalog);
+    // Footer "Back to Top" button.
+    await run('back-to-top', initBackToTop);
   } finally {
     document.documentElement.classList.remove('is-loading');
     document.documentElement.classList.add('rgx-ready');
