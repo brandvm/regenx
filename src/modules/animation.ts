@@ -33,4 +33,20 @@ export async function initAnimation() {
   window.SplitText = SplitText;
   CustomEase.create(EASE, 'M0,160 C100,152 0,0 160,0');
   CustomEase.create(EASE_IX2, '.64,.05,0,1');
+  refreshOnLayoutShift();
+}
+
+// ScrollTrigger only re-measures on window load and resize. Lazy images and
+// Finsweet lists change the page height after that, which left the media
+// pins starting ~110px early at 820px (Webflow's IX3 re-measured itself).
+// Refresh once the body height has settled after a change.
+function refreshOnLayoutShift() {
+  let height = document.body.offsetHeight;
+  let timer = 0;
+  new ResizeObserver(() => {
+    if (document.body.offsetHeight === height) return;
+    height = document.body.offsetHeight;
+    clearTimeout(timer);
+    timer = window.setTimeout(() => ScrollTrigger.refresh(), 200);
+  }).observe(document.body);
 }
