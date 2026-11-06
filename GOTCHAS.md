@@ -25,6 +25,35 @@ harvested across all client repos to improve `brandvm/wf-template`.
 
 ## This project
 
+### 2026-11-05 · Repo ScrollTriggers kept their boot positions; Webflow IX3 didn't
+- Area: js
+- Scope: template-candidate
+- Symptom: Rebuilding the Media Pin interaction in the repo, the pins at
+  820px played ~110px earlier than on staging; at 1440 they matched.
+- Cause: ScrollTrigger re-measures only on load and resize. Lazy images and
+  Finsweet lists grew the page after the boot `ScrollTrigger.refresh()`,
+  so every start below them was stale. Webflow's IX3 re-measures itself.
+- Fix: `animation.ts` watches the body height (ResizeObserver) and calls
+  `ScrollTrigger.refresh()` 200ms after it settles. Check scroll states at
+  every width, not only desktop, when moving IX3 scroll interactions to code.
+- Status: fixed (interactions-to-repo)
+- Found by: claude
+
+### 2026-11-05 · IX2 and IX3 data is in the published page chunk, not the MCP
+- Area: mcp
+- Scope: template-candidate
+- Symptom: `data_interactions_tool › list_interactions` returned the 7 IX3
+  interactions only; the accordion, nav dropdown and menu animations are
+  legacy IX2 and the MCP can neither list nor delete them.
+- Cause: The MCP covers IX3 only.
+- Fix: read both from the published `webflow.schunk.*.js` that calls
+  `ix3 … register([...])` and `Webflow.require("ix2").init({...})` (eval
+  the init object to list events and action lists). Remove IX2 in the
+  Designer by hand. The prototype's `?ix=off` (strip-ix.mjs) empties both
+  calls to preview the site without them.
+- Status: documented
+- Found by: claude
+
 ### 2026-11-05 · MCP can't link a component instance to "Current item"
 - Area: mcp
 - Scope: template-candidate

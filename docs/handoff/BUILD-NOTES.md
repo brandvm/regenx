@@ -25,6 +25,7 @@ Changes made during the build that differ from the approved design, and
 who approved them.
 
 - <Date> · <change> · <approved by>
+- 2026-11-05 · Webflow IX2/IX3 interactions rebuilt as repo modules, Webflow side not switched yet: see `INTERACTIONS.md` · pending user OK
 
 ## Redirect map
 
