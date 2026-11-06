@@ -12,6 +12,22 @@
    Fonts (same file, family name Geist, weights 100 to 900). */
 @font-face { font-family: "Geist"; src: url("/fonts/Geist-Variable.woff2") format("woff2"); font-weight: 100 900; font-style: normal; font-display: swap; }
 
+/* Stands in for the repo's fluid scaling (src/styles.css §01), which the
+   prototype doesn't load. Keep ideal/min/max the same as there, or the
+   prototype and staging differ at every desktop width (at 1440, 16px here
+   against 13.7px on staging with the template defaults). Not in :where():
+   the repo rule wins over a Designer body size too. */
+:root {
+  --size-unit: 16;
+  --size-container-ideal: 1680;
+  --size-container-min: 1440px;
+  --size-container-max: 1680px;
+  --size-container: clamp(var(--size-container-min), 100vw, var(--size-container-max));
+  --size-font: calc(var(--size-container) / (var(--size-container-ideal) / var(--size-unit)));
+}
+@media screen and (max-width: 991px) { :root { --size-font: 1rem; } }
+body { font-size: var(--size-font); }
+
 *, *::before, *::after { box-sizing: border-box; }
 :where(html) { -webkit-text-size-adjust: 100%; }
 :where(body) { margin: 0; min-height: 100%; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }

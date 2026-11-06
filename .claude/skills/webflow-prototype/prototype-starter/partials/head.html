@@ -13,12 +13,13 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css">
 <!-- Styles as render-blocking links, the way Webflow serves webflow.css in
      the head, so the first paint is already styled. Order = cascade order:
-     generated Webflow CSS, proposed changes, new classes, then the
-     prototype-only base. -->
+     generated Webflow CSS, proposed changes, new classes, library CSS for
+     the repo, then the prototype-only base. -->
 <link rel="stylesheet" href="/src/css/tokens.css">
 <link rel="stylesheet" href="/src/css/webflow.css">
 <link rel="stylesheet" href="/src/css/proposed.css">
 <link rel="stylesheet" href="/src/css/new-classes.css">
+<link rel="stylesheet" href="/src/css/repo.css">
 <link rel="stylesheet" href="/src/css/prototype.css">
 <!-- Same safety net as the repo loader's head code: main.ts removes
      .is-loading when it boots; if it never does, the page shows after 3 s. -->

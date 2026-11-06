@@ -14,11 +14,17 @@
 //     no @type, or holds an HTML entity (Webflow writes &#39; for an
 //     apostrophe typed into a field bound inside a script);
 //   - with --live, noindex on a page outside `seo.noindexOk`;
-//   - with --canonical, not exactly one canonical, or one on another host.
+//   - with --canonical, not exactly one canonical, or one on another host;
+//   - two indexable pages with the same title or the same description;
+//   - a made-up path that answers 200 instead of 404 (search engines index
+//     the error pages);
+//   - with --live, robots.txt blocking every page (`Disallow: /` for `*`).
+// An `X-Robots-Tag: noindex` header counts as noindex.
 // Noted, not failed: noindex pages on staging, titles over 60 characters,
 // descriptions outside 50–160, no JSON-LD on a page outside
 // `seo.noSchemaOk`. Both allow-lists are regexes matched against the path.
 import { loadConfig, args } from './lib.mjs';
+import { robotsBlocksAll } from './launch-lib.mjs';
 
 const cfg = loadConfig();
 const { pos, flags, values, live } = args();
@@ -32,7 +38,7 @@ const noSchemaOk = (cfg.seo?.noSchemaOk ?? []).map((r) => new RegExp(r));
 const matches = (list, p) => list.some((re) => re.test(p));
 
 const get = (url) => fetch(url, { redirect: 'follow', headers: { 'cache-control': 'no-cache' } })
-  .then(async (r) => ({ status: r.status, html: r.ok ? await r.text() : '' }), (e) => ({ status: 0, html: '', error: e.message }));
+  .then(async (r) => ({ status: r.status, html: r.ok ? await r.text() : '', xRobots: r.headers.get('x-robots-tag') ?? '' }), (e) => ({ status: 0, html: '', error: e.message }));
 const attr = (tag, name) => tag.match(new RegExp(`\\b${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)')`, 'i'))?.slice(1).find((v) => v != null) ?? null;
 const metaTag = (html, key, value) => [...html.matchAll(/<meta\b[^>]*>/gi)].map((m) => m[0]).find((t) => (attr(t, key) ?? '').toLowerCase() === value);
 const content = (html, key, value) => { const t = metaTag(html, key, value); return t ? attr(t, 'content') : null; };
@@ -75,11 +81,15 @@ async function discover() {
   return { source: `crawl from ${(cfg.pages ?? ['/']).join(', ')}`, paths: [...pages.keys()], pages };
 }
 
-function check(p, { status, html, error }, inSitemap) {
+const titlesSeen = new Map(); // title → paths, for duplicates
+const descsSeen = new Map();
+const seenOn = (map, text, p) => map.set(text, [...(map.get(text) ?? []), p]);
+
+function check(p, { status, html, error, xRobots = '' }, inSitemap) {
   const bad = [];
   const note = [];
   if (status !== 200) return { bad: [error ? `no answer (${error})` : `HTTP ${status}`], note, noindex: false };
-  const noindex = /noindex/i.test(content(html, 'name', 'robots') ?? '');
+  const noindex = /noindex/i.test(content(html, 'name', 'robots') ?? '') || /noindex/i.test(xRobots);
   if (noindex && live && !matches(noindexOk, p)) bad.push('noindex (not in seo.noindexOk)');
   // A noindex page in the sitemap asks search engines to index it and tells
   // them not to (Search Console reports it as an error).
@@ -88,10 +98,10 @@ function check(p, { status, html, error }, inSitemap) {
   if (!noindex) {
   const titles = [...html.matchAll(/<title\b[^>]*>([\s\S]*?)<\/title>/gi)].map((m) => decode(m[1].trim()));
   if (titles.length !== 1 || !titles[0]) bad.push(titles.length > 1 ? `${titles.length} <title> tags` : 'no <title>');
-  else if (titles[0].length > 60) note.push(`title is ${titles[0].length} characters`);
+  else { if (titles[0].length > 60) note.push(`title is ${titles[0].length} characters`); seenOn(titlesSeen, titles[0], p); }
   const desc = content(html, 'name', 'description');
   if (!desc) bad.push(missing(html, 'name', 'description').replace('description', 'meta description'));
-  else if (decode(desc).length < 50 || decode(desc).length > 160) note.push(`description is ${decode(desc).length} characters`);
+  else { if (decode(desc).length < 50 || decode(desc).length > 160) note.push(`description is ${decode(desc).length} characters`); seenOn(descsSeen, decode(desc), p); }
   for (const og of ['og:title', 'og:description', 'og:image']) if (!content(html, 'property', og)) bad.push(missing(html, 'property', og));
   const h1 = (html.match(/<h1\b/gi) ?? []).length;
   if (h1 !== 1) bad.push(`${h1} <h1>`);
@@ -127,6 +137,19 @@ for (const p of [...found.paths].sort()) {
   problems += r.bad.length;
   if (r.bad.length || r.note.length) console.log(`\n${p}\n${[...r.bad.map((m) => `  ${m}`), ...r.note.map((m) => `  (note) ${m}`)].join('\n')}`);
 }
+// Site-wide: duplicates, the 404 page, robots.txt.
+const site = [];
+for (const [what, map] of [['title', titlesSeen], ['description', descsSeen]]) {
+  for (const [text, where] of map) if (where.length > 1) site.push(`same ${what} on ${where.length} pages (${where.join(', ')}): "${text.slice(0, 60)}"`);
+}
+const missingPage = await get(`${base}/wf-seo-check-missing-${Date.now()}`);
+if (missingPage.status === 200) site.push('a page that doesn\'t exist answers 200 instead of 404');
+if (live) {
+  const robots = await get(base + '/robots.txt');
+  if (robots.status === 200 && robotsBlocksAll(robots.html)) site.push('robots.txt blocks every page (Disallow: /): Site settings › SEO › Indexing');
+}
+if (site.length) console.log(`\nsite\n${site.map((m) => `  ${m}`).join('\n')}`);
+problems += site.length;
 if (noindexed.length) console.log(`\nnoindex (${noindexed.length}):\n${noindexed.map((p) => `  ${p}`).join('\n')}`);
 console.log(`\nseo: ${problems} finding${problems === 1 ? '' : 's'}`);
 if (problems) process.exit(1);

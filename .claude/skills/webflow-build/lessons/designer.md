@@ -6,6 +6,190 @@ Harvested from client builds made from this template (`Scope:
 template-candidate` entries in their `GOTCHAS.md`). Module and file names
 refer to the project the lesson came from; Status is that project's.
 
+### 2026-10-29 · Style guide specimens can't show hover or focus
+- Area: designer
+- Symptom: the Figma design system shows every button and field in
+  Default, Hover, Focus and Disabled; the generated style guide could only
+  show Default, since specimens are `inert` and nobody can hover them.
+- Cause: the generator marks specimens inert and strips `data-*` from
+  them, so a module can't find them by a data attribute.
+- Fix: a prototype module copies the declarations of the real `:hover` /
+  `:focus` / `:focus-visible` rules onto specimens carrying a style guide
+  class (`sg-state-hover`, `sg-state-focus`, `sg-state-focus-visible`).
+  The hook is a class because `data-*` is stripped; keeping a
+  `data-sg-state` in the generator would be cleaner.
+- Status: open in the template
+- Found by: claude
+
+### 2026-10-29 · A style guide row that wraps a whole section squeezes the component
+- Area: designer
+- Symptom: a before/after row on the style guide showed the section's copy
+  and no photos.
+- Cause: the `sg:start` block wrapped the whole Section, so the specimen
+  was a two-column split inside the narrow specimen frame; the copy took
+  all the width and the flexible media column shrank to nothing.
+- Fix: a `components` block wraps the component only; a block that needs
+  its Section (for its combos) is a `page-sections` row, shown at half
+  size.
+- Status: fixed in that project's prototype
+- Found by: claude
+
+### 2026-10-29 · Style guide rows empty or floating for fixed, absolute and desktop-hidden classes
+- Area: designer
+- Symptom: the nav wrapper's specimens floated at the top of the window or
+  showed nothing; mega panel, back button and media tag rows were empty;
+  mega menus spilled out of their frames; and the site footer sat on top
+  of the specimens.
+- Cause: the nav wrapper had been made `position: fixed`; component frames
+  don't contain fixed elements, and theme frames (`contain: paint`) do but
+  collapse around an out-of-flow child. A class that sets a colour mode
+  gets a theme row with the class itself as the frame, so a hidden
+  absolute panel shows nothing; type rows show the class as is, so a class
+  hidden at desktop or absolute is empty. A footer-reveal module assumed
+  the element before the footer is the page's main wrapper; the generated
+  page's `<main>` has no class.
+- Fix: the nav wrapper stays absolute (conventions §1) and the nav module
+  adds a fixed combo; colour modes sit on the outer wrapper, not on a
+  hidden panel; wide menus are `page-sections` rows; footer-reveal only
+  runs when the element before the footer is positioned and opaque;
+  specimen-only rules in `prototype.css` put out-of-flow classes in the
+  flow inside the style guide's frames (the Webflow style guide page needs
+  the same). The generator could render out-of-flow and breakpoint-hidden
+  classes in the flow itself.
+- Status: open in the template
+- Found by: human
+
+### 2026-10-29 · `display: contents` drops the box's own styling
+- Area: designer
+- Symptom: after a mobile reorder of a hero, a card lost its frosted
+  background, padding and radius.
+- Cause: the card was set to `display: contents` so its children could be
+  ordered among the hero's other pieces. A `display: contents` element
+  renders no box, so its background, border, padding and radius go with
+  it.
+- Fix: keep the card a box and give the card itself the `order`, so it
+  sits in the same place in the mobile order with its children inside.
+  Use `display: contents` only on wrappers with no visible styling.
+- Status: fixed in that project's Webflow styles
+- Found by: claude
+
+### 2026-10-29 · A Collection List inside a flex or grid wrapper loses the wrapper's gap
+- Area: designer
+- Symptom: FAQ items built as a Collection List sat flush against each
+  other, although their wrapper is `display: flex` with a row gap.
+- Cause: the Collection List adds two block wrappers (`.w-dyn-list` ›
+  `.w-dyn-items`) between the wrapper and the items, so the gap spaces the
+  one list wrapper, not the items.
+- Fix: put the layout class (flex/grid and gap) on the list's items
+  wrapper (Collection List, `.w-dyn-items`), not on an outer wrapper. Any
+  CMS list built inside a flex or grid parent needs the same: accordions,
+  card grids, sliders.
+- Status: fixed in that project's Webflow styles
+- Found by: claude
+
+### 2026-10-29 · A lazy image with no width/height takes no space until it loads
+- Area: designer, perf
+- Symptom: a testimonial card was 55px shorter on staging than in the
+  prototype and grew when scrolled to (a layout shift).
+- Cause: a small SVG Image (`loading="lazy"`, class `height: auto`)
+  published without `width`/`height` attributes, so it is 0px tall until
+  it loads; the prototype's `<img width height>` reserved the space.
+- Fix: set `aspect-ratio` on the image's class (the style API takes it).
+  Any small lazy image with `height: auto` (icons, quote marks, logos)
+  needs its aspect ratio on the class.
+- Status: fixed in that project's Webflow styles
+- Found by: claude
+
+### 2026-10-29 · Empty CMS fields: bound elements are marked, component props aren't
+- Area: designer
+- Symptom: on a CMS template, an empty image or text field bound to an
+  Image or Paragraph published with `w-dyn-bind-empty` (hidden by
+  webflow.css), but component instances whose props were bound to empty
+  fields published as empty boxes, links with `href="#"`. Conditional
+  visibility on a field isn't in the API (`set_visibility` binds to props
+  only).
+- Cause: Webflow marks only elements bound directly to a field.
+- Fix: in the Designer, conditional visibility on the instance; through
+  the API, a `designer-cant` rule with `:has()` that hides the instance
+  when its bound part is empty (`.card:has(.card-title:empty)`,
+  `.cover:has(> .w-dyn-bind-empty)`). A fallback can sit under an
+  absolutely placed image that hides itself when empty. A sibling
+  selector (a title clamp that looks at the next element) must skip
+  `.w-dyn-bind-empty`.
+- Status: worked around
+- Found by: claude
+
+### 2026-10-28 · A grid child's placement is an ID rule that beats class `order`
+- Area: designer
+- Symptom: a grid child ignored any `order` set on its class at mobile
+  when reordering a section's blocks.
+- Cause: once a child has been moved in the grid, Webflow writes its
+  placement as an ID rule (`#w-node-…{order:-9999}` in the ≤991px query);
+  ids beat classes.
+- Fix: order the other pieces around it (e.g. −10001 and −10000 before
+  it, −9998 or 0 after it), or reset the child's grid placement in the
+  Designer. Wrappers that only group pieces can take `display: contents`
+  through a mobile-only combo so shared classes stay untouched (see
+  "`display: contents` drops the box's own styling").
+- Status: documented
+- Found by: claude
+
+### 2026-10-28 · Component variant styles lose to the base class's breakpoint rules
+- Area: designer
+- Symptom: a Typography Style mode set on a paragraph component's base
+  class at mobile also changed paragraphs using its large variant.
+- Cause: Webflow publishes variant styles as `.base:where(.w-variant-…)`,
+  so they add no specificity. The base class's breakpoint rule comes
+  later in the CSS and wins over the variant's desktop rule.
+- Fix: when a base style gets a breakpoint override, set the same
+  property on each variant that should differ at that breakpoint.
+- Status: documented
+- Found by: claude
+
+### 2026-10-28 · A mobile-only difference in one instance of a shared variant
+- Area: designer
+- Symptom: three of four accordion instances needed a different icon on
+  mobile; all four used the same component variant.
+- Cause: variant styles are per variant, not per instance.
+- Fix: duplicate the variant (its desktop styles come along unchanged),
+  give the copy its mobile styles, and switch only the instances that need
+  it (`set_component_instance_prop_values` on the variant prop). Desktop
+  and tablet stay identical.
+- Status: documented
+- Found by: claude
+
+### 2026-10-28 · Switching a section's theme at one breakpoint
+- Area: designer
+- Symptom: a section needed the light theme on mobile only; the theme's
+  utility class applies at every size.
+- Cause: none; this records the method that worked.
+- Fix: give the section a mobile-only combo and set the theme
+  collection's variable mode on it at that breakpoint
+  (`set_style_variable_mode`). The utility class stays, so tablet and
+  desktop keep their theme. Also set `color` on the combo to the theme's
+  text colour variable at the same breakpoint: the utility class does
+  that itself, a mode switch alone doesn't, so text keeps inheriting the
+  page colour (dark on dark) — see "A variable mode on a class doesn't
+  recolour inherited text".
+- Status: documented
+- Found by: claude
+
+### 2026-10-27 · Interactive content in a `pointer-events: none` fixed layer
+- Area: designer
+- Symptom: on production a cookie banner showed but its buttons, close
+  icon and link ignored mouse clicks; clicks landed on the page
+  underneath.
+- Cause: the site-wide fixed layer for global components is
+  `pointer-events: none` so it never blocks the page, and the banner
+  inside it inherited that. Testing missed it because `element.click()` in
+  a script fires the handler without hit-testing.
+- Fix: `pointer-events: auto` on the class of anything interactive placed
+  in that layer. Test overlays with a real mouse click (Playwright
+  `click()`) or `document.elementFromPoint` at the control's centre, never
+  only with `el.click()`.
+- Status: fixed in that project's Webflow styles
+- Found by: human
+
 ### 2026-10-09 · CMS text bindings inside JSON-LD can break the schema
 - Area: designer
 - Symptom: adding `"alternativeHeadline": "{{wf subheading}}"` to a CMS
@@ -169,7 +353,10 @@ refer to the project the lesson came from; Status is that project's.
   Every grid class sets both tracks explicitly (designer): a missing
   `grid-template-rows` / `-columns` is given `auto`, which matches the
   implicit track, so published CSS behaves the same. Breakpoints inherit
-  from base.
+  from base. Seen again with a class ported from the prototype that set
+  only `grid-template-rows` (a `0fr` → `1fr` open animation): the canvas
+  drew the open panel at half width; `grid-template-columns: 1fr` fixed it
+  with no change on the published page.
 - Status: fixed (every grid class, 2026-10-06)
 - Found by: human
 
@@ -351,6 +538,10 @@ refer to the project the lesson came from; Status is that project's.
 - Fix: a small relative class for parts inside a type class (e.g. 0.3em of
   the figure). Don't nest type classes; put the type class on the inner
   element, not on a padded wrapper whose em spacing would scale with it.
+  The same with a link inside small text: a link given the text's own
+  small type class (to reach a combo like `Body S + Link Underline`)
+  rendered at 0.8125em of 0.8125em. Links inside a paragraph take an
+  inline link class alone and inherit size from the text.
 - Status: fixed in that project's Webflow styles
 - Found by: claude
 
