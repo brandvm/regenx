@@ -1,0 +1,29 @@
+/* repo-css: js-state — start states of the former Webflow interactions
+   (docs/handoff/INTERACTIONS.md). Until the bundle boots (`is-loading`,
+   removed by src/index.ts or the loader's 8-second watchdog) the elements
+   the modules move from a hidden or offset start are kept invisible, as
+   Webflow's IX initial-state style did, so they never show at their
+   Designer state for a moment and then jump. Same conditions as the
+   modules: reduced motion keeps the Designer state, the About hero runs
+   from 480px up. */
+@media (prefers-reduced-motion: no-preference) {
+  html.is-loading :is(
+    [data-statement-text],
+    [data-statement] [data-media-scroll],
+    [data-media-pin-icon],
+    [data-media-pin] [data-media-pin-text]
+  ) {
+    visibility: hidden;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) and (min-width: 480px) {
+  html.is-loading [data-about-hero-video] {
+    visibility: hidden;
+  }
+}
+
+/* The process track and fill run whatever the motion setting. */
+html.is-loading :is([data-process-scroll-track], [data-process-scroll-fill]) {
+  visibility: hidden;
+}
