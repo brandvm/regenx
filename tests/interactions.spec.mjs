@@ -107,7 +107,8 @@ test('menu button opens and closes the panel and backdrop up to 991px', async ({
   expect(await style('[data-nav-menu]', 'opacity')(page)).toBe('1');
   expect(await style('[data-nav-overlay]', 'opacity')(page)).toBe('1');
   await expect(button).toHaveAttribute('aria-expanded', 'true');
-  await button.click({ force: true });
+  // The open backdrop covers the button; on the site Finsweet mirror-clicks it.
+  await button.dispatchEvent('click');
   await page.waitForTimeout(1000);
   expect(await style('[data-nav-menu]', 'display')(page)).toBe('none');
   expect(await style('[data-nav-overlay]', 'display')(page)).toBe('none');
