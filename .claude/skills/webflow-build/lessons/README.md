@@ -6,16 +6,42 @@ of them every session.
 
 | File | Covers | Entries |
 | --- | --- | --- |
-| [mcp.md](mcp.md) | Webflow MCP and API: What the Webflow MCP tools (element and WHTML builders, styles, variables, components, CMS) do differently from what you would expect, and the workaround for each. | 61 |
-| [designer.md](designer.md) | Designer and canvas: How the Designer, the canvas and publishing behave: combos, components, tag styles, forms, grids, empty elements. | 27 |
-| [css.md](css.md) | Repo CSS: Repo CSS against the Designer: cascade, focus, fixed children, overflow. | 15 |
-| [js.md](js.md) | JavaScript modules: Modules, GSAP, Lenis, Barba, Finsweet and Webflow's own scripts. | 27 |
+| [mcp.md](mcp.md) | Webflow MCP and API: What the Webflow MCP tools (element and WHTML builders, styles, variables, components, CMS) do differently from what you would expect, and the workaround for each. | 87 |
+| [designer.md](designer.md) | Designer and canvas: How the Designer, the canvas and publishing behave: combos, components, tag styles, forms, grids, empty elements. | 36 |
+| [css.md](css.md) | Repo CSS: Repo CSS against the Designer: cascade, focus, fixed children, overflow. | 20 |
+| [js.md](js.md) | JavaScript modules: Modules, GSAP, Lenis, Barba, Finsweet and Webflow's own scripts. | 31 |
 | [loader-release-ci.md](loader-release-ci.md) | Loader, release and CI: The three snippets, releases with jsDelivr tags, and the CI checks. | 13 |
 
 ## Titles
 
 **Webflow MCP and API** ([mcp.md](mcp.md))
 
+- Collection List query writes: intermittent conflicts, one key at a time
+- Collection List date filters: the value shape, and a filter and a sort refuse each other
+- Removing a Collection List's Empty State deletes the whole list
+- Images without srcset: late variants, stale props and plain Images
+- WHTML-imported Images and blocks refuse attributes; build them instead
+- Imported form controls: build forms as DOM elements
+- Section ids refused after import; import the id instead
+- A list inside a component's rich-text prop can't get text through the API
+- calc() with variables: one computed variable with a value per mode
+- Gradients with variables: literal colours, and check every variant
+- Fonts through the API: the upload, the second host, and the licence
+- Bound CMS dates have one format; links to the current item are Designer-only
+- A plain element in an empty slot without a person
+- Component prop bindings: what binds where
+- Large element batches time out half-applied; a new Rich Text has sample content
+- A breakpoint mode without its own value reads back as Base's
+- Style variable ids need their `variable-` prefix
+- The WHTML importer drops a plain space between inline elements
+- WHTML importer: images, icon classes and variant classes
+- Component variant styles work through the variants tool
+- The style guide page holds the starter's page inside its slot
+- Rich text child styles through the MCP
+- Turn a scroll interaction off at one breakpoint through the MCP
+- The element builder silently drops a link and `li` text
+- The style API refuses custom properties and fails the whole update
+- All client repos shared one Webflow MCP sign-in
 - Replacing a font through the API moves it to another host
 - The MCP can't prove a CMS field is unused
 - Upload a local file as an asset without a public URL
@@ -80,6 +106,15 @@ of them every session.
 
 **Designer and canvas** ([designer.md](designer.md))
 
+- `display: contents` drops the box's own styling
+- A Collection List inside a flex or grid wrapper loses the wrapper's gap
+- A lazy image with no width/height takes no space until it loads
+- Empty CMS fields: bound elements are marked, component props aren't
+- A grid child's placement is an ID rule that beats class `order`
+- Component variant styles lose to the base class's breakpoint rules
+- A mobile-only difference in one instance of a shared variant
+- Switching a section's theme at one breakpoint
+- Interactive content in a `pointer-events: none` fixed layer
 - CMS text bindings inside JSON-LD can break the schema
 - Phone hero video: serve what `object-fit: cover` actually shows
 - A two-class combo can't be edited from a three-class element
@@ -110,6 +145,11 @@ of them every session.
 
 **Repo CSS** ([css.md](css.md))
 
+- Webflow's body size variable is the text components' 1em
+- Prototype breakpoint proposals on `:root` lose to the Body tag's modes
+- The prototype had no fluid scaling
+- check:drift read Webflow's unspaced shorthands as drift
+- check:states reported a pressed state missing after a control removed itself
 - A `0fr` grid row still holds its item's padding
 - Measure preloads; font preloads can make it worse
 - Horizontal scrollers drag vertically
@@ -128,6 +168,10 @@ of them every session.
 
 **JavaScript modules** ([js.md](js.md))
 
+- Never start the LCP element from opacity 0
+- Finsweet List 2.7: what the markup needs on Webflow
+- Webflow Dropdown accordions close each other page-wide
+- Scroll-snap rows: markup order isn't screen order, and the row is as tall as its tallest card
 - Bundled GSAP plugins register themselves on Webflow's `window.gsap`
 - Lazy ScrollTrigger builds: hidden and re-rendered trigger elements
 - Reserving space for an async form: when to let go

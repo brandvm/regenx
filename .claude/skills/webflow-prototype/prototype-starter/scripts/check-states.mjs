@@ -88,6 +88,10 @@ const shot = async (page, handle, name) => {
 try {
   for (const p of list) {
     const page = await browser.newPage({ viewport: { width, height: 900 } });
+    // Every load starts with empty storage: a control that remembers it was
+    // used (a dismissed bar) would otherwise be gone on the next load and
+    // shift every later control's index onto another element.
+    await page.addInitScript(() => { try { localStorage.clear(); sessionStorage.clear(); } catch {} });
     const load = async () => {
       await page.goto(server.url + p, { waitUntil: 'networkidle' });
       await page.evaluate(() => document.fonts.ready);

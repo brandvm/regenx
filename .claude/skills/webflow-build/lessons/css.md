@@ -6,6 +6,74 @@ Harvested from client builds made from this template (`Scope:
 template-candidate` entries in their `GOTCHAS.md`). Module and file names
 refer to the project the lesson came from; Status is that project's.
 
+### 2026-10-28 · Webflow's body size variable is the text components' 1em
+- Area: css, designer
+- Symptom: setting Typography Role › Size › Body to 14px (0.875rem) at
+  mobile shrank every heading to 14px too.
+- Cause: Webflow's text components use that variable as their "1em":
+  `.c-heading h2`, `.c-paragraph p` and similar are `font-size:
+  var(--_typography-role---size--body)`, and the scale steps are `em`. A
+  rem value pins every one of them; an em value below 1 compounds when
+  nested.
+- Fix: leave the body role at 1em. Make body copy smaller through the
+  paragraph styles instead (a Typography Style mode on the paragraph
+  component at that breakpoint, with the same font, weight and line
+  height as Body), and set the same on each variant that should differ
+  (see designer.md "Component variant styles lose to the base class's
+  breakpoint rules").
+- Status: documented
+- Found by: claude
+
+### 2026-10-27 · Prototype breakpoint proposals on `:root` lose to the Body tag's modes
+- Area: css
+- Symptom: below 992px the prototype showed the starter's fonts and sizes
+  although `proposed.css` overrode the role variables at each breakpoint.
+- Cause: the starter applies breakpoint variable modes on the Body tag
+  style, so `webflow.css` sets the role and layout variables on `body`
+  inside each @media block; a proposal on `:root` is overridden for
+  everything inside body.
+- Fix: write breakpoint proposals on `:root, body`. The `proposed.css`
+  header says so (wf-template 0.9.0).
+- Status: fixed in wf-template 0.9.0
+- Found by: claude
+
+### 2026-10-27 · The prototype had no fluid scaling
+- Area: css
+- Symptom: at 1440 the prototype rendered at 16px = 1em while staging
+  rendered at 13.7px (the repo's §01 scaling), so prototype and staging
+  could never match at the check width.
+- Cause: the prototype doesn't load the repo's `src/styles.css`, and
+  `prototype.css` had no copy of §01.
+- Fix: `prototype.css` has a stand-in of §01 (wf-template 0.9.0). Keep
+  its `--size-container-ideal`, `-min` and `-max` the same as §01.
+- Status: fixed in wf-template 0.9.0
+- Found by: claude
+
+### 2026-10-27 · check:drift read Webflow's unspaced shorthands as drift
+- Area: css
+- Symptom: 12 "values that differ" on an untouched starter site
+  (footer, skip link and chip padding).
+- Cause: Webflow publishes `padding: var(--_a)var(--_b)` with no space
+  between the `var()` calls, and `var(--_a).625em` with a number straight
+  after one; the parser read the whole shorthand as each side's value.
+- Fix: `check-drift.mjs` splits values after a closing bracket at depth 0
+  too (wf-template 0.9.0).
+- Status: fixed in wf-template 0.9.0
+- Found by: claude
+
+### 2026-10-27 · check:states reported a pressed state missing after a control removed itself
+- Area: css
+- Symptom: "a.button: no pressed state" on several pages, although every
+  such control had an `:active` rule.
+- Cause: the check reloads the page per control and finds it by index. A
+  dismissible announcement bar remembered its dismissal in
+  `localStorage`, so after its close button was pressed the bar was gone
+  on every later load and each index pointed at another element.
+- Fix: `check-states.mjs` clears `localStorage` and `sessionStorage`
+  before every load (wf-template 0.9.0).
+- Status: fixed in wf-template 0.9.0
+- Found by: claude
+
 ### 2026-10-19 · A `0fr` grid row still holds its item's padding
 - Area: css
 - Symptom: a dropdown animated with `grid-template-rows: 0fr → 1fr`

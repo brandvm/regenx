@@ -1,6 +1,6 @@
 // Bring this repo's agent skills and template tooling up to date.
 //   pnpm update-skills [--ref <tag|branch>] [--repo <owner/repo>] [--dry-run]
-//                      [--skills-only] [--from <folder>]
+//                      [--skills-only] [--from <folder>] [--bench '<json>']
 // Downloads the template from GitHub (default: the latest release tag,
 // else master; --from uses a local copy of the template instead) and
 // brings over four things, listing every change before it writes:
@@ -20,6 +20,9 @@
 // --skills-only does step 1 and the wf:* shortcuts, nothing else.
 // Everything else in the repo (src/, loader.html, docs, AGENTS.md) is left
 // alone. Review the diff, run pnpm build, then commit.
+// A project Bench manages (a "bench" record in .wf-template.json) updates
+// from Bench, which passes --from and --bench; without --from (or --repo)
+// this stops, so the two never disagree on the version (docs/bench.md).
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -35,9 +38,14 @@ const from = opt('from');
 // Files the template owns in every repo made from it.
 const TOOLING = ['build.mjs', 'scripts/update-skills.mjs', 'scripts/phosphor.mjs', 'scripts/check-repo.mjs', 'THIRD-PARTY-NOTICES.md'];
 // package.json scripts that belong to the template repo only.
-const TEMPLATE_ONLY_SCRIPTS = ['harvest', 'new-project'];
+const TEMPLATE_ONLY_SCRIPTS = ['harvest', 'new-project', 'pack-template'];
 const metaFile = path.join(root, '.wf-template.json');
 const meta = fs.existsSync(metaFile) ? JSON.parse(fs.readFileSync(metaFile, 'utf8')) : {};
+const bench = benchRecord(opt('bench'));
+if (meta.bench && !from && !opt('repo')) {
+  console.error(`Bench manages this project's template (${meta.bench.name ?? meta.bench.template} ${meta.bench.version}): update it from Bench.\nOr pass --from <template folder>, or --repo <owner/repo> to update from GitHub instead.`);
+  process.exit(1);
+}
 const repo = opt('repo') ?? meta.template ?? (from && 'local');
 if (!repo) {
   console.error('Which template? Pass --repo <owner/repo>, or set "template" in .wf-template.json.');
@@ -167,9 +175,24 @@ if (fs.existsSync(wsSkills) && fs.readdirSync(wsSkills).some((n) => isLink(path.
   }
 }
 if (!dry) {
-  meta.template = repo;
+  // A local copy says nothing about which GitHub repo the template lives in.
+  if (!from || opt('repo')) meta.template = repo;
+  if (bench) meta.bench = bench;
   meta.skills = { version, commit, updated: new Date().toISOString().slice(0, 10) };
   fs.writeFileSync(metaFile, JSON.stringify(meta, null, 2) + '\n');
   if (changes.length || added.length || deps.length || tooling.length || seeded.length) console.log(`Review the diff${tooling.length || seeded.length ? ', run pnpm build' : ''}, then commit.`);
 }
 fs.rmSync(tmp, { recursive: true, force: true });
+
+// --bench '<json>': the record Bench keeps of the project's template
+// (docs/bench.md › The project record). Written as given, after checking it.
+function benchRecord(text) {
+  if (text === undefined) return undefined;
+  let rec;
+  try { rec = JSON.parse(text); } catch { rec = null; }
+  if (!rec || typeof rec !== 'object' || !/^(official|(custom|own)\/[a-z0-9-]+)$/.test(rec.template ?? '') || typeof rec.version !== 'string') {
+    console.error('--bench takes the JSON record, e.g. \'{"template":"official","name":"Brand Vision","version":"0.10.0","base":"0.10.0"}\'');
+    process.exit(1);
+  }
+  return rec;
+}

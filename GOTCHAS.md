@@ -120,6 +120,20 @@ harvested across all client repos to improve `brandvm/wf-template`.
 - Status: harvested into wf-template 0.15.0; fixed (catalog-mobile-list)
 - Found by: claude
 
+### 2026-11-02 · update-skills from 0.8.1 adds a broken pack-template script
+- Area: ci
+- Scope: template-candidate
+- Symptom: `pnpm update-skills` (0.8.1 → 0.12.0) added
+  `"pack-template": "node scripts/pack.mjs"` to `package.json`; that file
+  does not exist in client repos.
+- Cause: the run uses the repo's old `update-skills.mjs`, whose
+  `TEMPLATE_ONLY_SCRIPTS` predates `pack-template`. The new copy it
+  installs lists it, but only takes effect on the next run.
+- Fix: removed the script line by hand. A second `--dry-run` reports
+  "already up to date". `dist/` was byte-identical before and after.
+- Status: fixed (template 0.12.0 update)
+- Found by: claude
+
 ### 2026-10-29 · display: contents drops the box's own background
 - Area: designer
 - Scope: template-candidate

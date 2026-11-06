@@ -13,4 +13,7 @@
    :root { --_typography-scale---letter-spacing--tight: -0.04em; }
 
    Breakpoint values go in @media blocks at 991 / 767 / 479px, the
-   Designer's Tablet, Mobile Landscape and Mobile. */
+   Designer's Tablet, Mobile Landscape and Mobile, on `:root, body`: the
+   starter sets its breakpoint variable modes on the Body tag, so
+   webflow.css redeclares the variables on `body` in each @media block and
+   a proposal on `:root` alone is overridden for everything on the page. */
