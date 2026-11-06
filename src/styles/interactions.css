@@ -23,7 +23,8 @@
   }
 }
 
-/* The process track and fill run whatever the motion setting. */
-html.is-loading :is([data-process-scroll-track], [data-process-scroll-fill]) {
+/* The process fill (full width in the Designer, scaled to 0 by JS) runs
+   whatever the motion setting; its track starts where the Designer has it. */
+html.is-loading [data-process-scroll-fill] {
   visibility: hidden;
 }
