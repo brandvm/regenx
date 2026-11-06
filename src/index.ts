@@ -11,6 +11,14 @@ import { initCatalogList } from './modules/catalog-list';
 import { initLabTests } from './modules/lab-tests';
 import { initMcCatalog } from './modules/mc-catalog';
 import { initBackToTop } from './modules/back-to-top';
+import { initDropdownMotion } from './modules/dropdown-motion';
+import { initNavMenu } from './modules/nav-menu';
+import { initHoverRoll } from './modules/hover-roll';
+import { initTooltipHover } from './modules/tooltip-hover';
+import { initStatementScroll } from './modules/statement-scroll';
+import { initMediaPin } from './modules/media-pin';
+import { initAboutHero } from './modules/about-hero';
+import { initProcessScroll } from './modules/process-scroll';
 
 // Each module runs in isolation: one that throws is logged and skipped,
 // and every module after it still initializes.
@@ -32,7 +40,17 @@ async function boot() {
     await run('animation', initAnimation);
     await run('smooth-scroll', initSmoothScroll);
     await run('wave-grid', initWaveGrid);
+    // Former Webflow interactions (docs/handoff/INTERACTIONS.md). The
+    // dropdown motion runs before main's accordions.ts opens first items.
+    await run('dropdown-motion', initDropdownMotion);
+    await run('nav-menu', initNavMenu);
     await run('main', initMain);
+    await run('hover-roll', initHoverRoll);
+    await run('tooltip-hover', initTooltipHover);
+    await run('statement-scroll', initStatementScroll);
+    await run('media-pin', initMediaPin);
+    await run('about-hero', initAboutHero);
+    await run('process-scroll', initProcessScroll);
     // "As Seen In" logo rows: [data-marquee] (wf-template recipe).
     await run('marquee', initMarquee);
     // Medical Catalog phone list and Lab Panel search. Before the modals:
