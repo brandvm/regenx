@@ -16,8 +16,42 @@
   background-color: var(--_colors---background--dark);
 }
 
-[data-benefit-tabs] .sb-tab-link.w--current .sb-tab-link-caret {
+/* repo-css: js-state — the open tab's caret (w--current, Webflow's tabs
+   script). It grows from nothing (width, with its 1em gap cancelled by a
+   negative margin), fades and turns down, so the label glides over instead
+   of jumping sideways. */
+[data-benefit-tabs] .sb-tab-link .sb-tab-link-caret {
   display: block;
+  width: 0;
+  margin-right: -1em;
+  opacity: 0;
+  transform: rotate(-90deg) scale(.5);
+  transition: width .45s cubic-bezier(.32, .72, 0, 1),
+    margin-right .45s cubic-bezier(.32, .72, 0, 1),
+    transform .45s cubic-bezier(.32, .72, 0, 1),
+    opacity .25s ease;
+}
+
+[data-benefit-tabs] .sb-tab-link.w--current .sb-tab-link-caret {
+  width: .75em;
+  margin-right: 0;
+  opacity: 1;
+  transform: none;
+}
+
+/* Until fluid-tabs.ts sees the tabs (data-caret-in), the first tab's caret
+   waits closed, so it grows in on arrival too. Without the script it shows. */
+[data-benefit-tabs][data-fluid-bound]:not([data-caret-in]) .sb-tab-link.w--current .sb-tab-link-caret {
+  width: 0;
+  margin-right: -1em;
+  opacity: 0;
+  transform: rotate(-90deg) scale(.5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-benefit-tabs] .sb-tab-link .sb-tab-link-caret {
+    transition: none;
+  }
 }
 
 /* Fade the neighbouring cards into the panel edges; the centred card stays
@@ -55,6 +89,11 @@
   background-color: currentColor;
   opacity: .24;
   transition: width var(--dur-bbs) var(--ease-bbs), opacity var(--dur-bbs) var(--ease-bbs);
+  /* 24px hit area around the 8px dot (WCAG 2.5.8, audit #27): the padding
+     is transparent, so only the spacing between dots grows. */
+  box-sizing: content-box;
+  padding: calc(12.5px - .25em);
+  background-clip: content-box;
 }
 
 [data-benefit-slider] .sb-benefit-pagination .swiper-pagination-bullet-active {

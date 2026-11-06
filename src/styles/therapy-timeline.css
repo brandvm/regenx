@@ -135,6 +135,11 @@
   background-color: currentColor;
   opacity: .24;
   transition: width 240ms cubic-bezier(0.64, 0.05, 0, 1), opacity 240ms cubic-bezier(0.64, 0.05, 0, 1);
+  /* 24px hit area around the 8px dot (WCAG 2.5.8, audit #27): the padding
+     is transparent, so only the spacing between dots grows. */
+  box-sizing: content-box;
+  padding: calc(12.5px - .25em);
+  background-clip: content-box;
 }
 
 [data-therapy-timeline] [data-timeline-pagination] .swiper-pagination-bullet-active {

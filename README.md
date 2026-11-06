@@ -44,9 +44,11 @@ already filled in. Copy the content of each piece into its stated location.
    of every page's body. Keep other embeds, such as video markup.
 3. **FOOTER → Site settings / Custom code / Footer code.** Replace the old Lenis
    CDN tag, inline Lenis setup, and both CodeSandbox script tags with this piece.
-4. Keep Webflow's native **GSAP, ScrollTrigger, SplitText, and CustomEase** settings
-   enabled; Webflow interactions use them. The bundle shares the existing GSAP
-   instance and has packaged fallbacks for standalone local fixtures.
+4. Webflow's native **GSAP, ScrollTrigger, SplitText, and CustomEase** settings:
+   keep them enabled until the interaction migration is done (Webflow
+   interactions use them), then switch them off (`docs/handoff/MANUAL-TODO.md`
+   T). The bundle shares Webflow's GSAP while it is there and otherwise loads
+   its own packaged copies.
 5. Publish the Webflow site to **the `.webflow.io` staging domain**.
 
 The three old CodeSandbox references should be gone: `regenx-main.css`,

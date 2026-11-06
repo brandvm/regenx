@@ -1,9 +1,10 @@
-/* Folder tabs ([data-fluid-tabs], TRT benefits). Webflow's `is-fluid` combos
-   own the link layout, the black panel (colour, radius, padding) and reset
-   everything at ≤767px, where the tabs stay a stacked list. From 768px up,
-   fluid-tabs.ts draws the open tab and the panel as one SVG outline
-   (.fluid-shape) and redraws it every frame while the tab moves, so nothing
-   here has a transition or a timer of its own.
+/* Folder tabs ([data-fluid-tabs], TRT and Enclomiphene benefits). Webflow's
+   `is-fluid` combos own the link layout, the black panel (colour, radius,
+   padding) and reset everything at ≤767px, where the tabs stay a stacked
+   list. From 768px up, fluid-tabs.ts draws the open tab and the panel's top
+   band as one SVG outline (.fluid-shape) and redraws it every frame while the
+   tab moves; the panel below keeps Webflow's fill inline, clipped under the
+   band. Nothing here has a transition or a timer of its own.
 
    repo-css: js-state — applies once the script has drawn the outline
    (.is-fluid-ready); the outline takes over painting the panel. */
@@ -26,8 +27,28 @@
     position: relative;
   }
 
+  /* The script sets the panel's fill inline (read with this class off). */
   [data-fluid-tabs].is-fluid-ready .w-tab-content {
     background-color: transparent;
+  }
+
+  /* repo-css: js-state — the shape is drawn for one row, so the tabs keep
+     one row: equal columns, long labels wrap inside their tab and the tab
+     grows (Enclomiphene's third tab wrapped to a second row at 820px). */
+  [data-fluid-tabs].is-fluid-ready .w-tab-menu {
+    flex-wrap: nowrap;
+  }
+
+  [data-fluid-tabs].is-fluid-ready .w-tab-link {
+    flex: 1 1 0;
+    align-self: stretch;
+    min-width: 0;
+    height: auto;
+    min-height: 4.25em;
+    padding-top: .75em;
+    padding-bottom: .75em;
+    white-space: normal;
+    text-align: center;
   }
 
   /* benefit-slider.css pins benefit-tab labels to the left for the stacked

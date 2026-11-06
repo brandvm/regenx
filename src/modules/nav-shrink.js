@@ -3,7 +3,7 @@
 // ============================================
 export const NavShrink = (() => {
   function init() {
-    const targets = document.querySelectorAll(".g-nav-w, .s-g-nav, .sw-g-nav");
+    const targets = document.querySelectorAll(".g-nav-w, .s-g-nav, .sw-g-nav, .g-nav-block.is-center");
     if (!targets.length) return;
 
     const getThresholdPx = () => window.innerHeight * 0.05; // 5vh
@@ -16,7 +16,7 @@ export const NavShrink = (() => {
       const shouldShrink = window.scrollY >= thresholdPx;
       if (shouldShrink === last) return;
       last = shouldShrink;
-      targets.forEach((el) => el.classList.toggle("is-shrunk", shouldShrink));
+      targets.forEach((el) => el.classList.toggle("is-rx-shrunk", shouldShrink));
     };
 
     const onScroll = () => {

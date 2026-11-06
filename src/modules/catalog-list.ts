@@ -18,6 +18,7 @@ const MOBILE = '(max-width: 767px)';
 const COMPACT = 'data-catalog-compact';
 const HIDDEN = 'is-catalog-hidden';
 const SEARCH_HIDDEN = 'is-search-hidden';
+const SEARCH_ASIDE = 'data-catalog-search-aside';
 const FORM_HIDDEN = 'is-form-hidden';
 const OPEN = 'is-open';
 
@@ -171,6 +172,14 @@ export function initCatalogList() {
     groups.filter((g) => g.slider).forEach((g) => itemsOf(g).forEach((item) => {
       item.classList.toggle(SEARCH_HIDDEN, !!q && section.hasAttribute(COMPACT) && !text(item).toLowerCase().includes(q));
     }));
+    // Above phones the sliders keep sliding, so they aren't matched slide by
+    // slide: while a search is on they step aside with their sidebar links,
+    // leaving the Finsweet results (audit #36).
+    const asideOnDesktop = !!q && !section.hasAttribute(COMPACT);
+    groups.filter((g) => g.slider && !isRetired(g)).forEach((g) => {
+      g.block.toggleAttribute(SEARCH_ASIDE, asideOnDesktop);
+      g.links.forEach((link) => link.toggleAttribute(SEARCH_ASIDE, asideOnDesktop));
+    });
     schedule();
   }
 

@@ -115,8 +115,8 @@ neutralizers, sets the 1680px fluid `:root` font-size scale and reads
   waits for `Webflow.push` so Webflow wires tabs/dropdowns first, then runs
   each module through `run()` (one that throws is logged, the rest still
   start): `unique-form-ids` (CMS filter radios
-  publish the same id), `animation.ts` (shares Webflow's GSAP with packaged
-  fallbacks), Lenis, WaveGrid and `main.js`. It always releases the loading
+  publish the same id), `animation.ts` (shares Webflow's GSAP while it is on, packaged
+  copies otherwise), Lenis, WaveGrid and `main.js`. It always releases the loading
   state in `finally`.
 - `src/modules/main.js` is the ordered init list; each feature lives in its
   own `src/modules/<feature>.js` (moved verbatim from the supplied script)
@@ -131,8 +131,13 @@ neutralizers, sets the 1680px fluid `:root` font-size scale and reads
   purpose). Add rules to the file they belong to, never to the end of
   `src/styles.css`.
 - Libraries are bundled with `pnpm add` at pinned versions (GSAP 3.15.0,
-  Lenis 1.3.24, Swiper 11.2.10), never added as CDN tags. Keep Webflow's
-  native GSAP, ScrollTrigger, SplitText and CustomEase settings enabled.
+  Lenis 1.3.24, Swiper 11.2.10), never added as CDN tags. Webflow's native
+  GSAP, ScrollTrigger, SplitText and CustomEase settings stay enabled only
+  until the interaction migration is done (MANUAL-TODO B, C; Webflow IX
+  needs them). After it, switch them off (MANUAL-TODO T, approved
+  2026-11-06): the repo's modules don't use Webflow's copy, and
+  `animation.ts` loads its packaged GSAP, ScrollTrigger and SplitText and
+  sets them on `window` before any module runs.
 
 ## Webflow canvas facts
 

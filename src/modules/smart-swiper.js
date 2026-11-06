@@ -195,6 +195,15 @@ export const SmartSwiper = (function () {
     return true;
   }
 
+  // A wrapper Webflow marks role="list" (a CMS list) keeps its slides as list
+  // items; Swiper's A11y default (role="group") breaks the list.
+  function withListRole(el, opts) {
+    var wrapper = el.querySelector(".swiper-wrapper");
+    if (!wrapper || wrapper.getAttribute("role") !== "list") return opts;
+    opts.a11y = Object.assign({}, opts.a11y, { slideRole: "listitem" });
+    return opts;
+  }
+
   function normalizeOpts(base) {
     var o = Object.assign(
       {
@@ -377,7 +386,7 @@ export const SmartSwiper = (function () {
       readDataOverrides(el, (cfg.sync && cfg.sync.opts) || {})
     );
     try {
-      var s = new Swiper(el, opts);
+      var s = new Swiper(el, withListRole(el, opts));
       el._smartSwiperInstance = s;
       el.dataset.swiperInited = "1";
       try {
@@ -527,7 +536,7 @@ export const SmartSwiper = (function () {
     // Loop copies must exist before Swiper counts the slides.
     var benefit = cfg.benefit ? createBenefitSlider(el) : null;
     try {
-      var swiper = new Swiper(el, opts);
+      var swiper = new Swiper(el, withListRole(el, opts));
       el._smartSwiperInstance = swiper;
       if (timeline) {
         el._therapyTimeline = timeline;

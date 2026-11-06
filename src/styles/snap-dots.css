@@ -7,7 +7,8 @@
   display: flex;
   width: 100%;
   justify-content: center;
-  gap: .5rem;
+  /* No gap: each dot carries its own 24px hit area (audit #27). */
+  gap: 0;
 }
 
 /* The row takes the height of the card in view; taller cards stay inside it
@@ -20,7 +21,11 @@
 .snap-dot {
   width: .5rem;
   height: .5rem;
-  padding: 0;
+  /* 24px hit area around the 8px dot (WCAG 2.5.8, audit #27): the padding
+     is transparent (background-clip), so only the spacing grows. */
+  box-sizing: content-box;
+  padding: calc(12.5px - .25rem);
+  background-clip: content-box;
   border: 0;
   border-radius: 50%;
   background-color: currentColor;

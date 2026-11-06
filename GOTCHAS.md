@@ -25,6 +25,106 @@ harvested across all client repos to improve `brandvm/wf-template`.
 
 ## This project
 
+### 2026-11-06 · element_builder ignores set_text on nested TextBlocks
+- Area: mcp
+- Scope: template-candidate
+- Symptom: Building the Home Why stat cards as one nested tree, every TextBlock child came out with Webflow's placeholder "This is some text inside of a div block."; the build reported success.
+- Cause: `data_element_builder` applies `set_text` only to the top element of a tree, not to children. The created "TextBlock" reads back as a Block holding a String node, and `set_text` on that Block fails ("doesn't support text").
+- Fix: after a nested build, read the tree back and `set_text` on each String node (its own id, the Block id + 1).
+- Status: documented
+- Found by: claude
+
+### 2026-11-06 · Focus rings: pointer outlines removed in repo CSS (approved)
+- Area: css
+- Scope: project
+- Symptom: The client wanted focus rings for the keyboard only; browsers show :focus-visible after a click on a text field and when a script moves focus, and Webflow's own sheet outlines some focused `.w-*` elements.
+- Cause: The Designer can't express "only after keyboard input".
+- Fix: `input-modality.ts` sets `html[data-input]`; `styles/focus.css` draws one #2f6fed ring for the keyboard and removes outlines otherwise (`override-webflow`, approved by the user 2026-11-06 with the colour). Text fields keep a subtle grey border via a Designer Focus state. If a Designer outline "doesn't show", this rule is why.
+- Status: documented (uncommitted, MANUAL-TODO E)
+- Found by: claude
+
+### 2026-11-06 · WHTML turns an inline style into a new combo class
+- Area: mcp
+- Scope: template-candidate
+- Symptom: importing `<div class="sg-swatch-color" style="background-color: var(--x)">` created the combo `.sg-swatch-color.inline-div-0` holding the style (that's where this site's `therapy-timeline-static-*.inline-div-N` combos came from). `set_attributes` with a `style` attribute fails with OPERATION_FAILED.
+- Cause: the importer converts inline styles to classes; Webflow reserves the `style` attribute.
+- Fix: never put `style=""` in WHTML. For a per-element variable value (swatches, bars), use an HTML Embed created with its `code` setting in the element builder. The test combo was removed.
+- Status: open
+- Found by: claude
+
+### 2026-11-06 · WHTML class lists that aren't an existing combo chain create combos
+- Area: mcp
+- Scope: template-candidate
+- Symptom: `<div class="body-sm u-muted-64">` would make a new `.body-sm.u-muted-64` combo when that chain doesn't exist; a lone combo name with no global (`is-mobile`, `mc-catalog`) would become a new global class.
+- Cause: the importer maps a class list to a combo chain in order and creates what's missing.
+- Fix: check every class list against the snapshot chains before import; nest the classes instead (`<div class="body-sm"><div class="u-muted-64">`). Count styles before and after (1250 → 1250 on the style guide build).
+- Status: open
+- Found by: claude
+
+### 2026-11-06 · WHTML drops `id`s and keeps `href` as a custom attribute
+- Area: mcp
+- Scope: template-candidate
+- Symptom: `<section id="forms">` came in without its ID; `set_dom_id` then failed with "[Conflict] … component map" for any value. An imported `<a href="#x">` stored `href` as a custom attribute that `set_attributes` can't change.
+- Cause: importer behaviour (the ID `forms` probably clashes with a reserved name).
+- Fix: use a different ID (`form-parts`) and re-import the section; set links with `set_link` linkType `element`, then `remove_attribute` the stale `href`.
+- Status: open
+- Found by: claude
+
+### 2026-11-06 · move_element can't anchor "after" a component instance
+- Area: mcp
+- Scope: template-candidate
+- Symptom: Moving the Lab Panel CBC accordion (a `C | Accordion` instance) to just after PSA failed: "Cannot move an element after a component instance".
+- Cause: `move_element` rejects a component instance as the before/after anchor.
+- Fix: anchor on the parent instead: `creation_position: "append"` (or "prepend") on the list that holds the instances. To land between two instances, move the ones after it as well.
+- Status: documented
+- Found by: claude
+
+### 2026-11-06 · Tabs Fade In/Out durations aren't in the data API
+- Area: mcp
+- Scope: template-candidate
+- Symptom: Setting the benefits Tabs' In/Out durations to 0: `get_settings` on the TabsWrapper lists only domId, visibility and attributes.
+- Cause: The data API doesn't expose the Tabs element's own settings.
+- Fix: `fluid-tabs.ts` sets `data-duration-in/out="0"` on the root at runtime (Webflow's tabs script reads them on each click); the Designer setting is MANUAL-TODO G. Don't add them as custom attributes: Webflow writes the same attribute names itself.
+- Status: documented (MANUAL-TODO G)
+- Found by: claude
+
+### 2026-11-05 · Repo ScrollTriggers kept their boot positions; Webflow IX3 didn't
+- Area: js
+- Scope: template-candidate
+- Symptom: Rebuilding the Media Pin interaction in code, the pins at 820px
+  played ~110px earlier than on staging; at 1440 they matched.
+- Cause: ScrollTrigger re-measures only on load and resize. Lazy images and
+  Finsweet lists grew the page after the boot `ScrollTrigger.refresh()`,
+  so every start below them was stale. Webflow's IX3 re-measures itself.
+- Fix: `animation.ts` watches the body height (ResizeObserver) and calls
+  `ScrollTrigger.refresh()` 200ms after it settles. Check scroll states at
+  every width, not only desktop, when moving IX3 scroll interactions to code.
+- Status: fixed (uncommitted, 2026-11-06)
+- Found by: claude
+
+### 2026-11-05 · IX2 and IX3 data is in the published page chunk, not the MCP
+- Area: mcp
+- Scope: template-candidate
+- Symptom: `data_interactions_tool › list_interactions` returned the 7 IX3
+  interactions only; the accordion, nav dropdown and menu animations are
+  legacy IX2, and the MCP can neither list nor delete them.
+- Cause: The MCP covers IX3 only.
+- Fix: read both from the published `webflow.schunk.*.js` that calls
+  `ix3 … register([...])` and `Webflow.require("ix2").init({...})` (eval
+  the init object to list events and action lists). Remove IX2 in the
+  Designer by hand. The prototype's `?ix=off` empties both calls.
+- Status: documented
+- Found by: claude
+
+### 2026-11-06 · data-* hooks published before the IX are removed run twice once the repo ships
+- Area: js
+- Scope: template-candidate
+- Symptom: Planning the switch from Webflow IX to repo modules, the hooks went into Webflow first while IX stayed on (the replacement JS wasn't deployed yet).
+- Cause: Each module binds to its data-* hook. As soon as the bundle with the modules is live, any page that still has Webflow's IX for the same element animates it twice. The prototype, which runs `src/` live, had the same problem after `pnpm pull`.
+- Fix: deploy the repo bundle and remove the IX in one sitting (MANUAL-TODO B, C). In the prototype, `?ix=on` strips the hooks again (`scripts/strip-ix.mjs` › `removeHooks`) so it stays staging-as-is; `?ix=off` shows the result.
+- Status: open until MANUAL-TODO B and C are done
+- Found by: claude
+
 ### 2026-11-05 · MCP can't link a component instance to "Current item"
 - Area: mcp
 - Scope: template-candidate

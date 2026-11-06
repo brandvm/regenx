@@ -25,6 +25,7 @@ Changes made during the build that differ from the approved design, and
 who approved them.
 
 - <Date> · <change> · <approved by>
+- 2026-11-06 · Webflow IX2/IX3 interactions rebuilt as repo modules (uncommitted); 69 `data-*` hooks added in Webflow, not yet published; Webflow IX still on (MANUAL-TODO A–C). Plan: `prototype/plan/interactions.md` · user (prototype-first go-ahead, 2026-11-05)
 
 ## Redirect map
 

@@ -1,0 +1,24 @@
+/* Focus rings for the keyboard only (client request 2026-11-06).
+
+   repo-css: js-state — html[data-input] is set by input-modality.ts. One
+   ring for every element when the visitor moves with the keyboard; no
+   outline at all after mouse, touch or pen, including focus moved by a
+   script (modal.ts, lab-tests.ts) and text fields, which browsers otherwise
+   treat as focus-visible on click. All the repo's own :focus-visible rings
+   are outlines, so the pointer rule turns them off too. Text fields keep a
+   subtle grey border on focus (a Designer Focus state on their classes). */
+html[data-input="keyboard"] :focus-visible {
+  /* One fixed ring colour, legible on black and on white (4.6:1 on both,
+     WCAG 1.4.11; user's choice 2026-11-06): the ring sits outside the
+     element, so the element's own colour fails (white on a black button
+     vanished on white), and the theme variables don't follow every dark
+     block. */
+  outline: 2px solid #2f6fed;
+  outline-offset: 3px;
+}
+
+/* repo-css: override-webflow — Webflow's own sheet gives focused elements
+   an outline (e.g. .w-dropdown-toggle, inputs); after a pointer it goes. */
+html:not([data-input="keyboard"]) :focus {
+  outline: none !important;
+}
