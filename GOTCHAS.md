@@ -25,6 +25,24 @@ harvested across all client repos to improve `brandvm/wf-template`.
 
 ## This project
 
+### 2026-11-06 · bulk_update_pages drops jsonLdSchema
+- Area: mcp
+- Scope: template-candidate
+- Symptom: `data_pages_tool › bulk_update_pages` with `seo` and `jsonLdSchema` saved the SEO fields; the schema read back null.
+- Cause: the bulk endpoint ignores `jsonLdSchema`, and its response doesn't show it.
+- Fix: write schema with `bulk_update_pages_schema_markup` and read it back with `query_pages_schema_markup`.
+- Status: documented
+- Found by: claude
+
+### 2026-11-06 · Page folders: slug "untitled", and bulk_update_pages ignores parentFolderId
+- Area: mcp
+- Scope: template-candidate
+- Symptom: `designer_tool › create_page_folder` made the folder with slug `untitled`. `data_pages_tool › bulk_update_pages` with `parentFolderId` + `slug` changed the slugs but left every page in its old folder (so they briefly sat at `/design/introduction` etc.).
+- Cause: create_page_folder takes only a name; the bulk endpoint drops parentFolderId.
+- Fix: set the folder slug with `update_page_settings` on the folder id; move pages one at a time with `update_page_settings` parentFolderId, and read back publishedPath. Also: `create_page` duplicateOf keeps element ids but not the page head custom code (re-set it).
+- Status: open
+- Found by: claude
+
 ### 2026-11-06 · element_builder ignores set_text on nested TextBlocks
 - Area: mcp
 - Scope: template-candidate

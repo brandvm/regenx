@@ -1,9 +1,9 @@
-/* repo-css: js-state — start state of the hero chart card scale-in
+/* repo-css: js-state — start state of the service hero widget scale-in
    (hero-card-in.ts). Until the bundle boots (html.is-loading, removed by
-   src/index.ts or the loader's watchdog) the card stays hidden, so it never
-   shows full size and then jumps. Same condition as the module. */
+   src/index.ts or the loader's watchdog) the widget stays hidden, so it
+   never shows full size and then jumps. Same condition as the module. */
 @media (prefers-reduced-motion: no-preference) {
-  html.is-loading [data-hero-card-in] {
+  html.is-loading [data-hero-widget-in] {
     visibility: hidden;
   }
 }
