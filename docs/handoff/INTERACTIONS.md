@@ -76,7 +76,24 @@ the data-* hooks below added. Compared with staging as published:
   identical boxes and opacities, or within 0.1–0.3px / one colour step,
   everywhere except the nav dropdown and menu, which follow the same curve
   but start one or two frames earlier than IX2 does.
-- **`wf:pass`** with `?ix=off`: see the session report (frames > 2%).
+- **Full-page pass, IX on vs IX off** (`pass.mjs` run against the same
+  prototype with `?ix=on` and `?ix=off`, so prototype-vs-staging
+  differences don't count; Home, About, TRT, FAQ, Lab Panel, Peptide at
+  1440/820/390): identical document and section heights everywhere. The
+  only frames over 2% are the hero videos, the looping carousels and the
+  CTA gradient (time-based), plus sub-pixel text positions in the footer
+  links, which IX3 had split into letters at load. Against staging
+  itself, the prototype puts the nav at −65px once scrolled with IX on as
+  well as off: an existing prototype difference, not part of this change.
+- **Load film** (staging with IX stripped and the local bundle, About
+  hero video): hidden → tilted start when the bundle boots, as IX3 did
+  (hidden until `w-mod-ix3`). `src/styles/interactions.css` keeps the
+  moved elements hidden while `html.is-loading`. Without it the video
+  showed flat for ~600ms and then jumped (no preloader on /about).
+- **`pnpm check && pnpm build && pnpm test`**: 96 passed, including
+  `tests/interactions.spec.mjs` (9 tests: hover roll, breakpoint and
+  reduced-motion gates, accordion, menu, statement, process fill,
+  tooltip, load cloak).
 - **Performance**, staging as published vs staging with IX stripped and
   the repo bundle (Playwright + CDP metrics, 1440px, median of 3):
 
