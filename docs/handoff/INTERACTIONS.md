@@ -82,7 +82,8 @@ the data-* hooks below added. Compared with staging as published:
   1440/820/390): identical document and section heights everywhere. The
   only frames over 2% are the hero videos, the looping carousels and the
   CTA gradient (time-based), plus sub-pixel text positions in the footer
-  links, which IX3 had split into letters at load. Against staging
+  links, which IX3 had split into letters at load (Peptide compared with
+  its disclaimer accepted, so the modal doesn't lock the scroll). Against staging
   itself, the prototype puts the nav at −65px once scrolled with IX on as
   well as off: an existing prototype difference, not part of this change.
 - **Load film** (staging with IX stripped and the local bundle, About
