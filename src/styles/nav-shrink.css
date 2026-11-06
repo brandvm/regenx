@@ -1,0 +1,11 @@
+/* Scrolled nav bar (nav-shrink.js): a soft shadow under the shrunk pill.
+   Webflow's .sw-g-nav already transitions box-shadow, so it fades in with
+   the background and border.
+
+   repo-css: js-state — is-rx-shrunk is toggled by nav-shrink.js. Kept here
+   rather than on the Designer combo: the MCP can't put a variable in a box
+   shadow, and the user chose the repo for it (2026-11-06, MANUAL-TODO F).
+   rgba black 10% matches the Alpha/Black 10 variable without naming it. */
+.s-wrapper.sw-g-nav.is-rx-shrunk {
+  box-shadow: 0 0.25em 1.5em 0 rgba(0, 0, 0, 0.1);
+}

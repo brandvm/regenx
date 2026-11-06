@@ -25,6 +25,15 @@ harvested across all client repos to improve `brandvm/wf-template`.
 
 ## This project
 
+### 2026-11-06 · A radio built by the MCP: default style, and its name lags the group name
+- Area: mcp
+- Scope: template-candidate
+- Symptom: The "All" radio added to the /scientific-articles filter (`data_element_builder` › FormRadioInput) published as a default (native) radio, and with `name="radio-2"` although `set_settings › groupName` read back "Category", so it wasn't in the same group as the CMS radios. A radio's `value` setting can't take a CMS binding, and a `name` attribute fails with OPERATION_FAILED.
+- Cause: Radio Style (Default/Custom) isn't in the API, and the published `name` comes from the element's input name, which caught up with groupName only later.
+- Fix: set Style → Custom in the Designer (MANUAL-TODO Z); after setting groupName, check `query_elements` › `input.inputName` and the published `name` before relying on it. Put the CMS value in an attribute instead (`fs-list-value` bound to Name through `set_settings` › attributes › value_binding).
+- Status: documented
+- Found by: claude
+
 ### 2026-11-06 · bulk_update_pages drops jsonLdSchema
 - Area: mcp
 - Scope: template-candidate
