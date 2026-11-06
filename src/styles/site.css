@@ -437,11 +437,6 @@ a {
   }
 }
 
-.g-footer-nav-label *,
-.button-label * {
-  will-change: transform;
-}
-
 .g-footer-nav-item.is-open .g-footer-nav-list-wrap {
   grid-template-rows: 1fr;
 }
