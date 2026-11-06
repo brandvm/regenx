@@ -6,6 +6,90 @@ Harvested from client builds made from this template (`Scope:
 template-candidate` entries in their `GOTCHAS.md`). Module and file names
 refer to the project the lesson came from; Status is that project's.
 
+### 2026-10-30 · A staging page can't load a localhost bundle; port 3000 is shared across projects
+- Area: loader
+- Symptom: checking unpushed code on webflow.io, the dev flag
+  (`?wfc-dev=1`) loaded `http://localhost:3000`, which another project's
+  `pnpm dev` was holding. Injecting a local stylesheet and script into the
+  https staging page loaded nothing ("Failed to fetch"): Chrome's local
+  network access blocks a public page from reading localhost. A preview
+  server in the desktop app couldn't read the repo's `dist/` under
+  `~/Documents` (macOS privacy: "getcwd: Operation not permitted").
+- Cause: one fixed dev port for every template project; the browser's
+  local-network protection; sandboxed preview processes.
+- Fix: stop the other project's `pnpm dev` first. For a check, copy
+  `dist/` and a static build of the prototype (`vite build --base
+  /proto/`) to a scratch folder, save the published staging HTML there
+  with the loader's staging URL rewritten to the local server, and serve
+  it all from one local origin.
+- Status: open in the template (a dev port per project)
+- Found by: claude
+
+### 2026-10-29 · Lighthouse counts anything that finishes before the first paint
+- Area: perf, loader
+- Symptom: the same page scored 84 one run and 94 the next on mobile.
+  Blocking the repo CSS, jQuery, Webflow's JS or the hero image one at a
+  time changed nothing.
+- Cause: Lighthouse's simulated FCP and LCP average a graph of
+  render-blocking requests with one of every request that finished before
+  the first paint in the real, unthrottled load. The footer loader
+  appended `index.js` at parse time, and `font-display: swap` fonts start
+  as soon as the CSS is parsed; whenever either finished a few ms before
+  the paint, it was billed to the paint. Fonts uploaded through the API
+  come from a host that serves HTTP/1.1 (see mcp.md, "Fonts through the
+  API"), so each is also simulated as a new connection, and a preload made
+  the font finish first in every run.
+- Fix: the footer requests the bundle two animation frames after it runs
+  (at once in a hidden tab, with a 3 s fallback) and records the bundle
+  source at once, so Embed 2b's after-`load` refresh still runs; no font
+  preload. Mobile medians rose 5–14 points; CLS rose to 0.02–0.03 from the
+  later font swap (see css.md, "Font fallback metrics"), and the modules
+  needed their first state in CSS (js.md, "Once the bundle starts after
+  first paint…"). To diagnose, list the requests in the saved report whose
+  `networkEndTime` is before `metrics.observedFirstContentfulPaint`;
+  `--blocked-url-patterns` doesn't show the gain, since the blocked request
+  still opens its connection in the simulation.
+- Status: open in the template (the footer loader starts the bundle at
+  once)
+- Found by: claude
+
+### 2026-10-29 · The Embed editor reformats pasted loader code
+- Area: loader
+- Symptom: `wf:install` reported "Embed 2b differs from loader.html" right
+  after a correct paste.
+- Cause: the Designer's code editor (its Format action) rewrote the
+  script: double quotes to single, a one-line function body split over
+  three lines. Same behaviour, different text.
+- Fix: `wf:install` ignores quote style and the spacing around punctuation
+  (wf-template 0.15.0).
+- Status: fixed in wf-template 0.15.0
+- Found by: claude
+
+### 2026-10-29 · A page capture misses scripts loaded at runtime
+- Area: loader
+- Symptom: a local copy of a live page logged failed requests for
+  Finsweet Attributes `chunk-*.js` files; every other page was clean.
+- Cause: Finsweet Attributes v2 is an ES module that imports its features
+  by relative path when it needs them, so they're in no `<script src>` a
+  capture reads.
+- Fix: a capture script follows relative `import` / `from` specifiers in
+  every captured script until nothing new turns up.
+- Status: fixed in that project
+- Found by: claude
+
+### 2026-10-29 · Staging screenshots can't isolate a batch when live is older
+- Area: release
+- Symptom: after a batch of changes, `wf:baseline compare` of staging
+  against the live baselines showed 3–55% pixel changes on every page.
+- Cause: the live domain hadn't been published for two weeks, staging
+  had; staging carried those edits plus the batch, and scroll reveals,
+  slideshow frames and lazy map tiles differ per capture.
+- Fix: take staging baselines right before a batch, not only live ones;
+  to compare with live, check behaviour and computed sizes instead of
+  pixels.
+- Status: documented
+- Found by: claude
+
 ### 2026-10-02 · Filling in REPO in loader.html breaks the browser tests
 - Area: ci
 - Symptom: The first push after setup fails `pnpm test` with

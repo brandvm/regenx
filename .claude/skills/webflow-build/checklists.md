@@ -1,14 +1,43 @@
 # Build checklists
 
-Gates for the Webflow build, from the agency's project checklist. The
-gates before it (the inputs, each prototype page, the prototype handoff)
-are in the `webflow-prototype` skill
-([checklists.md](../webflow-prototype/checklists.md)); these lists start
-at the design handoff and end at the build handoff.
+Gates for the Webflow build, from the agency's project checklist. They
+start with the prototype (from the Figma file to a prototype the client
+approved), then run from the design handoff to the build handoff. The
+`webflow-prototype` skill has the prototype's working rhythm, and its
+[checklists.md](../webflow-prototype/checklists.md) the inputs and the
+gates for each prototype page.
 
 Tags: **[Claude]** Claude does it · **[Claude checks]** Claude verifies and
 reports · **[Person]** a person does it; Claude may track it, never claim it.
 Commands are the check scripts (`pnpm wf:*`, see SKILL.md › Checks).
+
+How to record progress: when an item is done, tick it in
+`docs/handoff/progress.json` with `pnpm progress tick "<checklist>" "<the
+start of the item>"`, adding `--page /path` for Page done and `--component
+<Name>` for Component done. Use `--by check` when a `pnpm wf:*` script
+decided it, and leave `--by` out (Claude) otherwise. Never tick a
+**[Person]** item for the person: say it's theirs, or add it to their list
+with `pnpm progress todo "<text>"` when they ask. Commit the file with the
+work it records.
+
+## Prototype (from the Figma file to a prototype the client approved)
+
+Bench proves the first four: Compare › With Figma the match, and Bench's
+own prototype build the link, the picks and the pages built. Don't tick
+them by hand. Outside Bench, Claude ticks them when they are true: the
+match after looking at each page beside its frame at the three widths.
+The steps are in SKILL.md › The prototype, from Figma.
+
+- [Claude checks] Each page matches its Figma frame at Desktop, Tablet and
+  Mobile.
+- [Claude checks] The Figma file is linked to the client.
+- [Claude checks] Frames picked, in order, each with its page address.
+- [Claude checks] Every picked frame built as a prototype page.
+- [Claude checks] Tokens, fonts and images come from the file; nothing
+  made up.
+- [Claude checks] The Figma prototype's links work: menus, tabs and forms.
+- [Person] Each page approved in the prototype (right-click in Pages).
+- [Person] The client approved the prototype in writing.
 
 ## Before building (design handoff, approved in writing)
 
@@ -77,14 +106,18 @@ Procedure: [media.md](media.md).
 
 ## Page done (per page, before showing it for review)
 
-- [Claude checks] `pass` and `compare` match the design at all three
-  widths; differences are explained or fixed.
+- [Claude checks] Matches the prototype at all three widths (`compare`,
+  with `pass` for the details).
+- [Claude] Any difference from the design that stays is explained in the
+  changes log (`BUILD-NOTES.md`); the rest are fixed.
 - [Claude checks] `outline`: one H1, no skipped levels, no words glued at
   line breaks; matches the H1 to H3 marked in the design.
 - [Claude checks] `anchors`: every in-page and cross-page link lands on
   its section.
-- [Claude checks] `a11y` at all widths: no serious or critical failures;
-  `links`: no broken links (`#` placeholders listed in the known issues).
+- [Claude checks] No serious or critical accessibility failures at any
+  width (`a11y`).
+- [Claude checks] No broken links; `#` placeholders are listed in the
+  known issues. Run `links`.
 - [Claude checks] `html`: nothing Webflow rewrote on publish breaks the
   page (roles, dropped attributes, form field names, variant classes).
 - [Claude checks] `overflow`: nothing runs off the right edge and the page
@@ -115,12 +148,16 @@ notes, integrations, changes log, redirect map and known issues.
 - [Claude checks] Style guide final check: `pnpm check:style-guide`
   passes and the published style guide holds every class; page section
   previews whose page now exists are removed.
-- [Claude checks] `pnpm wf:perf` on the key pages, mobile and desktop
-  (the median of several runs); the numbers go in `BUILD-NOTES.md`.
+- [Claude checks] Fast on a phone: Home scores 90 or more
+  (`pnpm wf:perf`).
+- [Claude checks] The key pages measured on mobile and desktop, the median
+  of several runs; the numbers go in `BUILD-NOTES.md`.
 - [Claude checks] `pnpm wf:install` on every page template: the installed
   snippets match `loader.html`, one viewport meta, no localhost request.
-- [Claude checks] `pnpm wf:seo`: every page has its title, description,
-  OG tags, one H1 and valid JSON-LD; noindex only where planned.
+- [Claude checks] Every page has its title, description, canonical and
+  one H1 (`pnpm wf:seo`).
+- [Claude checks] Open Graph tags and valid JSON-LD on every page, and
+  noindex only where planned: the rest of the SEO report.
 - [Claude] CMS notes: how to edit what (collections, fields, conditional
   sections, components and their props).
 - [Claude] Integration list and configuration notes (no credentials).

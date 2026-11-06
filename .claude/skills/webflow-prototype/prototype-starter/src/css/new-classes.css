@@ -13,4 +13,7 @@
 
    Rules the Designer can't express go at the end, each with the tag it
    will carry in the repo's styles.css (AGENTS.md › CSS policy):
-   / * repo-css: designer-cant — :has() * /  */
+   / * repo-css: designer-cant — :has() * /
+   A library's own CSS (Lenis, Swiper…) goes in repo.css, not here: its
+   classes are never Webflow classes, and the style guide check would ask
+   for them.  */

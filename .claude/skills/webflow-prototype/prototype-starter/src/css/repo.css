@@ -1,0 +1,9 @@
+/* REPO CSS FOR LIBRARIES, moved to the repo's styles.css as is
+   ------------------------------------------------------------------
+   CSS that a library needs (Lenis, Swiper, Finsweet…) and that styles the
+   library's own classes and state classes, which never become Webflow
+   classes. The style guide generator and check read every class in
+   new-classes*.css as a class to create in Webflow, so library rules go
+   here instead. Each block carries the tag it will have in styles.css:
+
+   / * repo-css: third-party — Lenis * /  */

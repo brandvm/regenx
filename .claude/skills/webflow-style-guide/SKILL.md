@@ -151,7 +151,7 @@ header comment followed by its markup:
 3. Add the project's specimens (button and form items; component and page
    blocks as pages are built) and run it again.
 4. `pnpm check:style-guide` until it passes.
-5. The person reviews the page at 1440, 820 and 390 and approves it
+5. The person reviews the page at 1440, 820, 667 and 390 and approves it
    **before the first content page is started**.
 6. From then on, every new class or component gets its row in the same
    piece of work: add the specimen, `pnpm style-guide`, `pnpm

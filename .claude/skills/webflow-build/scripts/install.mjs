@@ -6,7 +6,8 @@
 // as served and the page after load, and reports (exit 1 on any):
 //   - drift: a tag of loader.html (head code, Embed 2a, Embed 2b, footer
 //     code) that the page doesn't carry as written. Compared without
-//     comments or whitespace, with RELEASE, the org/repo names and the
+//     comments, whitespace or quote style (the Embed editor reformats
+//     pasted code), with RELEASE, the org/repo names and the
 //     2a ?v= number normalised, so a filled-in repo and a released
 //     install still match;
 //   - a jsDelivr URL pasted with a version other than RELEASE;
@@ -30,9 +31,13 @@ if (!fs.existsSync(loaderFile)) { console.error(`No loader.html in ${cfg.repoDir
 
 // The same normalisation on both sides: what is pasted differs from the
 // repo copy only in RELEASE (null in the repo), and in ORG/REPO while the
-// repo is still the template.
+// repo is still the template. Quote style and the spacing around
+// punctuation are ignored too: the Embed editor's Format action rewrites
+// double quotes to single and splits one-line bodies, with no change in
+// behaviour.
 const norm = (s) => s
   .replace(/<!--[\s\S]*?-->/g, '')
+  .replace(/'/g, '"')
   .replace(/var RELEASE = [^;]*;/g, 'var RELEASE = null;')
   .replace(/var OWNER = "[^"]*"/g, 'var OWNER = "ORG"')
   .replace(/var SITE = "[^"]*"/g, 'var SITE = "REPO"')
@@ -42,7 +47,7 @@ const norm = (s) => s
   .replace(/cdn\.jsdelivr\.net\/gh\/[\w.-]+\/[\w.-]+@[\w.-]+\//g, 'cdn.jsdelivr.net/gh/ORG/REPO@RELEASE/')
   .replace(/(styles\.css)\?v=\d+/g, '$1?v=N')
   .replace(/\s+/g, ' ')
-  .replace(/> </g, '><')
+  .replace(/ ?([{}()[\];,:=+<>|&?!]) ?/g, '$1')
   .trim();
 
 // loader.html's pieces: a comment with a "1) Head code"-style line starts

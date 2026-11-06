@@ -66,7 +66,7 @@ export function pages() {
 }
 
 // The widths the checks use: the repo config's, else the template's.
-export const widths = (cfg = config()) => cfg.widths ?? [[1440, 900], [820, 1180], [390, 844]];
+export const widths = (cfg = config()) => cfg.widths ?? [[1440, 900], [820, 1180], [667, 375], [390, 844]];
 
 // The prototype's address: PROTOTYPE_URL, else the dev script's port (the
 // project's own, written by pnpm new-project).

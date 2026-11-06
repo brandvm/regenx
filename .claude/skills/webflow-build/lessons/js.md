@@ -6,6 +6,202 @@ Harvested from client builds made from this template (`Scope:
 template-candidate` entries in their `GOTCHAS.md`). Module and file names
 refer to the project the lesson came from; Status is that project's.
 
+### 2026-11-02 · SplitText with `tag: 'span'` leaves pieces inline (IX3 did not)
+- Area: js
+- Symptom: after moving text reveals off IX3, mobile pages sat 24–47px
+  lower than production from the first split heading down, and line
+  slide-ins did not move.
+- Cause: IX3 writes `position: relative; display: inline-block` on split
+  words and chars, and `display: block` on lines and line masks. GSAP
+  3.15 `SplitText.create({ tag: 'span' })` adds neither, so words wrap
+  differently and transforms on inline spans are ignored.
+- Fix: set the same display and position on the pieces right after
+  splitting (with a test). See "Moving off IX3: decode the published
+  interactions, then replay them".
+- Status: fixed in that project
+- Found by: claude
+
+### 2026-11-02 · A line split cuts a not-yet-split heading into several headings
+- Area: js
+- Symptom: a heading on mobile was 14px shorter than production on some
+  loads only, and the DOM held two or three `<h2>`s for one heading.
+- Cause: lazy building made the order of nested splits depend on scroll
+  timing. When a section's line split (`words,lines`) ran before the char
+  split of the h2 inside it, SplitText broke the h2 at each line break
+  into separate h2 elements. IX3 always split the inner heading first.
+- Fix: before splitting lines, build any pending split nested inside that
+  trigger (with a test). See "Lazy ScrollTrigger builds: hidden and
+  re-rendered trigger elements".
+- Status: fixed in that project
+- Found by: claude
+
+### 2026-11-02 · Nested Collection Lists and Finsweet's late pages
+- Area: js
+- Symptom: a module's card counts were inflated in tests, and only the
+  first 20 of 61 cards got their toggle on staging.
+- Cause: (1) each card held a nested Collection List, so `.w-dyn-items >
+  .w-dyn-item` also matched the nested rows; (2) with
+  `fs-list-load="all"` Finsweet fetches the later pages after boot, so
+  cards set up at init missed them.
+- Fix: select only items that hold the card directly (`:scope >` or a
+  check on the child), and set up cards again from a MutationObserver on
+  each list. Count unique items by their link when the same item appears
+  in several lists.
+- Status: fixed in that project
+- Found by: claude
+
+### 2026-10-29 · Once the bundle starts after first paint, every layout a module sets is a visible shift
+- Area: js, perf
+- Symptom: after the bundle was moved after the first paint (see
+  loader-release-ci.md, "Lighthouse counts anything that finishes before
+  the first paint"), pages jumped on reload and first load. Reloaded while
+  scrolled down, CLS was 0.3–1.3: pins added their height, quote slides
+  stacked, Finsweet cut 9 cards to 6, an open-first accordion opened.
+  Logos took no space until they loaded. A load from the top measured CLS
+  0.003–0.018, so a top-of-page check missed all of it.
+- Cause: the modules build pins, stacks and page sizes at boot; a reload
+  restores the scroll position before that, so the boot moves what is on
+  screen. Images with `height: auto` and no width/height attributes are
+  0px tall until loaded.
+- Fix: each module's first state in CSS before its state attribute
+  exists, under the module's own conditions: pin heights as the module's
+  sum, slides stacked with the first shown, the first accordion item open
+  until the module's state attribute appears, only the first page of a
+  list until Finsweet starts (an attribute set on success and failure);
+  count-ups hold their box height; `html { scrollbar-gutter: stable }`.
+  In Webflow, `aspect-ratio` on every logo and mark class. To find them,
+  reload at several scroll depths and collect `layout-shift` entries with
+  their sources, and load with images blocked to compare image heights.
+  Playwright's `page.route` turns off the HTTP cache, so routed reloads
+  are cold loads. Worst reload CLS per page went to 0–0.04.
+- Status: fixed in that project
+- Found by: human + claude
+
+### 2026-10-30 · A CSS fade inside a Webflow Dropdown List never plays on open
+- Area: js
+- Symptom: porting IX2 dropdown animations to CSS transitions keyed on
+  `.w--open`, the dropdown's content jumped to opacity 1 on open; IX2 had
+  faded it in.
+- Cause: `.w-dropdown-list` is `display: none` until `w--open`, and a
+  transition can't start from `display: none`, so the open rule applies at
+  once. Closing works: the list stays displayed until the close fades
+  end.
+- Fix: play the opening fade with the Web Animations API (`fill:
+  backwards` through the delay) and keep the settled values in CSS.
+  `@starting-style` does it too, but not in older Safari and Firefox.
+- Status: fixed in that project
+- Found by: claude
+
+### 2026-10-29 · Closing a mobile menu played its transitions one after another
+- Area: js
+- Symptom: closing the mobile menu from inside a sub-menu first slid back
+  to the main list, then the panel went, then the bar changed colour. On
+  phones the panel also took taps while it faded (a stale link opened).
+- Cause: each piece has its own transition (slide 300ms, panel visibility
+  300ms, bar colour 250ms), meant for moving inside the open menu; closing
+  the whole menu fires them all and they finish at different times.
+- Fix: opening or closing the whole menu is one motion: the bar's colour
+  eases while the menu and any open view fade together (Web Animations,
+  250ms), and the view resets after the fade with transitions off (an
+  `.is-instant` state class). Panels pinned to a colour mode stay put
+  while the bar changes. Run the cleanup on a timer too: animations don't
+  advance in a background tab. The panel is `pointer-events: none` unless
+  open, and `overflow: clip` so focusing a link in a sliding view can't
+  scroll it sideways.
+- Status: fixed in that project's prototype
+- Found by: claude
+
+### 2026-10-29 · A sideways carousel caught the page's vertical wheel under Lenis
+- Area: js
+- Symptom: scrolling the page with the mouse over a carousel stuck there:
+  the wheel went into the carousel instead of the page.
+- Cause: Lenis with `allowNestedScroll: true` hands the wheel to any
+  element under the pointer that can scroll that way. The track had
+  `overflow-x: auto`, which makes `overflow-y` compute to `auto` too; with
+  fluid scaling its content can be a pixel taller than the box, so Lenis
+  saw a vertically scrollable element.
+- Fix: every sideways scroller is `overflow-x: auto` plus `overflow-y:
+  hidden`. The vertical wheel then scrolls the page; the horizontal wheel,
+  swipes and arrows move the carousel. No `data-lenis-prevent` needed.
+- Status: fixed in that project's prototype
+- Found by: human
+
+### 2026-10-29 · Never start the LCP element from opacity 0
+- Area: perf, js
+- Symptom: a home page scored 80 on mobile PageSpeed: LCP 4.0 s, of which
+  3 s render delay, and the LCP element was the hero H1. With the intro
+  loader replaced by a CSS entrance (`@keyframes` from `opacity: 0` at
+  first paint), LCP went to 4.5 s although FCP was 2.8 s.
+- Cause: an element painted at opacity 0 isn't an LCP candidate. With an
+  intro loader (which Lighthouse always sees: every run is a first visit)
+  LCP waited for the hero to fade in after the curtain; with the CSS
+  entrance the opacity animation runs on the compositor, so the H1 was
+  only counted after the animation, not at its first frame. A covered but
+  painted element does count.
+- Fix: the LCP element only moves (`y`) under a loader, never fades; an
+  entrance without a loader starts from a partial opacity (0.6) with a
+  small rise. Mobile went to 93 (LCP 2.7–3.1 s) and the reveal looks the
+  same. Check which element is the LCP in the Lighthouse report before
+  designing an entrance.
+- Status: fixed in that project
+- Found by: claude
+
+### 2026-10-29 · Finsweet List 2.7: what the markup needs on Webflow
+- Area: js
+- Symptom: (1) a custom empty message (`fs-list-element="empty"` outside
+  the Collection List) showed all the time, with and without matches;
+  (2) checks from a script saw Finsweet never start in a hidden browser
+  pane.
+- Cause: (1) Finsweet 2.7 finds that element but toggles only the list's
+  own Empty State; (2) the recipe starts an attribute when its elements
+  come near the viewport or on the first scroll, pointer or key input, and
+  a hidden pane gives neither.
+- Fix: (1) a small module shows the custom message only while the list
+  has no items; give it a hidden start state in Webflow so it doesn't
+  flash. (2) In checks, scroll or move the pointer first. Works as
+  documented (2.7.1 source, checked on staging): `fs-list-element="list"`,
+  `fs-list-load="more"` and `fs-list-itemsperpage` on the Collection List;
+  a custom Show more with `fs-list-element="pagination-next"` + instance
+  (hidden when all are shown); filters on the Form element (submit is
+  prevented, so Webflow's form handler doesn't run); search
+  `fs-list-field="*"`; a sort select's initial value is applied on start,
+  so the list is sorted without a native sort.
+- Status: fixed in that project
+- Found by: claude
+
+### 2026-10-28 · Webflow Dropdown accordions close each other page-wide
+- Area: js
+- Symptom: "first item open in every FAQ block" couldn't be done: opening
+  one accordion built from Webflow Dropdowns closed every other one on the
+  page, and a click anywhere or moving focus away closed it too.
+- Cause: on open, Webflow sends `w-close.w-dropdown` to every other
+  dropdown, closes on `focusout`, and binds a document `mouseUpOutside`
+  closer. A script that re-runs Webflow's setup after boot (Finsweet can)
+  binds them again and resets the open panels' IX2 styles.
+- Fix: a module that leaves Webflow in charge of clicks, keys, IX2 and
+  `aria-expanded`, and only unbinds those three closers for the accordion
+  class (nav dropdowns untouched). It opens the first visible item per
+  group through Webflow's own toggle handler, and repeats both after every
+  re-run of the dropdown module's `ready`. For a new build, an accordion
+  that isn't a Dropdown avoids all of this.
+- Status: fixed in that project
+- Found by: claude
+
+### 2026-10-28 · Scroll-snap rows: markup order isn't screen order, and the row is as tall as its tallest card
+- Area: js
+- Symptom: a mobile scroll-snap row's dots pointed at the wrong cards, and
+  short cards had ~450px of empty panel under them.
+- Cause: one card was moved last with `order` in Webflow, so markup order
+  is not screen order; and a flex row is as tall as its tallest card,
+  whatever card is in view.
+- Fix: the dots module sorts cards by their on-screen position, and rows
+  marked for it take the height of the card in view (`overflow-y: hidden`
+  while they do), like Swiper's `autoHeight`. Bind only a row that
+  actually scrolls sideways, so a row that stacks at a breakpoint gets
+  nothing.
+- Status: fixed in that project
+- Found by: claude
+
 ### 2026-10-20 · Bundled GSAP plugins register themselves on Webflow's `window.gsap`
 - Area: js
 - Symptom: with the bundle running after Webflow's GSAP, the bundled
