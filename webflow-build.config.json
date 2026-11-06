@@ -3,10 +3,22 @@
   "repoDir": ".",
   "bundlePattern": "brandvm\\.github\\.io/regenx/(index\\.js|styles\\.css)",
   "widths": [
-    [1440, 900],
-    [820, 1180],
-    [390, 844],
-    [375, 812]
+    [
+      1440,
+      900
+    ],
+    [
+      820,
+      1180
+    ],
+    [
+      390,
+      844
+    ],
+    [
+      375,
+      812
+    ]
   ],
   "pages": [
     "/",
@@ -23,13 +35,37 @@
     "/faqs/general-information"
   ],
   "seo": {
-    "noindexOk": ["^/design/"],
-    "noSchemaOk": ["^/(privacy-policy|terms-conditions|practice-policy|telemedicine-consent|404)$"],
+    "noindexOk": [
+      "^/design/"
+    ],
+    "noSchemaOk": [
+      "^/(privacy-policy|terms-conditions|practice-policy|telemedicine-consent|404)$"
+    ],
     "maxPages": 500
   },
   "overflow": {
-    "widths": [1920, 1440, 1280, 1024, 991, 820, 768, 600, 480, 430, 390, 375, 360, 320],
-    "ignore": [".marquee", "[data-marquee]", "[data-overflow-ok]"],
+    "widths": [
+      1920,
+      1440,
+      1280,
+      1024,
+      991,
+      820,
+      768,
+      600,
+      480,
+      430,
+      390,
+      375,
+      360,
+      320
+    ],
+    "ignore": [
+      ".marquee",
+      "[data-marquee]",
+      "[data-overflow-ok]"
+    ],
     "tolerance": 1
-  }
+  },
+  "prototypeUrl": "http://localhost:5173"
 }
