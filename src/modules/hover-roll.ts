@@ -67,7 +67,7 @@ export function initHoverRoll() {
         el.removeEventListener('mouseleave', leave);
       });
       rolls.forEach(({ tl, split }) => {
-        tl.progress(0).kill();
+        tl.revert();
         split.revert();
       });
     };
