@@ -163,3 +163,10 @@
     transition-duration: 0ms;
   }
 }
+
+/* repo-css: third-party — Swiper's pagination CSS sets the bullets container
+   to width: 100%. In the control row under the panel (Rx Timeline Controls)
+   the dots sit between the prev/next arrows, so they size to their content. */
+[data-therapy-timeline] .rx-timeline-controls [data-timeline-pagination] {
+  width: auto;
+}

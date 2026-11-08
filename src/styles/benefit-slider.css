@@ -125,3 +125,13 @@
     transition-duration: 0ms !important;
   }
 }
+
+/* repo-css: third-party — Swiper only transitions the wrapper's transform.
+   On mobile portrait the slider's height follows the visible card
+   (benefit-auto-height.ts), so let the height ease with the same duration
+   and curve as the slide. */
+@media (max-width: 479px) {
+  [data-benefit-slider] .swiper-wrapper {
+    transition-property: transform, height;
+  }
+}
