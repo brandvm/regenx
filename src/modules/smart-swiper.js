@@ -510,6 +510,10 @@ export const SmartSwiper = (function () {
     if (opts.loop && cfg.minLoopSlides && slideCount < cfg.minLoopSlides) {
       opts.loop = false;
       opts.rewind = true;
+      // Start on the middle product so the fan has slides on both sides
+      // (from the first one, the left of centre stayed empty). The info
+      // carousel follows (linkControllers aligns it on init).
+      if (opts.initialSlide == null) opts.initialSlide = Math.floor((slideCount - 1) / 2);
       Debug.log(
         "SmartSwiper: only",
         slideCount,
