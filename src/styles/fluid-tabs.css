@@ -48,13 +48,14 @@
     padding-top: .75em;
     padding-bottom: .75em;
     white-space: normal;
-    text-align: center;
   }
 
   /* benefit-slider.css pins benefit-tab labels to the left for the stacked
-     mobile list; folder tabs centre them as in Figma. */
-  [data-fluid-tabs] .w-tab-link {
+     mobile list; folder tabs centre them as in Figma. Benefit tabs only:
+     Home's service tabs keep their label left and dots right. */
+  [data-fluid-tabs] .sb-tab-link {
     justify-content: center;
+    text-align: center;
   }
 
   /* repo-css: designer-cant — every label is white with a difference blend,
