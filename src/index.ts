@@ -25,6 +25,8 @@ import { initMediaPin } from './modules/media-pin';
 import { initAboutHero } from './modules/about-hero';
 import { initProcessScroll } from './modules/process-scroll';
 import { initInputModality } from './modules/input-modality';
+import { initPins } from './modules/pins';
+import { initLabWidget } from './modules/lab-widget';
 
 // Each module runs in isolation: one that throws is logged and skipped,
 // and every module after it still initializes.
@@ -64,6 +66,10 @@ async function boot() {
     await run('media-pin', initMediaPin);
     await run('about-hero', initAboutHero);
     await run('process-scroll', initProcessScroll);
+    // Lab widgets (inline SVG): bars fill and values count up in view.
+    // Text pins on photos: placed from data-x / data-y.
+    await run('lab-widget', initLabWidget);
+    await run('pins', initPins);
     // TRT hero chart card: scale-in on view (replaces the Lottie).
     // "As Seen In" logo rows: [data-marquee] (wf-template recipe).
     await run('marquee', initMarquee);

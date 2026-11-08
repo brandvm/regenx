@@ -1,0 +1,225 @@
+/* Text pins on photos (modules/pins.ts). Webflow owns the markup (classes
+   Rx Pin, Rx Pin Dot, Rx Pin Label, Rx Stat …, Rx Badge …, Rx Tag …,
+   Rx Note …, Rx Line); this owns their look and placement.
+
+   repo-css: js-state — pins.ts places every item from data-x / data-y on the
+   drawn part of the photo and sets --pin-u (one Figma px at the current
+   size); data-side-now is the side after the edge check, data-pin-out marks
+   an anchor cropped away. Sizes are computed from --pin-u so the pins scale
+   with the photo, which the Designer can't express. */
+[data-pin-media] {
+  --pin-u: 1px;
+  --pin-fs: 14;
+  --pin-dot: 27.6;
+}
+
+[data-pin-media] :is(.rx-pin, .rx-stat, .rx-badge, .rx-tag, .rx-tag-dots, .rx-note, .rx-line) {
+  position: absolute;
+  z-index: 1;
+  font-size: max(9px, calc(var(--pin-u) * var(--pin-fs)));
+  line-height: 1.2;
+  color: #fff;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Until pins.ts has placed them (and on the Designer canvas, which runs no
+   script) they stay out of sight instead of piling up in a corner. */
+[data-pin-media]:not(.is-pins-ready) [data-x],
+[data-pin-media] [data-pin-out] {
+  visibility: hidden;
+}
+
+/* Glass dot (Figma "Group 86"): rounded square, radial white glaze,
+   hairline border, blur, a small dot in the middle. */
+[data-pin-media] .rx-pin-dot {
+  position: relative;
+  display: block;
+  width: calc(1em * var(--pin-dot) / var(--pin-fs));
+  height: calc(1em * var(--pin-dot) / var(--pin-fs));
+  border: 1px solid rgb(255 255 255 / 8%);
+  border-radius: calc(1em * 5.2 / 14);
+  background: radial-gradient(circle at 75% 15%, rgb(255 255 255 / 20%), rgb(255 255 255 / 1%) 70%);
+  box-shadow: inset .1em .15em .45em rgb(255 255 255 / 45%);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+[data-pin-media] .rx-pin-dot::after {
+  content: "";
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 22%;
+  height: 22%;
+  border-radius: 50%;
+  background: var(--pin-dot-color, #fff);
+  transform: translate(-50%, -50%);
+}
+
+/* Pin: the element is the dot, centred on its anchor; the label sits beside
+   it. */
+[data-pin-media] .rx-pin {
+  transform: translate(-50%, -50%);
+}
+
+[data-pin-media] .rx-pin-label {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + .45em);
+  transform: translateY(-50%);
+  text-shadow: 0 1px 6px rgb(0 0 0 / 35%);
+}
+
+[data-pin-media] .rx-pin[data-side-now="left"] .rx-pin-label,
+[data-pin-media] .rx-pin:not([data-side-now])[data-side="left"] .rx-pin-label {
+  right: calc(100% + .45em);
+  left: auto;
+}
+
+/* Stat: a dot with "725 ▲ / Testosterone" above it, aligned to the dot's
+   start or end (data-align). */
+[data-pin-media] .rx-stat {
+  transform: translate(-50%, -50%);
+}
+
+[data-pin-media] .rx-stat-text {
+  position: absolute;
+  bottom: calc(100% + .5em);
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-shadow: 0 1px 6px rgb(0 0 0 / 35%);
+}
+
+[data-pin-media] .rx-stat[data-align="end"] .rx-stat-text {
+  right: 0;
+  left: auto;
+  align-items: flex-end;
+}
+
+[data-pin-media] :is(.rx-stat-value, .rx-badge-value) {
+  display: inline-flex;
+  align-items: center;
+  gap: .3em;
+  font-size: calc(18em / 14);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+[data-pin-media] :is(.rx-stat-label, .rx-badge-label) {
+  opacity: .8;
+}
+
+/* ▲ / ▼ (Figma "Polygon 2"). */
+[data-pin-media] .rx-arrow {
+  display: inline-block;
+  width: .6em;
+  height: .5em;
+  background: currentColor;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+[data-pin-media] .rx-arrow.is-down {
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+
+/* Badge: glass card "▲ 821 ng/dL / Testosterone" (Figma Group 180/181,
+   191 × 82 at 14px). Anchored at its top-left corner. */
+[data-pin-media] .rx-badge {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  width: calc(1em * 191 / 14);
+  height: calc(1em * 82 / 14);
+  padding: 0 calc(1em * 18 / 14);
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: calc(1em * 11 / 14);
+  background: rgb(255 255 255 / 10%);
+  background-image: linear-gradient(rgb(0 0 0 / 40%), rgb(0 0 0 / 40%));
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+}
+
+[data-pin-media] .rx-badge .rx-pin-dot {
+  flex: none;
+}
+
+[data-pin-media] .rx-badge-text {
+  display: flex;
+  flex-direction: column;
+  gap: .15em;
+}
+
+/* Tag (Home peptide cards): a plain label, and a small cluster of dots
+   (three in a triangle, or four with .is-four), each anchored at its
+   top-left. */
+[data-pin-media] .rx-tag {
+  text-shadow: 0 1px 6px rgb(0 0 0 / 35%);
+}
+
+[data-pin-media] .rx-tag-dots {
+  width: calc(1em * 12 / 14);
+  height: calc(1em * 8 / 14);
+  --d: radial-gradient(circle, currentColor 70%, transparent 72%);
+  background:
+    var(--d) 0 0 / calc(1em * 4 / 14) calc(1em * 4 / 14) no-repeat,
+    var(--d) calc(1em * 8 / 14) 0 / calc(1em * 4 / 14) calc(1em * 4 / 14) no-repeat,
+    var(--d) calc(1em * 4 / 14) calc(1em * 4 / 14) / calc(1em * 4 / 14) calc(1em * 4 / 14) no-repeat;
+}
+
+[data-pin-media] .rx-tag-dots.is-four {
+  width: calc(1em * 11 / 14);
+  height: calc(1em * 9 / 14);
+  background:
+    var(--d) calc(1em * 2 / 14) 0 / calc(1em * 4 / 14) calc(1em * 4 / 14) no-repeat,
+    var(--d) calc(1em * 7 / 14) 0 / calc(1em * 4 / 14) calc(1em * 4 / 14) no-repeat,
+    var(--d) 0 calc(1em * 5 / 14) / calc(1em * 4 / 14) calc(1em * 4 / 14) no-repeat,
+    var(--d) calc(1em * 5 / 14) calc(1em * 5 / 14) / calc(1em * 4 / 14) calc(1em * 4 / 14) no-repeat;
+}
+
+/* Note with a leader line (Home peptide card 2): a bold title over a value;
+   the line (data-w long) ends in a dot at its start or end (data-dot). */
+[data-pin-media] .rx-note {
+  text-shadow: 0 1px 6px rgb(0 0 0 / 35%);
+}
+
+[data-pin-media] .rx-note-title {
+  font-weight: 700;
+}
+
+[data-pin-media] .rx-line {
+  height: 1px;
+  background: rgb(255 255 255 / 60%);
+}
+
+[data-pin-media] .rx-line::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: .4em;
+  height: .4em;
+  border-radius: 50%;
+  background: #fff;
+  transform: translate(50%, -50%);
+}
+
+[data-pin-media] .rx-line[data-dot="start"]::after {
+  right: auto;
+  left: 0;
+  transform: translate(-50%, -50%);
+}
+
+/* Accent colours (combos Is Yellow / Is Green). */
+[data-pin-media] .rx-pin-dot.is-yellow { --pin-dot-color: #ffd900; }
+[data-pin-media] .rx-pin-dot.is-green { --pin-dot-color: #46e07f; }
+[data-pin-media] :is(.rx-tag, .rx-tag-dots).is-yellow { color: #fde526; }
+
+@media (prefers-reduced-transparency: reduce) {
+  [data-pin-media] :is(.rx-pin-dot, .rx-badge) {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background-color: rgb(0 0 0 / 55%);
+  }
+}

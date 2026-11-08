@@ -1,0 +1,10 @@
+/* Lab result widgets (modules/lab-widget.ts): the inline SVG fills the glass
+   div (Service Hero | Widget W) at its own aspect ratio.
+   repo-css: js-state — markup from an HTML Embed; the SVG has no Webflow
+   classes to style. */
+[data-lab-widget] {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}

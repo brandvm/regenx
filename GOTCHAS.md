@@ -25,6 +25,24 @@ harvested across all client repos to improve `brandvm/wf-template`.
 
 ## This project
 
+### 2026-11-08 · Clean Figma photo exports: overlays, opaque "alpha", overflow
+- Area: designer
+- Scope: template-candidate
+- Symptom: Exporting photos without their text pins for the pins module: one export kept old pins, one transparent tube came out on a light-grey square, and its pins landed 33px high.
+- Cause: (1) a photo layer can stack several IMAGE fills (an old screenshot over the clean photo), and stripping a cloned parent keeps sibling frames that hold image fills; (2) the PNG reported hasAlpha but every pixel was opaque; (3) the tube overflowed its frame (y −33), so the render is 438 tall, not the frame's 385.
+- Fix: export the photo node itself (`download_assets`, scale 3) and look at it before use; for a cut-out, rebuild from the raw source image (rawImages) at the layer's position; measure pins from the export's own bounds. Also check staging first: the TRT stacking photo already had DOM pins (`.sd-media-pin`), so it needed nothing.
+- Status: documented
+- Found by: claude
+
+### 2026-11-08 · Unpublishing a CMS item: the hook blocks it, set Draft
+- Area: mcp
+- Scope: project
+- Symptom: `unpublish_collection_items` is refused by the local publish hook.
+- Cause: the hook blocks every publish-type call (the user publishes).
+- Fix: `update_collection_items` with `isDraft: true`; the item leaves the live site on the user's next publish (video testimonial "John", 2026-11-07).
+- Status: documented
+- Found by: claude
+
 ### 2026-11-06 · A radio built by the MCP: default style, and its name lags the group name
 - Area: mcp
 - Scope: template-candidate
