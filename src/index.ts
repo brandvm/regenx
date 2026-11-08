@@ -24,7 +24,6 @@ import { initStatementScroll } from './modules/statement-reveal';
 import { initMediaPin } from './modules/media-pin';
 import { initAboutHero } from './modules/about-hero';
 import { initProcessScroll } from './modules/process-scroll';
-import { initHeroCardIn } from './modules/hero-card-in';
 import { initInputModality } from './modules/input-modality';
 
 // Each module runs in isolation: one that throws is logged and skipped,
@@ -66,7 +65,6 @@ async function boot() {
     await run('about-hero', initAboutHero);
     await run('process-scroll', initProcessScroll);
     // TRT hero chart card: scale-in on view (replaces the Lottie).
-    await run('hero-card-in', initHeroCardIn);
     // "As Seen In" logo rows: [data-marquee] (wf-template recipe).
     await run('marquee', initMarquee);
     // Medical Catalog phone list and Lab Panel search. Before the modals:

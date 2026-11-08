@@ -15,7 +15,6 @@
 @import "./styles/interactions.css";
 @import "./styles/nav-switch.css";
 @import "./styles/nav-shrink.css";
-@import "./styles/hero-card-in.css";
 @import "./styles/focus.css";
 
 /* Icons. An @import has to come before every rule.
