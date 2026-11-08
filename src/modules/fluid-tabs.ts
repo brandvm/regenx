@@ -18,8 +18,15 @@
 // the old one slides out (transform/opacity only). The open tab's caret grows
 // in once the tabs come into view (data-caret-in, benefit-slider.css).
 // Styles live in styles/fluid-tabs.css and apply from 768px up only.
+//
+// By default the panel is the Tabs Content. When the panes mark a box of
+// their own with [data-fluid-panel] (Home's services tabs: the black intro
+// at the top of each pane, with a light product carousel below it), the open
+// tab joins that box instead: its fill, radius and top come from the open
+// pane's box, and only the box's contents slide on a switch.
 
 const ROOT = '[data-fluid-tabs]';
+const PANEL = '[data-fluid-panel]';
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
 // Stiffness (1/s²) and damping ratio. Leading edge: a hint of overshoot;
@@ -77,6 +84,13 @@ function bind(root: HTMLElement) {
   if (!menu || !content) return;
   const links = [...menu.querySelectorAll<HTMLElement>('.w-tab-link')];
   const wide = window.matchMedia('(min-width: 768px)');
+  const panels = [...content.querySelectorAll<HTMLElement>(PANEL)];
+  // The box the open tab joins: the open pane's panel, else the content.
+  const surface = () =>
+    (panels.length
+      ? content.querySelector<HTMLElement>(`:scope > .w-tab-pane.w--tab-active ${PANEL}`)
+      : null) ?? content;
+  const painted = panels.length ? panels : [content];
 
   // Webflow's own pane fade is replaced by the slide below.
   root.setAttribute('data-duration-in', '0');
@@ -132,39 +146,46 @@ function bind(root: HTMLElement) {
   // SVG draws that band, with the tab). fluid-tabs.css makes the panel
   // transparent once .is-fluid-ready is on, so read the fill without it.
   const paintPanel = () => {
+    const panel = surface();
     root.classList.remove('is-fluid-ready');
-    content.style.removeProperty('background-color');
-    const bg = getComputedStyle(content).backgroundColor;
+    panel.style.removeProperty('background-color');
+    const bg = getComputedStyle(panel).backgroundColor;
     root.classList.add('is-fluid-ready');
     if (bg && bg !== 'transparent' && !/^rgba\(.*,\s*0\)$/.test(bg)) fill = bg;
     if (!fill) return;
     path.setAttribute('fill', fill);
-    if (wide.matches) {
-      content.style.backgroundColor = fill;
-      // 1px under the strip, so the two blacks overlap and show no seam.
-      content.style.clipPath = `inset(${Math.max(0, box.rp - 1)}px 0 0 0 round 0 0 ${box.rp}px ${box.rp}px)`;
-    } else {
-      content.style.removeProperty('background-color');
-      content.style.removeProperty('clip-path');
-    }
+    painted.forEach((el) => {
+      if (wide.matches) {
+        el.style.backgroundColor = fill;
+        // 1px under the strip, so the two blacks overlap and show no seam.
+        el.style.clipPath = `inset(${Math.max(0, box.rp - 1)}px 0 0 0 round 0 0 ${box.rp}px ${box.rp}px)`;
+      } else {
+        el.style.removeProperty('background-color');
+        el.style.removeProperty('clip-path');
+      }
+    });
   };
 
   const measure = () => {
     const rootBox = root.getBoundingClientRect();
     const menuBox = menu.getBoundingClientRect();
-    const contentBox = content.getBoundingClientRect();
+    const panel = surface();
+    const panelBox = panel.getBoundingClientRect();
     const em = parseFloat(getComputedStyle(root).fontSize) || 16;
-    box.w = menuBox.width;
-    box.tabH = contentBox.top - menuBox.top;
+    // A pane's own box sets the outline's width; else the tab row does.
+    const across = panels.length ? panelBox : menuBox;
+    box.w = across.width;
+    box.tabH = panelBox.top - menuBox.top;
     box.rt = TAB_RADIUS * em;
     box.rj = JOIN_RADIUS * em;
     root.classList.remove('is-fluid-ready');
-    const radius = parseFloat(getComputedStyle(content).borderTopRightRadius) || 0;
+    const radius = parseFloat(getComputedStyle(panel).borderTopRightRadius) || 0;
     root.classList.add('is-fluid-ready');
-    box.rp = Math.min(radius, contentBox.height / 2);
+    box.rp = Math.min(radius, panelBox.height / 2);
     const h = box.tabH + box.rp;
-    svg.style.top = `${menuBox.top - rootBox.top}px`;
-    svg.style.left = `${menuBox.left - rootBox.left}px`;
+    // Absolute positions start inside the root's border.
+    svg.style.top = `${menuBox.top - rootBox.top - root.clientTop}px`;
+    svg.style.left = `${across.left - rootBox.left - root.clientLeft}px`;
     svg.setAttribute('width', `${box.w}`);
     svg.setAttribute('height', `${h}`);
     svg.setAttribute('viewBox', `0 0 ${box.w} ${h}`);
@@ -177,10 +198,11 @@ function bind(root: HTMLElement) {
     const menuBox = menu.getBoundingClientRect();
     const tab = current.getBoundingClientRect();
     if (!menuBox.width || !tab.width) return;
-    const newLeft = tab.left - menuBox.left;
+    const x0 = panels.length ? surface().getBoundingClientRect().left : menuBox.left;
+    const newLeft = tab.left - x0;
     movingRight = newLeft >= left.goal;
     left.goal = newLeft;
-    right.goal = tab.right - menuBox.left;
+    right.goal = tab.right - x0;
     if (!animate || reduceMotion()) {
       cancelAnimationFrame(frame);
       frame = 0;
@@ -205,6 +227,15 @@ function bind(root: HTMLElement) {
     ghost?.remove();
     ghost = null;
     if (reduceMotion()) return;
+    if (panels.length) {
+      // The black box stays put: its contents and what follows it slide in.
+      to.querySelectorAll<HTMLElement>(`${PANEL} > *, :scope > * > :not(${PANEL})`).forEach((el) => {
+        el.animate(
+          [{ opacity: 0, transform: `translateX(${dir * SHIFT}px)` }, { opacity: 1, transform: 'none' }],
+          { duration: SWAP, easing: EASE, delay: 60, fill: 'backwards' });
+      });
+      return;
+    }
     const inner = to.firstElementChild as HTMLElement | null;
     inner?.animate(
       [{ opacity: 0, transform: `translateX(${dir * SHIFT}px)` }, { opacity: 1, transform: 'none' }],
