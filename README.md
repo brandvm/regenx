@@ -143,13 +143,10 @@ buttons, milestone copy, and responsive layout; this repo adds the slider and
 synchronized ruler. Both arrow pairs control the same slider. There is no autoplay
 or looping, and keyboard navigation and reduced motion are supported.
 
-The two initial stages cover weeks **1–4** and **6–12**. Both fit on desktop, so
-the arrows are disabled there until more stages are added. On mobile, each stage
+The four stages cover weeks **1–4**, **6–12**, **12–18** and **18–24**, with
+the client's copy (2026-11-09; the last two were layout previews before). On
+desktop two fit at once and the arrows reach the rest; on mobile, each stage
 can be swiped or reached with the header arrows.
-
-Staging currently includes two explicitly labeled **preview** stages, **12–18**
-and **18–24**, to demonstrate scrolling. Their copy is for layout testing, not
-approved treatment information; replace or remove it before a production release.
 Transitions take one second with `cubic-bezier(0.64, 0.05, 0, 1)`. Responsive edge
 masks fade the slides and ruler without fading the navigation controls.
 

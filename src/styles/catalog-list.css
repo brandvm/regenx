@@ -135,9 +135,12 @@
 }
 
 /* repo-css: js-state — compact catalog (phones, portrait and landscape): the
-   category chips are text only; their Webflow icons show from tablet up. */
+   category chips keep their Webflow icons at the Lab Panel tabs' size
+   (client, Slack 2026-11-09: "add the icons next to the names"). The icons
+   are inline SVGs in Embeds (class icon _32, sized in em): only the compact
+   state, which is set by catalog-list.ts, tells phones from tablets here. */
 [data-catalog-compact] .services-main-nav-list.is-catalog [data-catalog-icon] {
-  display: none;
+  font-size: 1.125em;
 }
 
 /* repo-css: js-state — result count + Filters button under the search bar

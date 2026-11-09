@@ -548,7 +548,7 @@ harvested across all client repos to improve `brandvm/wf-template`.
 - Cause: Added to demonstrate scrolling/looping (5031afc, a2ceae0); not
   approved treatment information.
 - Fix: replace or remove before the first production release (README).
-- Status: open
+- Status: timeline stages fixed (client copy in Webflow, 2026-11-09, unpublished); Lorem Ipsum benefit cards not rechecked
 - Found by: human
 
 ### 2026-09-30 · A centred Swiper loop needs at least five slides

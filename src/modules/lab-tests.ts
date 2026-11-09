@@ -7,6 +7,8 @@
 // group in view is marked active and scrolled into sight; the active tab is
 // styled for phones only.
 
+import { revealTab, sectionInView } from './tab-spy';
+
 const HIDDEN = 'is-lab-hidden';
 const ACTIVE = 'is-active';
 
@@ -74,15 +76,13 @@ export function initLabTests() {
   });
   input?.addEventListener('input', update);
 
-  // The group in view: the last one whose top has passed the upper third.
-  // On the phone row the active tab is scrolled into view sideways.
+  // The group in view (tab-spy.ts); on the phone row its tab is scrolled
+  // into view sideways.
   let current: HTMLAnchorElement | null = null;
   function markActive() {
-    const line = window.innerHeight / 3;
     const visible = groups.filter((g) => !g.root.classList.contains(HIDDEN) && g.links.length);
-    if (!visible.length) return;
-    let active = visible[0];
-    for (const g of visible) if (g.root.getBoundingClientRect().top <= line) active = g;
+    const active = sectionInView(visible, (g) => g.root);
+    if (!active) return;
     const link = active.links[0];
     if (link === current) return;
     current = link;
@@ -91,10 +91,7 @@ export function initLabTests() {
       l.classList.toggle(ACTIVE, on);
       if (on) l.setAttribute('aria-current', 'true'); else l.removeAttribute('aria-current');
     });
-    const row = link.parentElement;
-    if (row && row.scrollWidth > row.clientWidth) {
-      row.scrollTo({ left: link.offsetLeft - (row.clientWidth - link.offsetWidth) / 2, behavior: 'smooth' });
-    }
+    revealTab(link);
   }
 
   let frame = 0;

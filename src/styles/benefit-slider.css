@@ -54,8 +54,10 @@
   }
 }
 
-/* Fade the neighbouring cards into the panel edges; the centred card stays
-   fully opaque at every breakpoint. */
+/* repo-css: designer-cant — mask-image. Fade the neighbouring cards into
+   the panel edges; the centred card stays fully opaque. On phones the card
+   fills the slider, so a fade would only blur the card's own sides (client,
+   Slack 2026-11-09): no mask there. */
 [data-benefit-slider] .sb-benefit-slider {
   --benefit-edge-fade: 18%;
   -webkit-mask-image: linear-gradient(to right, transparent, #000 var(--benefit-edge-fade), #000 calc(100% - var(--benefit-edge-fade)), transparent);
@@ -64,7 +66,8 @@
 
 @media (max-width: 767px) {
   [data-benefit-slider] .sb-benefit-slider {
-    --benefit-edge-fade: 6%;
+    -webkit-mask-image: none;
+    mask-image: none;
   }
 }
 

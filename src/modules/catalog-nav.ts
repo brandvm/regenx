@@ -5,6 +5,8 @@
 // A block marked [data-catalog-hide-empty] (New Products) is hidden, with its
 // sidebar link, while its Collection List has no items: Webflow can't hide an
 // element on an empty list.
+import { revealTab, sectionInView } from './tab-spy';
+
 const ACTIVE = 'is-active';
 
 export function initCatalogNav() {
@@ -20,35 +22,34 @@ export function initCatalogNav() {
     });
   });
 
-  // Hidden blocks and links (empty, or hidden in Webflow) take no part.
+  // Hidden links (empty blocks, or hidden in Webflow) take no part. Which
+  // blocks have a box is checked on every update: on phones the compact list
+  // (catalog-list.ts) shows them only after this runs, and its search hides
+  // some.
   const pairs = links
     .map((link) => ({ link, target: targetOf(link) }))
     .filter((p): p is { link: HTMLAnchorElement; target: HTMLElement } =>
-      !!p.target && p.link.getClientRects().length > 0 && p.target.getClientRects().length > 0);
+      !!p.target && p.link.style.display !== 'none' && !p.link.classList.contains('is-catalog-hidden'));
   if (!pairs.length) return;
 
+  let current: HTMLAnchorElement | null = null;
   const setActive = (active: HTMLAnchorElement) => {
+    if (active === current) return;
+    current = active;
     pairs.forEach(({ link }) => {
       const on = link === active;
       link.classList.toggle(ACTIVE, on);
       if (on) link.setAttribute('aria-current', 'true');
       else link.removeAttribute('aria-current');
     });
+    // The phone tab row scrolls sideways: keep the active tab in sight.
+    revealTab(active);
   };
 
-  // The active category is the last one whose block has reached the upper
-  // third of the viewport; before the first, the first.
+  // The anchor marks the start of its product block.
   const update = () => {
-    const line = window.innerHeight / 3;
-    let current = pairs[0];
-    for (const pair of pairs) {
-      // The anchor marks the start of its product block. A block hidden by
-      // the phone search (catalog-list.ts) has no box and doesn't count.
-      const block = pair.target.parentElement ?? pair.target;
-      if (!block.getClientRects().length) continue;
-      if (block.getBoundingClientRect().top <= line) current = pair;
-    }
-    setActive(current.link);
+    const pick = sectionInView(pairs, (p) => p.target.parentElement ?? p.target);
+    if (pick && pick.link.getClientRects().length) setActive(pick.link);
   };
 
   let frame = 0;
