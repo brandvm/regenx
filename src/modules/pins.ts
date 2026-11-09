@@ -19,8 +19,8 @@
 // box. One Figma px is --pin-u; pins.css sizes everything from it, so a pin
 // keeps its spot at every width. If a label would still run past the box
 // (the minimum text size kicks in on small screens), it flips to the other
-// side of its dot; a badge is pushed back inside; an item whose anchor is
-// cropped away is hidden.
+// side of its dot, and any text still past the edge is pushed back inside;
+// an item whose anchor is cropped away is hidden.
 
 const MEDIA = '[data-pin-media]';
 const ITEM = '[data-x][data-y]';
@@ -50,11 +50,24 @@ function photoRect(media: HTMLElement, box: DOMRect): Rect {
   };
 }
 
+// Moves el by the least amount that brings it inside the rect.
+function clampInto(el: HTMLElement, rect: Rect) {
+  el.style.removeProperty('translate');
+  const r = el.getBoundingClientRect();
+  const dx = Math.min(0, rect.x + rect.w - r.right) || Math.max(0, rect.x - r.left);
+  const dy = Math.min(0, rect.y + rect.h - r.bottom) || Math.max(0, rect.y - r.top);
+  if (dx || dy) el.style.translate = `${dx}px ${dy}px`;
+}
+
 function fit(media: HTMLElement) {
   const box = media.getBoundingClientRect();
   if (!box.width) return;
   const photo = photoRect(media, box);
-  media.style.setProperty('--pin-u', `${photo.w / Number(media.dataset.pinW || 400)}px`);
+  const u = photo.w / Number(media.dataset.pinW || 400);
+  media.style.setProperty('--pin-u', `${u}px`);
+  // Text keeps a small gap from the box edge (8 Figma px).
+  const gap = 8 * u;
+  const inner: Rect = { x: box.left + gap, y: box.top + gap, w: box.width - 2 * gap, h: box.height - 2 * gap };
   media.querySelectorAll<HTMLElement>(ITEM).forEach((item) => {
     const x = photo.x + (photo.w * parseFloat(item.dataset.x!)) / 100;
     const y = photo.y + (photo.h * parseFloat(item.dataset.y!)) / 100;
@@ -63,23 +76,20 @@ function fit(media: HTMLElement) {
     if (item.dataset.w) item.style.width = `calc(var(--pin-u) * ${parseFloat(item.dataset.w)})`;
     item.toggleAttribute('data-pin-out', x < 0 || y < 0 || x > box.width || y > box.height);
 
+    // Text that runs past the box is pushed back inside it: a pin label first
+    // flips to the other side of its dot, then (like stat text) shifts on its
+    // own so the dot stays on its spot; other items shift whole.
+    const text = item.querySelector<HTMLElement>(':scope > .rx-pin-label, :scope > .rx-stat-text');
+    text?.style.removeProperty('translate');
     const side = item.dataset.side;
-    if (side === 'left' || side === 'right') {
+    if (text && (side === 'left' || side === 'right')) {
       item.dataset.sideNow = side;
-      const label = item.querySelector<HTMLElement>('.rx-pin-label');
-      if (label) {
-        const l = label.getBoundingClientRect();
-        if (side === 'right' && l.right > box.right) item.dataset.sideNow = 'left';
-        if (side === 'left' && l.left < box.left) item.dataset.sideNow = 'right';
-      }
+      const l = text.getBoundingClientRect();
+      if (side === 'right' && l.right > inner.x + inner.w) item.dataset.sideNow = 'left';
+      if (side === 'left' && l.left < inner.x) item.dataset.sideNow = 'right';
     }
-    if (item.classList.contains('rx-badge')) {
-      item.style.removeProperty('translate');
-      const r = item.getBoundingClientRect();
-      const dx = Math.min(0, box.right - r.right) || Math.max(0, box.left - r.left);
-      const dy = Math.min(0, box.bottom - r.bottom) || Math.max(0, box.top - r.top);
-      if (dx || dy) item.style.translate = `${dx}px ${dy}px`;
-    }
+    if (text) clampInto(text, inner);
+    else if (!item.matches('.rx-pin, .rx-stat, .rx-line')) clampInto(item, inner);
   });
 }
 
