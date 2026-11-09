@@ -735,3 +735,12 @@ they are not rediscovered. Status refers to the template.
   `--nav-h` from the nav.
 - Status: project pattern
 - Found by: human
+
+### 2026-11-09 · The element snapshot tool can't render backdrop-filter
+- Area: mcp
+- Scope: template-candidate
+- Symptom: `element_snapshot_tool` shows glass elements (backdrop-filter blur) as a flat light film with no blur, so frosted frames and badges look broken in the snapshot even when the CSS is right (existing Why widgets render the same way).
+- Cause: the snapshot renderer doesn't implement backdrop-filter.
+- Fix: judge glass effects on staging (or the localhost prototype), not on element snapshots.
+- Status: open
+- Found by: claude
