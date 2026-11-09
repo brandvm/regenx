@@ -31,7 +31,7 @@ harvested across all client repos to improve `brandvm/wf-template`.
 - Symptom: Two nav menus sometimes showed open together. Separately, between 992 and 1200px every menu panel was cut off at the nav pill.
 - Cause: (1) the menus were Webflow Dropdowns with three modules (nav-switch hover via synthetic `mouseup`, dropdown-motion, nav-overlay) each watching `w--open`; nothing owned "one open", it relied on Webflow's outside-click closer, which hover and Webflow's deferred class changes could slip past. (2) `site.css` sets `.g-nav-block.is-center { overflow: scroll }` ≤1200px (so the link row can scroll when it doesn't fit), which clips the absolutely placed lists whose containing block (`.g-nav-menu`) is inside it.
 - Fix: the menus are a custom element (div, DOM `button` with aria-expanded, div list) driven by one module, `nav-drop.ts`, that keeps a single `current`. At 992–1200px `.g-nav-menu` is `position: static` so the lists anchor to `.sw-g-nav`, outside the scroll box, and the row is made to fit (icons off, tighter links, smaller logo). For hover menus, prefer one controller over Webflow's Dropdown.
-- Status: fixed in Webflow + repo 2026-11-09 (uncommitted, unpublished; MANUAL-TODO AA)
+- Status: fixed 2026-11-09 (repo 132f154, Webflow published; checked on staging at 1440, 1024 and 390)
 - Found by: claude
 
 ### 2026-11-08 · Clean Figma photo exports: overlays, opaque "alpha", overflow
