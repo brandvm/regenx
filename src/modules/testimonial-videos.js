@@ -153,31 +153,3 @@ export const TestimonialVideos = (function () {
 /* In your onReady block, alongside the other modules:
        TestimonialVideos.init();
   */
-
-/* ============================================================
-   NavOverlay — page scrim tied to the nav dropdowns
-   ------------------------------------------------------------
-   • Any .g-nav-drop open  → .g-nav-overlay gets display:block,
-     then opacity:1 on the next frame so the CSS transition runs.
-   • All dropdowns closed  → opacity:0 first, display:none only
-     after the fade finishes (transitionend, with a timer as a
-     fallback so it can never get stuck visible).
-   • Switching A → B keeps the overlay up: a short grace window
-     ignores the instant where Webflow has closed A but not yet
-     opened B, and a re-open mid-fade cancels the pending hide.
-
-   Also replaces the jQuery .js-close-dropdown snippet:
-     - .js-close-dropdown inside a .w-dropdown closes that one
-     - .js-close-dropdown outside one (e.g. put the class on
-       .g-nav-overlay itself) closes every open dropdown
-     - Escape closes everything
-
-   NOTE: the open state lives on .w-dropdown-toggle (w--open),
-   not on the .w-dropdown root — that's what we observe.
-
-   Required CSS on .g-nav-overlay (set it in Webflow):
-     opacity: 0;  display: none;
-     transition: opacity 300ms ease;      ← any duration you like
-   The fade length is read from that computed transition, so the
-   display:none always lands exactly when the fade ends.
-   ============================================================ */

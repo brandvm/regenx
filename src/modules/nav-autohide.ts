@@ -15,7 +15,7 @@ export function initNavAutohide() {
 
   const top = () => nav.offsetHeight * 1.5;
   const menuOpen = () =>
-    !!nav.querySelector('.w-dropdown-toggle.w--open') ||
+    !!nav.querySelector('[data-nav-drop-toggle][aria-expanded="true"]') ||
     (!desktop.matches && !!centre && getComputedStyle(centre).display !== 'none');
 
   let lastY = window.scrollY;

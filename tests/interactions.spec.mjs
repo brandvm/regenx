@@ -122,6 +122,66 @@ test('menu button opens and closes the panel and backdrop up to 991px', async ({
   expect(errors).toEqual([]);
 });
 
+// G | Nav menus: the custom element (div, button, list) nav-drop.ts drives.
+const menuItem = (n) => `<div class="g-nav-drop" data-nav-drop>
+  <button type="button" class="g-nav-link" id="t${n}" data-nav-drop-toggle aria-expanded="false" aria-controls="m${n}">Menu ${n}<span class="g-nav-link-arrow">v</span></button>
+  <div class="g-nav-drop-list" id="m${n}" data-nav-drop-list style="position:absolute;top:100%;left:0">
+    <div class="g-nav-drop-content-w"><div class="g-nav-drop-content" style="background:#fff;width:300px;height:120px"><a href="#a${n}">Link ${n}</a></div></div>
+  </div></div>`;
+const menus = `<div class="g-nav-overlay" style="display:none;opacity:0"></div>
+  <div class="g-nav-menu" style="position:relative;display:flex;gap:40px;padding:20px">${[1, 2, 3].map(menuItem).join('')}</div>
+  <div style="height:800px"></div>`;
+const expanded = (page) => page.$$eval('[data-nav-drop-toggle]', (els) => els.map((el) => el.getAttribute('aria-expanded')).join(' '));
+const shown = (page) => page.$$eval('[data-nav-drop-list]', (els) => els.map((el) => getComputedStyle(el).display).join(' '));
+
+test('nav menus: one open at a time on desktop hover, click, keys and Esc', async ({ page }) => {
+  const errors = await setup(page, menus);
+  await page.hover('#t1');
+  await page.waitForTimeout(400);
+  expect(await expanded(page)).toBe('true false false');
+  expect(await shown(page)).toBe('block none none');
+  // Moving straight across the names switches at once, never two open.
+  await page.hover('#t3');
+  expect(await expanded(page)).toBe('false false true');
+  await page.hover('#t2');
+  await page.waitForTimeout(400);
+  expect(await expanded(page)).toBe('false true false');
+  expect(await shown(page)).toBe('none block none');
+  // Leaving the names and the panel closes it.
+  await page.mouse.move(1000, 600);
+  await page.waitForTimeout(600);
+  expect(await expanded(page)).toBe('false false false');
+  // A mouse click only opens (hover owns closing).
+  await page.click('#t1');
+  await page.click('#t1');
+  expect(await expanded(page)).toBe('true false false');
+  await page.mouse.move(1000, 600);
+  await page.waitForTimeout(600);
+  // Keyboard: Enter toggles, Esc closes and returns focus to the name.
+  await page.focus('#t3');
+  await page.keyboard.press('Enter');
+  expect(await expanded(page)).toBe('false false true');
+  await page.keyboard.press('Escape');
+  expect(await expanded(page)).toBe('false false false');
+  expect(await page.evaluate(() => document.activeElement?.id)).toBe('t3');
+  expect(errors).toEqual([]);
+});
+
+test('nav menus: taps toggle one at a time below 992px', async ({ page }) => {
+  const errors = await setup(page, menus, { width: 800 });
+  expect(await shown(page)).toBe('none none none');
+  await page.click('#t1');
+  await page.click('#t2');
+  await page.waitForTimeout(1000);
+  expect(await expanded(page)).toBe('false true false');
+  expect(await shown(page)).toBe('none block none');
+  await page.click('#t2');
+  await page.waitForTimeout(1000);
+  expect(await expanded(page)).toBe('false false false');
+  expect(await shown(page)).toBe('none none none');
+  expect(errors).toEqual([]);
+});
+
 const statement = `<div style="height:1200px"></div>
   <div data-statement style="font-size:40px"><div data-statement-text>Integrated care <span data-media-scroll style="display:inline-block;width:60px;height:30px;background:#333"></span> for every patient.</div></div>
   <div style="height:1500px"></div>`;

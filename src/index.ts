@@ -15,7 +15,7 @@ import { initMcCatalog } from './modules/mc-catalog';
 import { initBackToTop } from './modules/back-to-top';
 import { initDropdownMotion } from './modules/dropdown-motion';
 import { initMenuMotion } from './modules/menu-motion';
-import { initNavSwitch } from './modules/nav-switch';
+import { initNavDrop } from './modules/nav-drop';
 import { initNavAutohide } from './modules/nav-autohide';
 import { initCatalogSticky } from './modules/catalog-sticky';
 import { initHoverRoll } from './modules/hover-roll';
@@ -55,9 +55,10 @@ async function boot() {
     // accordions.ts opens the first items, so that opening animates.
     await run('dropdown-motion', initDropdownMotion);
     await run('menu-motion', initMenuMotion);
-    // Desktop nav: one hover menu over dropdown-motion; the nav hides while
-    // scrolling down (nav-shrink.js in main sets the scrolled bar).
-    await run('nav-switch', initNavSwitch);
+    // Nav menus (custom element, one open at a time: hover on desktop, tap
+    // below 992px); the nav hides while scrolling down (nav-shrink.js in
+    // main sets the scrolled bar).
+    await run('nav-drop', initNavDrop);
     await run('nav-autohide', initNavAutohide);
     await run('main', initMain);
     await run('hover-roll', initHoverRoll);

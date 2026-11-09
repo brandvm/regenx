@@ -21,7 +21,6 @@ import { Videos } from "./videos";
 import { Accordions } from "./accordions";
 import { SDMedia } from "./sd-media";
 import { TestimonialVideos } from "./testimonial-videos";
-import { NavOverlay } from "./nav-overlay";
 import { ShareLinks } from "./share-links";
 
 // ============================================
@@ -53,7 +52,6 @@ export function initMain() {
   run("Accordions", () => Accordions.init());
   run("SDMedia", () => SDMedia.init());
   run("TestimonialVideos", () => TestimonialVideos.init());
-  run("NavOverlay", () => NavOverlay.init());
   run("ShareLinks", () => ShareLinks.init());
 
   if (Debug.ON) {

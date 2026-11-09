@@ -1,12 +1,13 @@
-/* Desktop nav menu (nav-switch.ts): the dropdowns open on hover and share one
+/* Desktop nav menu (nav-drop.ts): the menus open on hover and share one
    panel. The script draws that panel's background (.g-nav-switch-shell) and
-   animates it with transform and opacity; the dropdowns' own open/close
-   motion (inline styles from dropdown-motion.ts, or IX2 while it is still
-   on) is held at its end state here: "in" shown, "out" hidden. Desktop only;
-   below 992px the burger menu keeps dropdown-motion's behaviour.
+   animates it with transform and opacity; here each menu's list is shown
+   ("in") or hidden ("out") and its panel held at its open state, with its
+   own background hidden. Desktop only; below 992px nav-drop.ts grows the
+   menus open and shut itself.
 
-   repo-css: js-state — data-nav-switch is set by nav-switch.ts. The
-   !important beats the inline styles the motion writes every frame. */
+   repo-css: js-state — data-nav-switch is set by nav-drop.ts. The
+   !important beats the inline styles nav-drop writes below 992px, which
+   can linger on a resize. */
 @media screen and (min-width: 992px) {
   .g-nav-drop[data-nav-switch="in"] .g-nav-drop-list {
     display: block !important;
