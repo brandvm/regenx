@@ -12,8 +12,10 @@ const fixture = `
         <label><input type="checkbox" name="therapy" value="trt">TRT</label>
         <label><input type="checkbox" name="therapy" value="peptide">Peptide</label>
       </div>
-      <label><input type="radio" name="situation" value="second">Second opinion</label>
-      <label><input type="radio" name="situation" value="other">Other</label>
+      <div role="group" aria-label="Your situation">
+        <label><input type="checkbox" name="Second-opinion" data-name="Second opinion">I desire a second opinion</label>
+        <label><input type="checkbox" name="Other" data-name="Other">Other</label>
+      </div>
     </div>
     <div class="form-action">
       <button type="button" class="button-link" data-step-back>Back</button>
@@ -178,25 +180,31 @@ test('every required group is checked and stale submit attributes cannot unlock 
   await expect(page.locator('[type="submit"]')).toBeDisabled();
 });
 
-// Contact step 1 (client rule, 2026-10-30): one checkbox or one radio is
-// enough, in any mix; the situation radios are a single choice.
-test('step 1 accepts a radio alone, a checkbox alone or both', async ({ page }) => {
+// Contact step 1 (user, 2026-11-09): every option is a checkbox, any mix,
+// and at least one tick is needed. Replaces the 2026-10-30 rule that the
+// situation options were a single choice.
+test('step 1 takes several situation options and needs at least one tick', async ({ page }) => {
   const errors = await setup(page);
   const next = page.getByRole('button', { name: 'Next', exact: true });
+  const second = page.getByLabel('I desire a second opinion', { exact: true });
+  const other = page.getByLabel('Other', { exact: true });
   await expect(next).toBeDisabled();
-  await page.getByLabel('Second opinion', { exact: true }).check();
+  await second.check();
   await expect(next).toBeEnabled();
-  await page.getByLabel('Other', { exact: true }).check();
-  await expect(page.getByLabel('Second opinion', { exact: true })).not.toBeChecked();
+  await other.check();
+  await expect(second).toBeChecked();
   await page.getByLabel('TRT', { exact: true }).check();
-  await page.getByLabel('Peptide', { exact: true }).check();
   await expect(next).toBeEnabled();
   await page.getByLabel('TRT', { exact: true }).uncheck();
-  await page.getByLabel('Peptide', { exact: true }).uncheck();
-  await expect(next).toBeEnabled();
+  await second.uncheck();
+  await other.uncheck();
+  await expect(next).toBeDisabled();
+  await other.check();
+  await second.check();
   await next.click();
   await expect(page.locator('[data-step-label]')).toHaveText('Step 2 of 2');
-  await expect(page.locator('[data-step="2"] [data-step-summary] .form-step-summary-item')).toHaveText(['other']);
+  // A checkbox's chip uses its field name, not the whole label sentence.
+  await expect(page.locator('[data-step="2"] [data-step-summary] .form-step-summary-item')).toHaveText(['Second opinion', 'Other']);
   expect(errors).toEqual([]);
 });
 
@@ -207,12 +215,12 @@ test('step 2 repeats the choices made in step 1 and follows changes', async ({ p
   await page.getByLabel('Other', { exact: true }).check();
   await page.getByRole('button', { name: 'Next', exact: true }).click();
   await expect(page.locator('[data-step="2"] .form-step-summary-label')).toHaveText('Your selections');
-  await expect(items).toHaveText(['TRT', 'other']);
+  await expect(items).toHaveText(['TRT', 'Other']);
   await page.locator('[data-step="2"]').getByRole('button', { name: 'Back', exact: true }).click();
   await page.getByLabel('TRT', { exact: true }).uncheck();
   await page.getByLabel('Peptide', { exact: true }).check();
   await page.getByRole('button', { name: 'Next', exact: true }).click();
-  await expect(items).toHaveText(['Peptide', 'other']);
+  await expect(items).toHaveText(['Peptide', 'Other']);
   await expect(page.locator('[data-step-summary]')).toHaveCount(1);
   expect(errors).toEqual([]);
 });

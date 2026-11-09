@@ -67,8 +67,11 @@ export const FormSteps = (function () {
     // Later panes repeat what was chosen earlier, so the visitor keeps the
     // context. Webflow can place [data-step-summary] in a pane; otherwise it
     // goes after the pane header.
+    // A checkbox's Webflow field name is its short answer ("Second
+    // opinion"); the label can be a whole sentence.
     function choiceText(input) {
       if (input.type === "radio" && input.value && input.value !== "on") return input.value;
+      if (input.type === "checkbox" && input.dataset.name) return input.dataset.name;
       var field = input.closest("label");
       var text = field && field.querySelector(".form-check-label, .w-form-label");
       return (text || field || input).textContent.replace(/\s+/g, " ").trim();

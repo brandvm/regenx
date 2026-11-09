@@ -25,6 +25,15 @@ harvested across all client repos to improve `brandvm/wf-template`.
 
 ## This project
 
+### 2026-11-09 · MCP: a checkbox can't be swapped in for a radio cleanly
+- Area: mcp
+- Scope: template-candidate
+- Symptom: Turning the Contact "Your situation" radios into checkboxes: `data_element_builder` › FormCheckboxInput makes a whole field (wrapper, input, label "Checkbox"), and `remove_element` on that placeholder FormInlineLabel fails with OPERATION_FAILED ("internal error", also on retry). The checkbox has no Style (Default/Custom) setting either, so it publishes as a native checkbox without the `w-checkbox-input--inputType-custom` box.
+- Cause: The API won't delete a form field's own label, and Checkbox Style isn't in the API (same as radios, 2026-11-06 entry).
+- Fix: `move_element` the old radio's label (keeps its bold text) after the new input, `move_element` the placeholder label into the old radio wrapper, then remove that wrapper; the placeholder goes with it. Set Style → Custom by hand in the Designer on each new checkbox.
+- Status: documented
+- Found by: claude
+
 ### 2026-11-09 · Nav menus: two open at once; panels clipped at 992–1200px
 - Area: js
 - Scope: template-candidate

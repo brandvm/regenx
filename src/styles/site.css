@@ -664,14 +664,6 @@ a {
   background-repeat: no-repeat;
 }
 
-#wf-form-Consultation-Form [data-step="1"] input[type="radio"] {
-  border-radius: 50%;
-}
-
-#wf-form-Consultation-Form [data-step="1"] input[type="radio"]:checked {
-  background-image: radial-gradient(circle, #000 0 45%, transparent 49%);
-}
-
 /* repo-css: designer-cant — :has(> input:checked) selection state. Each
    option is a bordered row; the selected row and its control turn black.
    Replaces the yellow ring on the icon (off-brand, per review). */
