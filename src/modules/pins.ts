@@ -17,10 +17,10 @@
 // Photos are often cropped by object-fit: cover (or letterboxed by contain),
 // so anchors are measured on the part of the photo that is drawn, not on the
 // box. One Figma px is --pin-u; pins.css sizes everything from it, so a pin
-// keeps its spot at every width. If a label would still run past the box
-// (the minimum text size kicks in on small screens), it flips to the other
-// side of its dot, and any text still past the edge is pushed back inside;
-// an item whose anchor is cropped away is hidden.
+// keeps its spot at every width and the layout scales like the photo. As a
+// safety net, a label that would run past the box flips to the other side
+// of its dot, and any text still past the edge is pushed back inside; an
+// item whose anchor is cropped away is hidden.
 
 const MEDIA = '[data-pin-media]';
 const ITEM = '[data-x][data-y]';

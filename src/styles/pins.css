@@ -6,7 +6,9 @@
    drawn part of the photo and sets --pin-u (one Figma px at the current
    size); data-side-now is the side after the edge check, data-pin-out marks
    an anchor cropped away. Sizes are computed from --pin-u so the pins scale
-   with the photo, which the Designer can't express. */
+   with the photo, which the Designer can't express. There is no minimum
+   text size: on small screens the pins shrink with the photo, like a
+   scaled-down copy of the desktop layout (user 2026-11-09). */
 [data-pin-media] {
   --pin-u: 1px;
   --pin-fs: 14;
@@ -16,7 +18,7 @@
 [data-pin-media] :is(.rx-pin, .rx-stat, .rx-badge, .rx-tag, .rx-tag-dots, .rx-note, .rx-line) {
   position: absolute;
   z-index: 1;
-  font-size: max(9px, calc(var(--pin-u) * var(--pin-fs)));
+  font-size: calc(var(--pin-u) * var(--pin-fs));
   line-height: 1.2;
   color: #fff;
   white-space: nowrap;
@@ -41,8 +43,8 @@
   border-radius: calc(1em * 5.2 / 14);
   background: radial-gradient(circle at 75% 15%, rgb(255 255 255 / 20%), rgb(255 255 255 / 1%) 70%);
   box-shadow: inset .1em .15em .45em rgb(255 255 255 / 45%);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(calc(var(--pin-u) * 14));
+  -webkit-backdrop-filter: blur(calc(var(--pin-u) * 14));
 }
 
 [data-pin-media] .rx-pin-dot::after {
@@ -67,7 +69,7 @@
   top: 50%;
   left: calc(100% + .45em);
   transform: translateY(-50%);
-  text-shadow: 0 1px 6px rgb(0 0 0 / 35%);
+  text-shadow: 0 .07em .43em rgb(0 0 0 / 35%);
 }
 
 [data-pin-media] .rx-pin[data-side-now="left"] .rx-pin-label,
@@ -89,7 +91,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  text-shadow: 0 1px 6px rgb(0 0 0 / 35%);
+  text-shadow: 0 .07em .43em rgb(0 0 0 / 35%);
 }
 
 [data-pin-media] .rx-stat[data-align="end"] .rx-stat-text {
@@ -137,8 +139,8 @@
   border-radius: calc(1em * 11 / 14);
   background: rgb(255 255 255 / 10%);
   background-image: linear-gradient(rgb(0 0 0 / 40%), rgb(0 0 0 / 40%));
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
+  backdrop-filter: blur(calc(var(--pin-u) * 40));
+  -webkit-backdrop-filter: blur(calc(var(--pin-u) * 40));
 }
 
 [data-pin-media] .rx-badge .rx-pin-dot {
@@ -155,7 +157,7 @@
    (three in a triangle, or four with .is-four), each anchored at its
    top-left. */
 [data-pin-media] .rx-tag {
-  text-shadow: 0 1px 6px rgb(0 0 0 / 35%);
+  text-shadow: 0 .07em .43em rgb(0 0 0 / 35%);
 }
 
 [data-pin-media] .rx-tag-dots {
@@ -181,7 +183,7 @@
 /* Note with a leader line (Home peptide card 2): a bold title over a value;
    the line (data-w long) ends in a dot at its start or end (data-dot). */
 [data-pin-media] .rx-note {
-  text-shadow: 0 1px 6px rgb(0 0 0 / 35%);
+  text-shadow: 0 .07em .43em rgb(0 0 0 / 35%);
 }
 
 [data-pin-media] .rx-note-title {
