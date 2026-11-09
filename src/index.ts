@@ -27,6 +27,7 @@ import { initProcessScroll } from './modules/process-scroll';
 import { initInputModality } from './modules/input-modality';
 import { initPins } from './modules/pins';
 import { initLabWidget } from './modules/lab-widget';
+import { initTocFollow } from './modules/toc-follow';
 
 // Each module runs in isolation: one that throws is logged and skipped,
 // and every module after it still initializes.
@@ -95,6 +96,8 @@ async function boot() {
     await run('back-to-top', initBackToTop);
     // FAQPage JSON-LD from the FAQ accordions (/faqs/*, service FAQ sections).
     await run('faq-schema', initFaqSchema);
+    // Article TOC: keep the current section's link in view in its box.
+    await run('toc-follow', initTocFollow);
   } finally {
     document.documentElement.classList.remove('is-loading');
     document.documentElement.classList.add('rgx-ready');

@@ -25,6 +25,15 @@ harvested across all client repos to improve `brandvm/wf-template`.
 
 ## This project
 
+### 2026-11-09 · Finsweet TOC highlights a link its box never scrolls to
+- Area: js
+- Scope: template-candidate
+- Symptom: On long articles the "In this Article" box (max-height, overflow auto) stayed at the top; past the first screen of sections the highlighted link sat below the visible part of the box.
+- Cause: Finsweet `fs-toc` only moves `w--current` between links; it never scrolls the box that holds them. Also: in Claude's hidden browser pane Finsweet sets no `w--current` at all (its observers pause), so test with the pane visible or toggle the class by hand.
+- Fix: `toc-follow.ts` watches the TOC table for `w--current` and scrolls the nearest scrolling ancestor so that link is centred.
+- Status: fixed (uncommitted, 2026-11-09)
+- Found by: human
+
 ### 2026-11-09 · MCP: a checkbox can't be swapped in for a radio cleanly
 - Area: mcp
 - Scope: template-candidate
