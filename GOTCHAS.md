@@ -421,9 +421,9 @@ harvested across all client repos to improve `brandvm/wf-template`.
   which binds them again and resets the open panels' IX2 styles.
 - Fix: `accordions.ts` keeps Webflow in charge of clicks, keys, IX2 and
   `aria-expanded`, and only unbinds those three closers for `.acc` (nav
-  dropdowns untouched). It opens the first visible item per group through
-  Webflow's own toggle handler, and repeats both after every re-run of the
-  dropdown module's `ready`.
+  dropdowns untouched), and repeats that after every re-run of the dropdown
+  module's `ready`. Until 2026-11-10 it also opened the first visible item
+  per group; since then every accordion starts closed (user).
 - Status: harvested into wf-template 0.9.0; fixed (acc-first-open)
 - Found by: claude
 

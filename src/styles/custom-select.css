@@ -1,7 +1,11 @@
 /* Custom select (custom-select.ts): styled arrow and options list for
-   form selects. The combobox and list are built by JS; the box reuses the
-   select's Webflow classes (form-pane-text-field), so border, radius,
-   height, type and the focus border come from the Designer. */
+   form selects. The box reuses the select's Webflow classes
+   (form-pane-text-field), so its border, radius, height, type and focus
+   border come from the Designer.
+   repo-css: js-state — the combobox, list and their is-open / is-up /
+   is-active / aria-selected states are built and toggled by custom-select.ts;
+   values copy the Designer's (white, 10% black border, radius 12/8,
+   #f7f7f7 active row) as literals, not Webflow variable names (AGENTS.md). */
 .rx-select {
   position: relative;
   width: 100%;
@@ -26,7 +30,7 @@
   -webkit-tap-highlight-color: transparent;
 }
 .rx-select.is-open .rx-select-button {
-  border-color: var(--_colors---utility--u-muted-32);
+  border-color: color-mix(in srgb, currentColor 32%, transparent);
 }
 .rx-select-button[aria-disabled] {
   cursor: not-allowed;
@@ -38,13 +42,13 @@
   text-overflow: ellipsis;
 }
 .rx-select-value.is-placeholder {
-  color: var(--_colors---utility--u-muted-48);
+  color: color-mix(in srgb, currentColor 48%, transparent);
 }
 .rx-select-arrow {
   flex: none;
   font-size: 1.25em;
   line-height: 1;
-  color: var(--_colors---utility--u-muted-56);
+  color: color-mix(in srgb, currentColor 56%, transparent);
   transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .rx-select.is-open .rx-select-arrow {
@@ -63,13 +67,13 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   list-style: none;
-  font-size: var(--_typography-role---size--body-sm);
-  letter-spacing: var(--_typography-role---letter-spacing--body);
-  color: var(--_colors---text-color--dark);
-  background-color: var(--_colors---background--white);
-  border: 1px solid var(--_colors---border--strong);
-  border-radius: var(--_spacing---radius--12);
-  box-shadow: 0 0.5em 1.5em 0 var(--_colors---alpha--black-10);
+  font-size: 0.875em;
+  letter-spacing: normal;
+  color: #000;
+  background-color: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0.75em;
+  box-shadow: 0 0.5em 1.5em 0 rgba(0, 0, 0, 0.1);
   opacity: 0;
   visibility: hidden;
   transform: translateY(-0.25em);
@@ -94,11 +98,11 @@
   justify-content: space-between;
   gap: 0.5em;
   padding: 0.625em 0.75em;
-  border-radius: var(--_spacing---radius--8);
+  border-radius: 0.5em;
   cursor: pointer;
 }
 .rx-select-option.is-active {
-  background-color: var(--_colors---background--light);
+  background-color: #f7f7f7;
 }
 .rx-select-check {
   flex: none;

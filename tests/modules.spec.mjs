@@ -261,15 +261,15 @@ const accordions = `
   window.accState = (id) => ({ open: store.get(document.getElementById(id)).open, handlers: Object.keys(handlers.get(document.getElementById(id)) || {}) });
 </script>`;
 
-test('accordions open the first visible item of each group and stop closing each other', async ({ page }) => {
+test('accordions all start closed and stop closing each other', async ({ page }) => {
   const errors = await setup(page, accordions);
   const state = (id) => page.evaluate((id) => window.accState(id), id);
+  for (const id of ['faq1', 'faq2', 'faq3', 'sd1', 'sd2', 'hidden1']) expect((await state(id)).open).toBe(false);
+  await expect(page.locator('#faq1 > .w-dropdown-toggle')).toHaveAttribute('aria-expanded', 'false');
+  // Opening two keeps both open.
+  await page.evaluate(() => ['faq1', 'faq2'].forEach((id) => window.jQuery(document.querySelector(`#${id} > .w-dropdown-toggle`)).triggerHandler('mouseup.w-dropdown')));
   expect((await state('faq1')).open).toBe(true);
-  expect((await state('faq2')).open).toBe(false);
-  expect((await state('sd1')).open).toBe(true);
-  expect((await state('sd2')).open).toBe(false);
-  expect((await state('hidden1')).open).toBe(false);
-  await expect(page.locator('#faq1 > .w-dropdown-toggle')).toHaveAttribute('aria-expanded', 'true');
+  expect((await state('faq2')).open).toBe(true);
   // Webflow's own ways of closing a dropdown from outside are gone.
   expect((await state('faq2')).handlers).toEqual([]);
   expect(await page.evaluate(() => { window.jQuery.data(document.getElementById('faq1')).mouseUpOutside(); return window.log; })).toEqual([]);

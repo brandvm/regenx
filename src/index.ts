@@ -30,6 +30,7 @@ import { initLabWidget } from './modules/lab-widget';
 import { initTocFollow } from './modules/toc-follow';
 import { initDateSelect } from './modules/date-select';
 import { initCustomSelect } from './modules/custom-select';
+import { initNavSearch } from './modules/nav-search';
 
 // Each module runs in isolation: one that throws is logged and skipped,
 // and every module after it still initializes.
@@ -60,7 +61,7 @@ async function boot() {
     await run('wave-grid', initWaveGrid);
     // Former Webflow interactions (prototype/plan/interactions.md). Each binds
     // only to its data-* hooks. dropdown-motion runs before main, whose
-    // accordions.ts opens the first items, so that opening animates.
+    // accordions.ts keeps several accordions open at once.
     await run('dropdown-motion', initDropdownMotion);
     await run('menu-motion', initMenuMotion);
     // Nav menus (custom element, one open at a time: hover on desktop, tap
@@ -68,6 +69,8 @@ async function boot() {
     // main sets the scrolled bar).
     await run('nav-drop', initNavDrop);
     await run('nav-autohide', initNavAutohide);
+    // The nav search icon opens a search field under the bar.
+    await run('nav-search', initNavSearch);
     await run('main', initMain);
     await run('hover-roll', initHoverRoll);
     await run('tooltip-hover', initTooltipHover);

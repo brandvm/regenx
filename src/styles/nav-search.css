@@ -1,0 +1,85 @@
+/* Nav search panel (nav-search.ts): opens under the nav bar from the
+   search icon.
+   repo-css: js-state — the panel and its [hidden] state are built and
+   toggled by nav-search.ts; colours and radii copy the Designer's values
+   as literals, not Webflow variable names (AGENTS.md). @keyframes is
+   designer-cant. */
+.rx-nav-search {
+  position: fixed;
+  z-index: 1000;
+  left: 50%;
+  width: min(36rem, calc(100% - 2rem));
+  transform: translateX(-50%);
+  animation: rx-nav-search-in 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.rx-nav-search[hidden] {
+  display: none;
+}
+.rx-nav-search-form {
+  display: flex;
+  align-items: center;
+  gap: 0.625em;
+  margin: 0;
+  padding: 0.375em 0.375em 0.375em 1em;
+  font-size: 0.875em;
+  color: #000;
+  background-color: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 6.25em;
+  box-shadow: 0 0.5em 1.5em 0 rgba(0, 0, 0, 0.1);
+}
+.rx-nav-search-icon {
+  flex: none;
+  font-size: 1.25em;
+  line-height: 1;
+  color: color-mix(in srgb, currentColor 56%, transparent);
+}
+.rx-nav-search-input {
+  flex: 1;
+  min-width: 0;
+  height: 2.5em;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  /* 16px minimum so iOS doesn't zoom the page on focus. */
+  font-size: max(1em, 16px);
+  color: inherit;
+  background: none;
+  border: 0;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.rx-nav-search-input::placeholder {
+  color: color-mix(in srgb, currentColor 48%, transparent);
+}
+.rx-nav-search-input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+.rx-nav-search-close {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2.5em;
+  height: 2.5em;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+  background-color: #f7f7f7;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.rx-nav-search-close i {
+  font-size: 1.125em;
+  line-height: 1;
+}
+@keyframes rx-nav-search-in {
+  from { opacity: 0; transform: translate(-50%, -0.375em); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rx-nav-search {
+    animation: none;
+  }
+}

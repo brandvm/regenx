@@ -10,8 +10,7 @@ import { gsap, EASE_IX2 } from './animation';
 // ([data-acc-icon="add"]) blurs out and the "−" ([data-acc-icon="subtract"])
 // blurs in; closing reverses.
 //
-// Runs before main.js's accordions.ts opens the first item of each group,
-// so that opening animates, as with IX2.
+// Runs before main.js's accordions.ts, so every open animates, as with IX2.
 // The IX2 version also froze each list's width in px when it opened; the
 // lists keep their Designer width here, so a resize can't leave them wrong.
 
