@@ -28,6 +28,7 @@ import { initInputModality } from './modules/input-modality';
 import { initPins } from './modules/pins';
 import { initLabWidget } from './modules/lab-widget';
 import { initTocFollow } from './modules/toc-follow';
+import { initDateSelect } from './modules/date-select';
 
 // Each module runs in isolation: one that throws is logged and skipped,
 // and every module after it still initializes.
@@ -48,6 +49,9 @@ async function boot() {
     // Focus rings for the keyboard only: before any module that moves focus.
     await run('input-modality', initInputModality);
     await run('unique-form-ids', initUniqueFormIds);
+    // Date fields with data-date-select → Month / Day / Year dropdowns.
+    // Before main, so FormSteps sees the selects on its first sync.
+    await run('date-select', initDateSelect);
     await run('animation', initAnimation);
     await run('smooth-scroll', initSmoothScroll);
     await run('wave-grid', initWaveGrid);

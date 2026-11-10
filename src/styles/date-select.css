@@ -1,0 +1,12 @@
+/* Date of Birth dropdowns (date-select.ts). The selects are built by JS,
+   so their layout can't live in the Designer; they reuse the field's own
+   classes (form-pane-text-field w-select), so they match the State select. */
+.rx-date-select {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: 0.5rem;
+  width: 100%; /* .form-pane-field is a flex column with align-items: flex-start */
+}
+.rx-date-select-field {
+  min-width: 0;
+}

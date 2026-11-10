@@ -18,6 +18,7 @@
 @import "./styles/focus.css";
 @import "./styles/pins.css";
 @import "./styles/lab-widget.css";
+@import "./styles/date-select.css";
 
 /* Icons. An @import has to come before every rule.
    repo-css: third-party — Phosphor icon font; `pnpm phosphor` writes the
