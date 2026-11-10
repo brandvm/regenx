@@ -35,9 +35,10 @@ const collect = page => page.evaluate(() => {
 
 test('Date of Birth becomes Month / Day / Year and submits one MM/DD/YYYY field', async ({ page }) => {
   const errors = await setup(page);
-  const month = page.getByRole('combobox', { name: 'Month' });
-  const day = page.getByRole('combobox', { name: 'Day' });
-  const year = page.getByRole('combobox', { name: 'Year' });
+  // The native selects (custom-select.ts draws its own box over them).
+  const month = page.locator('#Date-of-Birth-Month');
+  const day = page.locator('#Date-of-Birth-Day');
+  const year = page.locator('#Date-of-Birth-Year');
   await expect(page.locator('#Date-of-Birth')).toHaveAttribute('type', 'hidden');
   await expect(page.getByRole('group', { name: 'Date of Birth' })).toBeVisible();
   const width = await page.locator('.rx-date-select').evaluate(el => el.getBoundingClientRect().width);

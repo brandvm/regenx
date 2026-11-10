@@ -29,6 +29,7 @@ import { initPins } from './modules/pins';
 import { initLabWidget } from './modules/lab-widget';
 import { initTocFollow } from './modules/toc-follow';
 import { initDateSelect } from './modules/date-select';
+import { initCustomSelect } from './modules/custom-select';
 
 // Each module runs in isolation: one that throws is logged and skipped,
 // and every module after it still initializes.
@@ -52,6 +53,8 @@ async function boot() {
     // Date fields with data-date-select → Month / Day / Year dropdowns.
     // Before main, so FormSteps sees the selects on its first sync.
     await run('date-select', initDateSelect);
+    // Form selects (State, Month / Day / Year): styled box and options list.
+    await run('custom-select', initCustomSelect);
     await run('animation', initAnimation);
     await run('smooth-scroll', initSmoothScroll);
     await run('wave-grid', initWaveGrid);
