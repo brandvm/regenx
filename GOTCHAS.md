@@ -25,6 +25,42 @@ harvested across all client repos to improve `brandvm/wf-template`.
 
 ## This project
 
+### 2026-11-09 · Renaming a slug breaks typed links
+- Area: designer
+- Scope: template-candidate
+- Symptom: after the product and page slug renames, 13 nav, footer and Home links 404'd.
+- Cause: those links were typed URLs, not page/CMS links. For button component links the Webflow API only accepts typed URLs.
+- Fix: before renaming slugs, list typed links to the old paths; set them as page links in the Designer (not via the API).
+- Status: fixed for the 13 links
+- Found by: claude
+
+### 2026-11-06 · GitHub Pages deploy stalls
+- Area: loader-release-ci
+- Scope: template-candidate
+- Symptom: a staging run sat in `deployment_queued`, was cancelled twice on GitHub's side, and the test-browser install hung 9 minutes; staging served the old bundle.
+- Cause: GitHub Pages outage; staging has no release to fall back to while `RELEASE = null`.
+- Fix: emergency only: in the Head code set `var STAG = "https://cdn.jsdelivr.net/gh/brandvm/regenx@<full-sha>/dist/"` (keep `loader.html` matching), then revert. Don't publish Webflow after removing old interactions until the new bundle is live. Long term: cut a release (MANUAL-TODO AC).
+- Status: open until a release exists
+- Found by: claude
+
+### 2026-11-06 · `auto: Mac` commits in history
+- Area: repo
+- Scope: project
+- Symptom: commits named `auto: Mac <date>` that commit the whole working tree.
+- Cause: an auto-sync tool on the Mac (bench sync); looked inactive on 2026-11-06.
+- Fix: check `git log` for new `auto:` commits before committing; stop the tool if it's back.
+- Status: watch
+- Found by: claude
+
+### 2026-11-08 · Uploaded images get no smaller variants
+- Area: mcp
+- Scope: template-candidate
+- Symptom: "TRT Accordion 1 - 01 v2.webp" (1932×1908) has no responsive srcset, so phones load the full file; the pins photos uploaded the same way probably do too.
+- Cause: assets uploaded via the API/MCP skip Webflow's responsive image generation.
+- Fix: upload at display size, or re-upload in the Designer so Webflow generates variants; check srcset on staging.
+- Status: open
+- Found by: claude
+
 ### 2026-11-09 · Finsweet TOC highlights a link its box never scrolls to
 - Area: js
 - Scope: template-candidate

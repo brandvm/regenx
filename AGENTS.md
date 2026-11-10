@@ -14,10 +14,11 @@ source of agent rules — edit this file, never a copy of it.
   Actions, enabled 2026-09-15)
 - Production bundles: `https://cdn.jsdelivr.net/gh/brandvm/regenx@<RELEASE>/dist/`
   once `RELEASE` is set
-- Production domain: unknown — fill in (production is intentionally
-  unconfigured during development)
+- Production domain: `https://www.regenxhealth.com` (www, decided 2026-11-09 for canonicals; the old Wix site is still live there, and
+  production hosting stays unconfigured during development)
 - Production release: none yet (`RELEASE = null` in the HEAD snippet; no tags)
-- Webflow MCP server: `webflow-regen-x` (`.mcp.json`, `https://mcp.webflow.com/mcp`)
+- Webflow MCP server: `webflow-regen-x` (`.mcp.json`, `https://mcp.webflow.com/mcp`). Use this one: the Brand Vision workspace connector can't reach RegenX.
+- Designer with the MCP companion app open: `https://regen-x.design.webflow.com?app=dc8209c65e3ec02254d15275ca056539c89f6d15741893a0adf29ad6f381eb99`
 - Origin: CodeSandbox `regenx-main.css`, `regenx-wave.js`, `regenx-main.js`
   plus global head/footer code, migrated 2026-09-15 (bff85c4).
 

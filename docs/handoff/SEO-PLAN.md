@@ -8,7 +8,46 @@ kept in this repo as the source of truth.
 
 ## Status
 
-<Date> — <what is done, what is next, what waits on the client.>
+2026-11-09 — URL structure, product slugs and H1s done and published; noindex
+for article-less products, H-tag fixes and the redirect review are next.
+
+- **Canonical domain:** `https://www.regenxhealth.com` (www).
+- **URL structure (final, matches the live Wix site):** products at
+  `/treatments/<slug>` with the `/treatments` hub (Webflow allowed the shared
+  slug); articles at `/post/<slug>`, same as Wix, so articles need no
+  redirects. Other staging renames: `/peptide-therapy` → `/peptides`,
+  `/lab-panel` → `/lab-tests`, `/medical-catalog` → `/treatments`.
+- **14 product slugs** renamed to the SEO doc's slugs and published (e.g.
+  `nad-therapy`, `ghk-cu-copper-peptide`, `mk-677-ibutamoren`,
+  `bpc-157-tb-500`, `anavar-oxandrolone`, `testosterone-cream-gel`). Old
+  slugs were staging-only: no redirects.
+- **Products "Page H1" field:** added and filled for all 68 products (22 use
+  the SEO doc's wording), bound on the template, published. Still open: the
+  product page FAQ heading ("Frequently Asked Questions About …") is built
+  from Name, not Page H1.
+- **Open: noindex for the 43 products with an empty Product Article** (they
+  show another product's article: duplicate content). Plan: a conditional
+  robots noindex on the product template when Product Article is empty, plus
+  sitemap exclusion. Nothing set in Webflow yet (MANUAL-TODO AD).
+- **Open: H-tag fixes** from `../seo/h-tag-check.csv` (workspace): 26 plain
+  "Possible Side Effects" / "Important Considerations" lines in article rich
+  text → H3; missing sections on TRT, Peptides, Enclomiphene and About;
+  Testosterone Injections has two H2s set as H3; a zero-width character in
+  the Home H1 and one TRT H2.
+- **Open: redirects.** The full Wix → Webflow map is
+  `../seo/regenx-url-map-full.xlsx`: 25 rows "Yes" (moved pages, Wix typo
+  `/telemedine-consent`, blog categories → `/scientific-articles`,
+  Wayback/WordPress URLs), 27 rows "Review" (ED meds, HGH, weight loss, PE,
+  shockwave, hidden `/viagra-sildenafil`). See the workspace
+  `docs/REDIRECTS.md`.
+- **Working docs:** URL map Sheet
+  https://docs.google.com/spreadsheets/d/1T0Szieyes9zx8pH1bZWvAa4CojFmf5bb8v8blP7mcuU/edit
+  (158 rows, staging + canonical, plus a "Noindex (no article)" tab; owned by
+  the Chrome account asheem.shrestha01@gmail.com, ownership transfer open) and
+  the client's SEO Assets Doc
+  https://docs.google.com/document/d/116DjJ_kioxjRAr2VJdYfQZJUaZDxVdTe7QT-xFFZQlU/edit
+  (tabs: Slugs, H Tags, Internal Linking Strategy). Both in the Drive folder
+  "REGENX Health".
 
 ## What staging outputs today
 
@@ -79,5 +118,5 @@ Rules that cost time before:
 
 - [ ] The official name, address, phone, email and hours for the schema.
 - [ ] Social profile URLs (`sameAs`) and the X handle, if any.
-- [ ] The production domain, www or apex, for canonicals.
+- [x] The production domain, www or apex, for canonicals: www (2026-11-09).
 - [ ] Approval of the default share image and the drafted meta copy.
