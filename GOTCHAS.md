@@ -25,6 +25,15 @@ harvested across all client repos to improve `brandvm/wf-template`.
 
 ## This project
 
+### 2026-11-10 · Catalog category lists filter on Extra Categories, not Category
+- Area: cms
+- Scope: project
+- Symptom: new products, published with their main Category set to ED Medications / Hair Regrowth Solutions, didn't appear in those sections of /treatments, even after a site publish.
+- Cause: the /treatments section lists filter on `Extra Categories contains <category>` (plus `Article Only is off`). That's how a product shows in several sections, e.g. Finasteride (Category Testosterone) under Hair Regrowth.
+- Fix: when adding a product, put its own category in Extra Categories too (and any other section it belongs to), then publish the items and the site.
+- Status: fixed for the 13 products added 2026-11-10
+- Found by: claude
+
 ### 2026-11-09 · Renaming a slug breaks typed links
 - Area: designer
 - Scope: template-candidate
