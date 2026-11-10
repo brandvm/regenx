@@ -31,6 +31,7 @@ import { initTocFollow } from './modules/toc-follow';
 import { initDateSelect } from './modules/date-select';
 import { initCustomSelect } from './modules/custom-select';
 import { initNavSearch } from './modules/nav-search';
+import { initEmptySections } from './modules/empty-sections';
 
 // Each module runs in isolation: one that throws is logged and skipped,
 // and every module after it still initializes.
@@ -51,6 +52,8 @@ async function boot() {
     // Focus rings for the keyboard only: before any module that moves focus.
     await run('input-modality', initInputModality);
     await run('unique-form-ids', initUniqueFormIds);
+    // Sections whose Collection List is empty disappear (no "No items found.").
+    await run('empty-sections', initEmptySections);
     // Date fields with data-date-select → Month / Day / Year dropdowns.
     // Before main, so FormSteps sees the selects on its first sync.
     await run('date-select', initDateSelect);

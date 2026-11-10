@@ -2,9 +2,10 @@
 // marked active (black, per Figma "1V Filters"). The links are Webflow
 // section links in .services-main-nav-list.is-catalog; Webflow gives
 // same-page section links no current state of its own.
-// A block marked [data-catalog-hide-empty] (New Products) is hidden, with its
-// sidebar link, while its Collection List has no items: Webflow can't hide an
-// element on an empty list.
+// A category block (the block that holds a sidebar link's anchor, or one
+// marked [data-catalog-hide-empty]) is hidden, with its sidebar link, while
+// its Collection List has no items: Webflow can't hide an element on an
+// empty list, and shows "No items found." instead (user, 2026-11-10).
 import { revealTab, sectionInView } from './tab-spy';
 
 const ACTIVE = 'is-active';
@@ -13,7 +14,12 @@ export function initCatalogNav() {
   const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('.services-main-nav-list.is-catalog a[href^="#"]'));
   const targetOf = (link: HTMLAnchorElement) => document.getElementById(decodeURIComponent(link.hash.slice(1)));
 
-  document.querySelectorAll<HTMLElement>('[data-catalog-hide-empty]').forEach((block) => {
+  const blocks = new Set<HTMLElement>(document.querySelectorAll<HTMLElement>('[data-catalog-hide-empty]'));
+  links.forEach((link) => {
+    const block = targetOf(link)?.parentElement;
+    if (block?.querySelector('.w-dyn-list')) blocks.add(block);
+  });
+  blocks.forEach((block) => {
     if (block.querySelector('.w-dyn-item')) return;
     block.style.display = 'none';
     links.forEach((link) => {

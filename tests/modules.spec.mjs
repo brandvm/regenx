@@ -128,28 +128,69 @@ test('catalog sidebar marks the category in view as active', async ({ page }) =>
   expect(errors).toEqual([]);
 });
 
-// New Products (empty Collection List) comes first in the sidebar and is
-// hidden, with its link; a later empty list without the marker stays.
+// Category blocks with an empty Collection List are hidden with their
+// sidebar links: New Products (marked) and any other block (ED Medications).
 const catalogWithNew = `<style>section{height:1200px}</style>
 <div class="services-main-nav-list is-catalog" style="position:fixed;top:0;left:0">
   <a class="services-main-nav-link" href="#New">New Products</a>
   <a class="services-main-nav-link" href="#Most-Prescribed">Most Prescribed</a>
   <a class="services-main-nav-link" href="#ED-Medications">ED Medications</a>
+  <a class="services-main-nav-link" href="#Hair">Hair</a>
 </div>
 <section data-catalog-hide-empty><div id="New"></div><div class="w-dyn-list"><div class="w-dyn-empty">No items found.</div></div></section>
 <section data-catalog-hide-empty><div id="Most-Prescribed"></div><div class="w-dyn-list"><div class="w-dyn-items"><div class="w-dyn-item">MP</div></div></div></section>
-<section><div id="ED-Medications"></div><div class="w-dyn-list"><div class="w-dyn-empty">No items found.</div></div></section>`;
+<section><div id="ED-Medications"></div><div class="w-dyn-list"><div class="w-dyn-empty">No items found.</div></div></section>
+<section><div id="Hair"></div><div class="w-dyn-list"><div class="w-dyn-items"><div class="w-dyn-item">H</div></div></div></section>`;
 
-test('catalog sidebar hides an empty New Products block and its link', async ({ page }) => {
+test('catalog hides every empty category block and its sidebar link', async ({ page }) => {
   const errors = await setup(page, catalogWithNew);
   const links = page.locator('.services-main-nav-link');
   await expect(page.locator('section').nth(0)).toBeHidden();
   await expect(links.nth(0)).toBeHidden();
-  await expect(page.locator('section').nth(2)).toBeVisible();
+  await expect(page.locator('section').nth(2)).toBeHidden();
+  await expect(links.nth(2)).toBeHidden();
+  await expect(page.getByText('No items found.')).toHaveCount(2);
+  await expect(page.getByText('No items found.').first()).toBeHidden();
   await expect(links.nth(1)).toHaveClass(/is-active/);
   await page.evaluate(() => window.scrollTo(0, 1300));
-  await expect(links.nth(2)).toHaveClass(/is-active/);
-  await expect(links.nth(0)).not.toHaveClass(/is-active/);
+  await expect(links.nth(3)).toHaveClass(/is-active/);
+  await expect(links.nth(1)).not.toHaveClass(/is-active/);
+  expect(errors).toEqual([]);
+});
+
+// A product page with no FAQs, related insights or other medications, as
+// Webflow publishes the empty lists, plus a card whose strengths list is empty.
+const emptyProduct = `
+<section class="section" id="body">
+  <div class="rte">Article</div>
+  <div class="line" id="faq-line"></div>
+  <div class="product-faqs"><h2>Frequently Asked Questions About X</h2>
+    <div class="w-dyn-list"><div class="w-dyn-empty">No items found.</div></div></div>
+</section>
+<section class="section" id="related"><h2>Related Insights</h2>
+  <div class="articles-list-w w-dyn-list"><div class="w-dyn-empty">No items found.</div></div></section>
+<section class="section" id="other"><div class="product-slider-w" id="slider"><h2>Other Medications</h2>
+  <div class="w-dyn-list"><div class="w-dyn-empty">No items found.</div></div></div></section>
+<section class="section" id="cards"><h2>Static heading</h2>
+  <div class="w-dyn-list" id="cards-list"><div class="w-dyn-items"><div class="w-dyn-item">Card
+    <div class="w-dyn-list" id="strengths"><div class="w-dyn-empty">No items found.</div></div></div></div></div>
+  <div class="w-dyn-list" id="loose"><div class="w-dyn-empty">No items found.</div></div>
+</section>`;
+
+test('empty product sections disappear instead of showing No items found', async ({ page }) => {
+  const errors = await setup(page, emptyProduct);
+  await expect(page.locator('.product-faqs')).toBeHidden();
+  await expect(page.locator('#faq-line')).toBeHidden();
+  await expect(page.locator('#body .rte')).toBeVisible();
+  await expect(page.locator('#related')).toBeHidden();
+  await expect(page.locator('#slider')).toBeHidden();
+  await expect(page.locator('#other')).toBeHidden();
+  // A section with other content keeps it; only its empty lists go.
+  await expect(page.locator('#cards')).toBeVisible();
+  await expect(page.locator('#cards-list')).toBeVisible();
+  await expect(page.locator('#strengths')).toBeHidden();
+  await expect(page.locator('#loose')).toBeHidden();
+  for (const empty of await page.getByText('No items found.').all()) await expect(empty).toBeHidden();
   expect(errors).toEqual([]);
 });
 
