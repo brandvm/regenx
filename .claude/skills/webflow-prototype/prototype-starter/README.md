@@ -1,8 +1,9 @@
 # Prototype starter
 
 A localhost prototype that mirrors Webflow, for the prototype phase
-(`conventions.md` §13): the design is built and approved here first, then
-rebuilt in Webflow class for class.
+(`conventions.md` §13): the Figma design is built and approved here first,
+page by page from its frames (`webflow-build` › The prototype, from
+Figma), then rebuilt in Webflow class for class.
 
 It mirrors Webflow on purpose:
 - **URLs:** each page is `folder/index.html` at its Webflow URL, served
@@ -20,7 +21,8 @@ It mirrors Webflow on purpose:
 ## Start
 
 `pnpm new-project` copies this folder to `<Client>/prototype`, next to the
-repo (copy it by hand for a workspace set up without it). Then:
+repo, and so does Bench for a new site from Figma (copy it by hand for a
+workspace set up without either). Then:
 
 ```bash
 pnpm install
@@ -36,7 +38,8 @@ error instead of a silent move to the next one. Change both together.
 
 | Path | What it is |
 | --- | --- |
-| `index.html`, `<page>/index.html` | Pages at their Webflow URLs; add each to `pages` in `vite.config.js` |
+| `index.html`, `<page>/index.html` | Pages at their Webflow URLs, one per picked Figma page; add each to `pages` in `vite.config.js` |
+| `images/` | Images exported from the Figma file: photos as WebP, icons as SVG |
 | `design/style-guide/index.html` | The style guide page, **generated** by `pnpm style-guide` in the fixed layout of the `webflow-style-guide` skill: a sidebar of sections, each a list of rows |
 | `design/style-guide/items/*.html` | Specimens written by hand (buttons, form parts): one header comment per item. Components and page sections come from `<!-- sg:start … -->` blocks in the pages themselves |
 | `src/css/style-guide.css` | **Generated** with the page: the skill's Sg layout classes plus one combo per colour, radius and spacing variable |
@@ -51,6 +54,7 @@ error instead of a silent move to the next one. Change both together.
 | `.screens/` | Screenshots from `pnpm screens` and `pnpm check:states --shots`, `type-metrics.json` from `pnpm measure:type --json` (not in git) |
 | `src/css/proposed.css` | Changes to existing variables and class bindings, as P1, P2… old → new |
 | `src/css/new-classes.css` | New classes, grouped by component (more files: `new-classes-*.css`) |
+| `src/css/repo.css` | A library's own CSS (Lenis, Swiper…): moved to the repo's `src/styles.css` as is, with its `repo-css: third-party` tag; never Webflow classes |
 | `src/css/prototype.css` | Stand-ins for what Webflow ships, and the tag styles; never moved. Element rules are in `:where()`, so a site's real tag styles in `webflow.css` win |
 | `src/main.ts`, `src/modules/` | The module manifest and one file per module |
 | `CLASSES.md` | **Generated** (`pnpm classes`): every new class with its Designer name |
@@ -204,7 +208,7 @@ write both files, delete `source.json`, run `pnpm css` and
    modules and their `data-*` hooks.
 5. Build in Webflow with the webflow-build skill.
 
-Rules in the new-classes files that the Designer can't express go to the
-repo's `src/styles.css` with their `repo-css:` tag. `check:style-guide`
+Rules in the new-classes files that the Designer can't express, and
+`repo.css`, go to the repo's `src/styles.css` with their `repo-css:` tag. `check:style-guide`
 lists JS state classes too; they need a specimen on the style guide only if
 the Designer styles them.

@@ -1,6 +1,6 @@
 ---
 name: webflow-build
-description: Build a Webflow site in Webflow from an approved design (an approved localhost prototype, or a Figma link), with the Webflow MCP and this wf-template repo: variables, tag styles, classes and CMS, the repo port and loader, the style guide page, the media page, components, then pages section by section, each verified against the design at three widths, up to the build handoff. Use when starting or continuing a Webflow build (Designer through the MCP plus JS/CSS in the repo), building components or pages, comparing Webflow staging with the prototype, checking anchors, page transitions, load flicker or the published HTML, or wrapping up a build session. For project setup and the prototype, use webflow-prototype; for launch, webflow-launch; for a site that is already live, webflow-audit.
+description: Build a Webflow site in Webflow from its approved localhost prototype (built first from the Figma design, in Bench or by Claude), with the Webflow MCP and this wf-template repo: variables, tag styles, classes and CMS, the repo port and loader, the style guide page, the media page, components, then pages section by section, each verified against the prototype at four widths, up to the build handoff. Use when building prototype pages from Figma frames, starting or continuing a Webflow build (Designer through the MCP plus JS/CSS in the repo), building components or pages, comparing Webflow staging with the prototype, checking anchors, page transitions, load flicker or the published HTML, or wrapping up a build session. For project setup, the inputs and the Webflow snapshot, use webflow-prototype; for launch, webflow-launch; for a site that is already live, webflow-audit.
 ---
 
 # Webflow build: approved design → Webflow, section by section
@@ -12,16 +12,21 @@ listed.
 
 - [checklists.md](checklists.md) gates every step: the design handoff,
   the Webflow foundation, the media page, each component, each finished
-  page and the build handoff.
+  page and the build handoff. Progress on them is recorded in
+  `docs/handoff/progress.json` with `pnpm progress` (checklists.md › How
+  to record progress), which Bench's Tasks panel shows.
 - [conventions.md](conventions.md) sets the page and section structure,
   class and variable naming, and the component, CMS and style-guide
   patterns every build starts from.
 - [lessons/](lessons/README.md) holds what cost time on earlier builds, by
   area. Read the file for the area you are about to work in.
-- The `webflow-prototype` skill comes before this one: project setup, the
-  inputs, and the localhost prototype the build is compared against. With
-  a Figma-only handoff, its [figma.md](../webflow-prototype/figma.md)
-  reads the frames.
+- The prototype comes first, always: it is built from the Figma file,
+  page by page, in Bench (or by Claude in the terminal with the same
+  steps), and the client approves it before anything is built in Webflow.
+  The steps are below (The prototype, from Figma); the
+  `webflow-prototype` skill has project setup, the inputs, the snapshot
+  and the style guide, and its [figma.md](../webflow-prototype/figma.md)
+  how to read the file.
 - [rules.md](rules.md) has the rules every Webflow skill shares (no commit
   or push without an OK, Designer first, no credentials in chat, manual
   steps, lessons), the session wrap-up and how to contribute back.
@@ -54,10 +59,13 @@ Every checklist item says who does it:
    for today's area (MCP work: `lessons/mcp.md`). Never repeat a mistake
    already logged.
 2. Read the project memory: where the last session stopped, open manual
-   steps, open questions. Say in one line where things stand and what's
-   next; ask which page or section if it isn't clear.
+   steps, open questions. Run `pnpm progress show` for the stage, the
+   checklists still open and the person's own to-dos. Say in one line
+   where things stand and what's next; ask which page or section if it
+   isn't clear.
 3. Run **Before building** in `checklists.md` before the first Webflow
-   batch (the inputs and the prototype gates are `webflow-prototype`'s). Agree
+   batch; the **Prototype** stage before it is done (the inputs are
+   `webflow-prototype`'s). Agree
    any change to `conventions.md` with the designer. If an input is
    missing, ask for it; don't guess content, states or SEO fields.
 4. Webflow MCP: call `webflow_guide_tool` once, then reuse one session id
@@ -95,10 +103,76 @@ The shared rules are in [rules.md](rules.md). The build adds:
   batch that ticks the row; none may be left at the build handoff or at
   launch (search the published HTML for `data-manual-todo`).
 
+## The prototype, from Figma
+
+Every site starts from a Figma file. The prototype is built from it, page
+by page, and approved before anything is built in Webflow.
+
+**In Bench.** Add client › from a Figma design sets up the client folder,
+the repo from this template and an empty `prototype/` (a copy of
+[prototype-starter/](../webflow-prototype/prototype-starter/README.md)).
+Build the prototype from Figma groups the frames into pages; the person
+picks and orders them, each with its address. One AI job then builds them
+one page at a time: each page comes as its own message with its frames'
+node ids. Each built page keeps its Figma frame for Compare › With Figma.
+Bench looks at the file again when the client opens and hourly, and
+offers to update the pages whose frames changed: change only what changed
+in those frames, and keep edits made in the prototype since.
+
+**Not in Bench,** Claude follows the same steps in the terminal: list the
+frames, agree the pages, their order and addresses with the person, then
+build one page at a time.
+
+**One page:**
+
+1. **Its frames.** Frames with the same name across Desktop, Tablet and
+   Mobile are one page. Read each with the Figma connector
+   (`get_design_context`, `get_screenshot`, `get_variable_defs`) or the
+   Figma app's MCP server ([figma.md](../webflow-prototype/figma.md)).
+   No Tablet frame: draw Tablet between Desktop and Mobile. No Mobile
+   frame: make it work on a phone from the larger frames, and say so.
+   Frames that aren't pages (the style guide) are read for tokens, type
+   and components.
+2. **Tokens** from the file's variables and text styles, as CSS custom
+   properties: changes to the snapshot's variables and new ones in
+   `src/css/proposed.css` (old → new), named by `conventions.md` §4;
+   never in the generated `tokens.css`.
+3. **Fonts** the text styles use, in `public/fonts/` with their licence,
+   declared in `src/css/prototype.css` and preloaded in
+   `partials/head.html`.
+4. **Images** exported from the file into `prototype/images/`: photos as
+   WebP at the largest size the design uses, icons as SVG.
+5. **Only what's in the file.** A value, state, text or image the file
+   doesn't give is a question: ask before inventing it (in Bench, add it
+   with `mcp__bench__todo_add` and carry on).
+6. **Where it goes:** `prototype/<page>/index.html` at its Webflow address
+   (Home is `prototype/index.html`), added to `pages` in
+   `prototype/vite.config.js`. Nav and footer are shared partials. Change
+   only that page, plus the partials and tokens it needs. Don't commit,
+   push or publish.
+7. **Check** it beside its frames at Desktop, Tablet and Mobile, and that
+   the Figma prototype's links work (menus, tabs, forms).
+
+Then the page runs **Prototype page done** (`webflow-prototype`'s
+[checklists.md](../webflow-prototype/checklists.md)) and the person
+approves it (in Bench: right-click in Pages). The **Prototype** stage in
+[checklists.md](checklists.md) tracks it all, up to the client's approval
+in writing:
+
+- each page matches its Figma frame at Desktop, Tablet and Mobile
+  (Bench's "Matches the Figma frame" check);
+- the Figma file is linked to the client;
+- frames picked, in order, each with its page address;
+- every picked frame built as a prototype page;
+- tokens, fonts and images come from the file; nothing made up;
+- the Figma prototype's links work;
+- each page approved in the prototype;
+- the client approved the prototype in writing.
+
 ## The order of a build
 
-Structure and names follow `conventions.md`. Each step is gated in
-`checklists.md`:
+It starts once the **Prototype** stage is done. Structure and names follow
+`conventions.md`. Each step is gated in `checklists.md`:
 
 1. variables;
 2. tag styles (set once in the Designer so the MCP can reach them);
@@ -127,9 +201,9 @@ A site duplicated from the starter already has the base of steps 1 to
 
 For each section, in page order:
 
-1. **Read the design**: prototype markup, CSS and the module that animates
-   it; or the Figma frame, its states and the interaction spec. Note every
-   `data-*` hook, id and aria attribute.
+1. **Read the prototype**: its markup, CSS and the module that animates
+   it, with the page's Figma frame for states and the interaction spec.
+   Note every `data-*` hook, id and aria attribute.
 2. **Check what Webflow has**: classes (`query_styles`), components and
    their props, CMS fields, assets. Reuse before creating; name anything
    new by `conventions.md` (sections 2–4).
@@ -188,8 +262,9 @@ The scripts are in this skill's `scripts/` folder, with a `pnpm` shortcut
 each. They read `webflow-build.config.json` from the current directory or a
 parent (the example is `webflow-build.config.example.json`). By default
 staging loads this repo's local `dist/`, so code can be checked before a
-push; `--live` checks what visitors get (`seo`, `install` and `parity`
-check the custom domain in `liveUrl` with it). Screenshots go to
+push; `--live` checks what visitors get (`seo`, `install`, `parity`,
+`tracking` and `redirects` check the custom domain in `liveUrl` with it;
+`domain` always does). Screenshots go to
 `.webflow-build/` next to the config.
 
 ```bash
@@ -208,6 +283,10 @@ pnpm wf:seo [/path…] [--live] [--canonical]                      # sitemap cra
 pnpm wf:install [/path…] [--live]                                # installed snippets vs loader.html, localhost requests
 pnpm wf:parity [/path…] [--live] [--width W] [--control]         # migration: old custom code vs dist/, every element
 pnpm wf:overflow [/path…] [--live] [--width W[,W…]] [--why]     # what runs off the right edge, 2560 … 360
+pnpm wf:tracking [/path…] [--live]                               # tags, double page views, cookie consent, gclid/UTM (hits blocked)
+pnpm wf:redirects map [--from URL] [--existing export.csv]       # old site → new pages, Webflow 301 import file
+pnpm wf:redirects test [--live] [--file urls.txt]                # every redirect lands in one permanent hop
+pnpm wf:domain                                                   # liveUrl: certificate, domain renewal, DNS host, http/www redirects
 ```
 
 Two more read the prototype's files, with no browser and no Webflow
@@ -297,10 +376,6 @@ widths (Webflow's breakpoints are 991/767/479). For interactions, script
 the hover, click or scroll state and compare that, not only the resting
 state.
 
-The prototype comparison needs a localhost prototype. With a Figma-only
-handoff, review against the frame screenshots in `Assets/figma/`
-([figma.md](../webflow-prototype/figma.md)) and run the other scripts as they are.
-
 ## Repo work
 
 - One module per feature in `src/modules/`, one `run()` line in the
@@ -357,8 +432,9 @@ all show up in `wf:parity` if the live site didn't have them.
 - **One page per session, finished completely:** built, checked at every
   width, its states and SEO fields done, **Page done** run, handoff
   updated. Half-built pages are where shortcuts get forgotten.
-- **Page-by-page approval.** The designer approves each prototype page
-  (after **Prototype page done**) before its Webflow build, and each
+- **Page-by-page approval.** The client approves each prototype page
+  (after **Prototype page done**), then the whole prototype in writing,
+  before its Webflow build; the designer approves each
   Webflow page before the next one starts.
 - **A go-ahead before each Webflow batch.** Propose the batch (variables
   old → new, classes with what they are for, the elements to build), wait

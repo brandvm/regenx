@@ -6,6 +6,145 @@ Harvested from client builds made from this template (`Scope:
 template-candidate` entries in their `GOTCHAS.md`). Module and file names
 refer to the project the lesson came from; Status is that project's.
 
+### 2026-10-30 · Font fallback metrics: calibrate `size-adjust` on the site's own text
+- Area: css, perf
+- Symptom: while the web fonts loaded, headings moved 2–3px and hero text
+  re-wrapped (11px) at 390; Lighthouse CLS 0.02–0.03 once the font preload
+  was dropped. A first set of fallback faces, with `size-adjust` from
+  frequency-weighted lowercase widths (as fontaine and next/font compute
+  it), fixed 390 but made a title wrap to two lines at 1440.
+- Cause: the stacks fell back to `system-ui`, narrower than the web font;
+  and the textbook ratio against Arial was wrong for this site's
+  capital-heavy headings (110.5% from lowercase, 108.8% measured).
+- Fix: one `@font-face` fallback per web font in repo CSS (`local("Arial")`
+  or `local("Courier New")`, plus Liberation/Arimo/Cousine), with
+  `size-adjust` measured with canvas `measureText` on every text string of
+  the site's pages in the web font against the fallback, and the web
+  font's typo ascent, descent and line gap divided by it. The Webflow
+  family variables name the fallback second (`"Font", "Font Fallback",
+  system-ui, sans-serif`). Test before writing to Webflow: serve the local
+  stylesheet plus a test-only override of the family variables, load each
+  page with `.woff2` blocked and with fonts, and compare the first
+  screen's text boxes (36 → 9px at 1440, 122 → 8px at 390). Live CLS went
+  to 0.001–0.005.
+- Status: fixed in that project
+- Found by: claude
+
+### 2026-10-29 · Figma sizes come out small on classes with their own type size
+- Area: css
+- Symptom: inputs were 27.5px high instead of 40, and chips and badges
+  were smaller than in Figma, though every value was taken from it.
+- Cause: em spacing is computed against the element's own font size
+  (conventions §6). Spacing variables are em at 16px, so on a 12–15px
+  class they shrink; and an input nested in its label took its size
+  (0.75em) from the label's 11px.
+- Fix: on those classes, variable-bound spacing is `calc(var(--x) * 16 /
+  <font px>)` and plain Figma numbers are em at that size; label and
+  control are siblings, as in a Webflow Form Field. Measure rendered px
+  against Figma, not the CSS values.
+- Status: fixed in that project's prototype
+- Found by: claude
+
+### 2026-10-29 · Library CSS in new-classes.css fails the style guide check
+- Area: css
+- Symptom: after Lenis's CSS was added at the end of `new-classes.css`
+  (where Designer-can't rules go), `check:style-guide` failed:
+  `lenis-stopped` and `.lenis.lenis-stopped` "not on the style guide".
+- Cause: the generator and the check read every class in
+  `new-classes*.css` as a Webflow class to create; a library's own state
+  classes never are.
+- Fix: the starter has `src/css/repo.css` for library CSS, linked after
+  the new classes and moved to the repo's `styles.css` as is (wf-template
+  0.15.0).
+- Status: fixed in wf-template 0.15.0
+- Found by: claude
+
+### 2026-10-29 · The template's base CSS would restyle a live site during a migration
+- Area: css, loader
+- Symptom: moving a live site's code onto the template, `src/styles.css`
+  (already set up for the redesign: fluid scaling, margin resets,
+  `img {display:block}`, `a {text-decoration:none}`) would have shipped to
+  the live pages and changed how they look.
+- Cause: the template has one bundle; a live-site migration and a
+  redesign in the same repo need two stylesheets that never meet.
+- Fix: a second entry, `src/live/` → `dist/live/index.js` and
+  `dist/live/styles.css` (build.mjs), and a `BUNDLE = "live/"` folder in
+  loader.html (also in 2a's href); the tests read it like SITE. At the
+  redesign's launch BUNDLE becomes `""` and `src/live/` is deleted.
+- Status: open in the template (a bundle folder in the loader)
+- Found by: claude
+
+### 2026-10-28 · Webflow's body size variable is the text components' 1em
+- Area: css, designer
+- Symptom: setting Typography Role › Size › Body to 14px (0.875rem) at
+  mobile shrank every heading to 14px too.
+- Cause: Webflow's text components use that variable as their "1em":
+  `.c-heading h2`, `.c-paragraph p` and similar are `font-size:
+  var(--_typography-role---size--body)`, and the scale steps are `em`. A
+  rem value pins every one of them; an em value below 1 compounds when
+  nested.
+- Fix: leave the body role at 1em. Make body copy smaller through the
+  paragraph styles instead (a Typography Style mode on the paragraph
+  component at that breakpoint, with the same font, weight and line
+  height as Body), and set the same on each variant that should differ
+  (see designer.md "Component variant styles lose to the base class's
+  breakpoint rules").
+- Status: documented
+- Found by: claude
+
+### 2026-10-27 · Prototype breakpoint proposals on `:root` lose to the Body tag's modes
+- Area: css
+- Symptom: below 992px the prototype showed the starter's fonts and sizes
+  although `proposed.css` overrode the role variables at each breakpoint.
+- Cause: the starter applies breakpoint variable modes on the Body tag
+  style, so `webflow.css` sets the role and layout variables on `body`
+  inside each @media block; a proposal on `:root` is overridden for
+  everything inside body.
+- Fix: write breakpoint proposals on `:root, body`. The `proposed.css`
+  header says so (wf-template 0.9.0).
+  Each smaller breakpoint's body block redeclares the roles again, so a
+  changed value goes in every breakpoint block below the one it starts at
+  (the `proposed.css` header says so from wf-template 0.15.0).
+- Status: fixed in wf-template 0.9.0
+- Found by: claude
+
+### 2026-10-27 · The prototype had no fluid scaling
+- Area: css
+- Symptom: at 1440 the prototype rendered at 16px = 1em while staging
+  rendered at 13.7px (the repo's §01 scaling), so prototype and staging
+  could never match at the check width.
+- Cause: the prototype doesn't load the repo's `src/styles.css`, and
+  `prototype.css` had no copy of §01.
+- Fix: `prototype.css` has a stand-in of §01 (wf-template 0.9.0). Keep
+  its `--size-container-ideal`, `-min` and `-max` the same as §01.
+- Status: fixed in wf-template 0.9.0
+- Found by: claude
+
+### 2026-10-27 · check:drift read Webflow's unspaced shorthands as drift
+- Area: css
+- Symptom: 12 "values that differ" on an untouched starter site
+  (footer, skip link and chip padding).
+- Cause: Webflow publishes `padding: var(--_a)var(--_b)` with no space
+  between the `var()` calls, and `var(--_a).625em` with a number straight
+  after one; the parser read the whole shorthand as each side's value.
+- Fix: `check-drift.mjs` splits values after a closing bracket at depth 0
+  too (wf-template 0.9.0).
+- Status: fixed in wf-template 0.9.0
+- Found by: claude
+
+### 2026-10-27 · check:states reported a pressed state missing after a control removed itself
+- Area: css
+- Symptom: "a.button: no pressed state" on several pages, although every
+  such control had an `:active` rule.
+- Cause: the check reloads the page per control and finds it by index. A
+  dismissible announcement bar remembered its dismissal in
+  `localStorage`, so after its close button was pressed the bar was gone
+  on every later load and each index pointed at another element.
+- Fix: `check-states.mjs` clears `localStorage` and `sessionStorage`
+  before every load (wf-template 0.9.0).
+- Status: fixed in wf-template 0.9.0
+- Found by: claude
+
 ### 2026-10-19 · A `0fr` grid row still holds its item's padding
 - Area: css
 - Symptom: a dropdown animated with `grid-template-rows: 0fr → 1fr`

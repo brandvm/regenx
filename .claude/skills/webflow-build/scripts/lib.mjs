@@ -8,13 +8,16 @@
 //   "stagingUrl":   "https://<site>.webflow.io",    // published Webflow staging
 //   "repoDir":      ".",                           // this repo (has dist/ and @playwright/test), relative to the config
 //   "bundlePattern": "<org>\\.github\\.io/<repo>/(index\\.js|styles\\.css)",
-//   "widths": [[1440, 900], [820, 1180], [390, 844]],
+//   "widths": [[1440, 900], [820, 1180], [667, 375], [390, 844]],
+//                   // one per Webflow breakpoint: Desktop (992+), Tablet (≤991), Mobile
+//                   // landscape (≤767: 667, as 844, a phone on its side, is Tablet), Mobile (≤478)
 //   "pages": ["/", "/about"],                       // optional: default paths for a11y, links, baseline, html, perf
 //   "prototypeDir": "../prototype",                 // optional: the prototype folder, for preflight and styles
 //   "liveUrl": "https://www.client.com",            // optional: the custom domain, for --live
 //   "seo": { "noindexOk": [], "noSchemaOk": [] },   // optional: path regexes wf:seo allows
 //   "parity": { "oldAssets": {} },                  // optional: wf:parity, old asset URL regex -> dist file
-//   "overflow": { "widths": [], "ignore": [] }      // optional: wf:overflow width sweep and selectors to skip
+//   "overflow": { "widths": [], "ignore": [] },     // optional: wf:overflow width sweep and selectors to skip
+//   "redirects": { "oldUrl": "", "file": "docs/seo/redirects.csv" } // optional: wf:redirects old site and map file
 // }
 //
 // By default staging pages load this repo's local dist/ instead of the
@@ -41,15 +44,16 @@ export function loadConfig() {
   const cfg = JSON.parse(fs.readFileSync(file, 'utf8'));
   cfg.file = file;
   cfg.repoDir = path.resolve(path.dirname(file), cfg.repoDir ?? '.');
-  cfg.widths ??= [[1440, 900], [820, 1180], [390, 844]];
+  cfg.widths ??= [[1440, 900], [820, 1180], [667, 375], [390, 844]];
   cfg.prototypeUrl = cfg.prototypeUrl?.replace(/\/$/, '');
   cfg.stagingUrl = cfg.stagingUrl?.replace(/\/$/, '');
   return cfg;
 }
 
 // Flags that take a value: --width 390, --offset 72, --max 50, --dir baselines,
-// --root ../prototype, --runs 5, --out file.
-const VALUED = new Set(['--width', '--offset', '--max', '--dir', '--threshold', '--root', '--runs', '--out']);
+// --root ../prototype, --runs 5, --out file, --from <url>, --existing file,
+// --file urls.txt, --today 2026-01-31.
+const VALUED = new Set(['--width', '--offset', '--max', '--dir', '--threshold', '--root', '--runs', '--out', '--from', '--existing', '--file', '--today']);
 
 export function args() {
   const argv = process.argv.slice(2);

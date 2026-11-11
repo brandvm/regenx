@@ -1,7 +1,9 @@
 # Working from a Figma link
 
-The design arrives as a Figma file or frame link, read through the Figma
-connector (the Figma MCP server). A link always shows the current
+Every site starts from a Figma file: the prototype is built from its
+frames, page by page (`webflow-build` › The prototype, from Figma). The
+file arrives as a link, read through the Figma connector (the Figma MCP
+server). A link always shows the current
 version, and the connector reads variables and renders frames, which a
 saved `.fig` file can't. A `.fig` is the fallback only (see the end).
 
@@ -31,8 +33,7 @@ Per page, in this order:
    frame link).
 2. **Screenshots:** one per frame, saved to the workspace's
    `Assets/figma/<page>-<width>.png`. These are the reference for review
-   while the prototype is built, and the fallback for checks when there
-   is no prototype.
+   while the prototype is built.
 3. **Variables:** read the file's variables and styles once (colours,
    type, spacing, radius, with their modes). Map them onto the
    collections in `conventions.md` §4 and propose them as old → new for
@@ -45,9 +46,10 @@ Per page, in this order:
    design's body size (`--size-unit`, 16 by default) so values follow the
    fluid scaling.
 5. **Assets:** export images and icons through the connector into
-   `Assets/` (SVG for icons, the largest raster size the design uses for
-   photos). Licences and final photos are the person's (checklists ›
-   Before building).
+   `prototype/images/`: photos as WebP at the largest size the design
+   uses, icons as SVG. Only what the file has; a missing image is a
+   question, not a stand-in. Licences and final photos are the person's
+   (checklists › Before building).
 
 ## Habits
 
@@ -63,7 +65,8 @@ Per page, in this order:
   without a style is a question, not a new class.
 - **Re-read before building a page.** The file may have changed since the
   prototype; compare the frame's last-modified date with the approval
-  date in `HANDOFF.md` and ask if it is newer.
+  date in `HANDOFF.md` and ask if it is newer. Bench looks when the client
+  opens and hourly, and offers to update the pages whose frames changed.
 - **A layer's screenshot is clipped to its frame, at 1x at most.** The
   connector renders a node as it shows in its parent, so a background
   without the card drawn over it can't be exported, and Figma stays
@@ -77,13 +80,13 @@ Per page, in this order:
 - **Video fills don't come through the connector.** `get_design_context`
   returns an empty div for a VIDEO fill and no asset URL, and screenshots
   only render a frame. Ask for the `.fig` (below): the video is in it.
-- **Review against the frames:** with a prototype, the `pnpm wf:*` checks
-  compare staging with it. Without one, put the frame screenshot next to
-  a staging screenshot at the same width and list the differences.
+- **Review against the frames:** each prototype page beside its frames
+  at Desktop, Tablet and Mobile (in Bench, Compare › With Figma). The
+  Webflow build is then compared with the prototype (`pnpm wf:*`).
 
 ## Without the connector: a saved .fig file
 
-When there is no link, or the connector can't be connected, a person
+When the connector can't be connected, a person
 saves the file from Figma (File › Save local copy) into the workspace's
 `Assets/figma/` and Claude reads it in the prototype:
 
