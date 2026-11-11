@@ -149,7 +149,7 @@ duplicated the starter site under the client's name
    or component it introduced (`pnpm style-guide`); `pnpm screens` (every
    width from 2560 to 360: overflow and errors) and `pnpm check:states`
    (focus and pressed states); run **Prototype page done**; the person
-   approves it at 1440, 820 and 390.
+   approves it at 1440, 820, 667 and 390.
 4. The handoff (below).
 
 ## Handing over to the build

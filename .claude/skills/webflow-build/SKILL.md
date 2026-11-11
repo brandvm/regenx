@@ -1,6 +1,6 @@
 ---
 name: webflow-build
-description: Build a Webflow site in Webflow from an approved design (an approved localhost prototype, or a Figma link), with the Webflow MCP and this wf-template repo: variables, tag styles, classes and CMS, the repo port and loader, the style guide page, the media page, components, then pages section by section, each verified against the design at three widths, up to the build handoff. Use when starting or continuing a Webflow build (Designer through the MCP plus JS/CSS in the repo), building components or pages, comparing Webflow staging with the prototype, checking anchors, page transitions, load flicker or the published HTML, or wrapping up a build session. For project setup and the prototype, use webflow-prototype; for launch, webflow-launch; for a site that is already live, webflow-audit.
+description: Build a Webflow site in Webflow from an approved design (an approved localhost prototype, or a Figma link), with the Webflow MCP and this wf-template repo: variables, tag styles, classes and CMS, the repo port and loader, the style guide page, the media page, components, then pages section by section, each verified against the design at four widths, up to the build handoff. Use when starting or continuing a Webflow build (Designer through the MCP plus JS/CSS in the repo), building components or pages, comparing Webflow staging with the prototype, checking anchors, page transitions, load flicker or the published HTML, or wrapping up a build session. For project setup and the prototype, use webflow-prototype; for launch, webflow-launch; for a site that is already live, webflow-audit.
 ---
 
 # Webflow build: approved design → Webflow, section by section
@@ -188,8 +188,9 @@ The scripts are in this skill's `scripts/` folder, with a `pnpm` shortcut
 each. They read `webflow-build.config.json` from the current directory or a
 parent (the example is `webflow-build.config.example.json`). By default
 staging loads this repo's local `dist/`, so code can be checked before a
-push; `--live` checks what visitors get (`seo`, `install` and `parity`
-check the custom domain in `liveUrl` with it). Screenshots go to
+push; `--live` checks what visitors get (`seo`, `install`, `parity`,
+`tracking` and `redirects` check the custom domain in `liveUrl` with it;
+`domain` always does). Screenshots go to
 `.webflow-build/` next to the config.
 
 ```bash
@@ -208,6 +209,10 @@ pnpm wf:seo [/path…] [--live] [--canonical]                      # sitemap cra
 pnpm wf:install [/path…] [--live]                                # installed snippets vs loader.html, localhost requests
 pnpm wf:parity [/path…] [--live] [--width W] [--control]         # migration: old custom code vs dist/, every element
 pnpm wf:overflow [/path…] [--live] [--width W[,W…]] [--why]     # what runs off the right edge, 2560 … 360
+pnpm wf:tracking [/path…] [--live]                               # tags, double page views, cookie consent, gclid/UTM (hits blocked)
+pnpm wf:redirects map [--from URL] [--existing export.csv]       # old site → new pages, Webflow 301 import file
+pnpm wf:redirects test [--live] [--file urls.txt]                # every redirect lands in one permanent hop
+pnpm wf:domain                                                   # liveUrl: certificate, domain renewal, DNS host, http/www redirects
 ```
 
 Two more read the prototype's files, with no browser and no Webflow

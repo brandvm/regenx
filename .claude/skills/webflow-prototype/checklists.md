@@ -21,7 +21,9 @@ before code. Missing → ask; Claude never fills them in with guesses.
 - [Person] The desktop design frame and the width range it scales over,
   for the fluid scaling in `src/styles.css` §01 (default 1680, scaling
   1440–1680). [Claude] sets `--size-container-ideal`, `-min` and `-max`
-  from it, and the Webflow variables stay in em.
+  from it, in §01 and in the prototype's stand-in
+  (`prototype/src/css/prototype.css`), and the Webflow variables stay in
+  em.
 - [Person] CMS structure: collections, fields (with types), references,
   sort order, and which pages list or template them.
 - [Person] SEO per page: title, meta description, H1, slug.
@@ -48,7 +50,7 @@ comes back as rework in Webflow, where it costs more.
 - [Claude] The style guide was approved before the first content page, and
   every class or component this page added has its row
   (`pnpm style-guide`, `pnpm check:style-guide`).
-- [Claude checks] Tablet and phone, not only desktop: looked at 1440, 820
+- [Claude checks] Tablet and phone, not only desktop: looked at 1440, 820, 667
   and 390, no sideways scroll, nothing overlapping or cut off. `pnpm
   screens` passes: no overflow and no errors at any width from 2560 to
   360 (the screenshots are in `.screens/`).
@@ -69,11 +71,11 @@ comes back as rework in Webflow, where it costs more.
 - [Claude] The page's modules depend on `data-*` hooks, not class names;
   new classes are in `new-classes*.css` and variable changes in
   `proposed.css` as old → new.
-- [Person] Approves the page at the three widths.
+- [Person] Approves the page at the four widths.
 
 ## Prototype handoff (once, before the Webflow build starts)
 
-- [Person] Every prototype page approved at the three widths, and the
+- [Person] Every prototype page approved at the four widths, and the
   style guide with it.
 - [Claude] `docs/handoff/HANDOFF.md` is filled in: pages, variables and
   classes, CMS, components to make (from the component plan), modules with

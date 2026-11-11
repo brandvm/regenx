@@ -52,8 +52,17 @@ from the client.
   tool, where the connector has it) is a copy. Bind single-line fields
   only: a quote or line break breaks the JSON, and an apostrophe becomes
   `&#39;`.
+- [Claude] Heading plan: `pnpm wf:outline` on every page and template,
+  checked against [headings.md](headings.md). Tag fixes go in the build;
+  [Person] approves any change of H1 or H2 wording (it is copy).
+- [Claude] Redirect map, when the site replaces an old one:
+  `pnpm wf:redirects map` (the old site from `liveUrl`, or `--from`)
+  writes `docs/seo/redirects.csv` in Webflow's import format; every row
+  printed under "needs a look" is checked and edited in the file.
+  [Person] approves the map, and exports the site's existing 301s if it
+  has any (an import replaces them all; re-run with `--existing`).
 - [Claude checks] `pnpm wf:seo` on staging: every page in the sitemap
-  passes; long titles and short descriptions are fixed or accepted;
+  passes (no duplicate titles or descriptions, a real 404); long titles and short descriptions are fixed or accepted;
   pages with no schema are in `seo.noSchemaOk`. Then Google's Rich
   Results Test on one page of each type.
 - [Person] Supplies the official name, address, phone, hours, social
@@ -103,9 +112,14 @@ SEO and tracking
   (`asset-audit`), favicon, schema where `SEO-PLAN.md` plans it.
 - [Claude checks] Canonicals point to the live domain (after the domain is
   attached: `liveUrl` in the config, then `pnpm wf:seo --live --canonical`).
-- [Person] GA4 and conversions fire (real-time view); nothing tracks
-  before cookie consent where consent is required. [Claude checks] the tags
-  load only after consent in the page's network requests.
+- [Claude checks] `pnpm wf:tracking --live` once the tags are on the
+  domain (on staging first, if they load there): which tags load on which
+  pages, no page view counted twice, nothing tracks before the cookie
+  choice or after Reject, gclid and UTM survive the host redirects. Every
+  request that sends data is blocked, so the check adds nothing to the
+  client's reports. It can't tell whether an account received anything.
+- [Person] GA4 and conversions arrive (Realtime report), after accepting
+  cookies on the live site.
 
 ## Launch day
 
@@ -116,8 +130,9 @@ SEO and tracking
 - [Claude] With an explicit OK: publish to the live domain (`safe-publish`
   if available: show what changed, confirm, publish); cut the repo release
   and set `RELEASE` in the head snippet (README › Release).
-- [Claude checks] SSL works; www and https redirects go to the canonical
-  host.
+- [Claude checks] `pnpm wf:domain`: the certificate is trusted and not
+  near its end, http and the other www host redirect permanently to the
+  `liveUrl` host, the domain doesn't expire within 45 days.
 - [Claude checks] `pnpm wf:install --live`: the published snippets match
   `loader.html` (with the new `RELEASE`), one viewport meta, no request to
   localhost.
@@ -127,8 +142,10 @@ SEO and tracking
   indexing.
 - [Claude] Save the visual baselines of the live site (`pnpm wf:baseline
   save --live`, every page in `pages`) and commit them.
-- [Claude] Apply the 301 redirects; [Claude checks] the top old URLs
-  redirect correctly.
+- [Claude] Apply the 301 redirects: [Person] imports
+  `docs/seo/redirects.csv` (Site settings › Publishing › 301 redirects ›
+  Import) and publishes; [Claude checks] `pnpm wf:redirects test --live`:
+  every row lands on its page in one permanent hop.
 - [Claude checks] `sitemap.xml` exists (Site settings › SEO ›
   Auto-generate sitemap) and does **not** list `/design/style-guide` or
   `/design/media`: exclude both through the sitemap tool once the site
@@ -140,7 +157,10 @@ SEO and tracking
 
 All [Person], Claude can prepare the documents:
 - Live site; ownership transfer (Webflow site, hosting billing, domain,
-  design files, font and image licences).
+  design files, font and image licences). [Claude] lists what to transfer:
+  registrar, DNS host and renewal dates (`pnpm wf:domain`), the tags with
+  their IDs and the third-party services the pages load (`pnpm wf:tracking
+  --live`).
 - CMS training (recorded) and training notes ([Claude] drafts them from
   the CMS notes).
 - Analytics, Tag Manager and Search Console access.
@@ -151,11 +171,16 @@ All [Person], Claude can prepare the documents:
 ## After launch (first 30 days)
 
 - [Claude checks] Days 1 to 3: crawl for 404s and redirect chains
-  (`pnpm wf:links --live --external`); [Person] checks Search Console coverage.
+  (`pnpm wf:links --live --external`); [Person] checks Search Console
+  coverage and exports its "Not found (404)" URLs; [Claude checks]
+  `pnpm wf:redirects test --live --file <export>` and adds rows to the
+  map for any that fail.
 - [Person] Week 1: leads arriving, analytics numbers look right.
 - [Person] Weeks 2 to 4: indexing and traffic against the baseline.
 - [Claude] Fix the after-launch items from the known issues list.
 - [Person] 30-day check-in, retro, testimonial or case study.
+- [Claude checks] `pnpm wf:domain` at the check-in (and on any later
+  support visit): renewals coming up go to whoever pays for them.
 - [Claude] Before every later release: `pnpm wf:baseline compare --live`
   after publishing to staging; every change is expected or fixed.
 - [Claude] Offer the project's new `template-candidate` GOTCHAS to the
