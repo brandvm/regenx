@@ -96,7 +96,7 @@ test('accordion motion grows the open list to its height and hides it again afte
 // G | Nav's menu button, panel and backdrop.
 const nav = `<div class="g-nav-overlay" data-nav-overlay style="position:fixed;inset:0;background:rgba(0,0,0,.25)"></div>
   <div data-nav-menu style="display:flex;width:300px;height:200px">Links</div>
-  <button data-nav-menu-button type="button"><svg data-nav-menu-icon width="16" height="16"></svg>Menu</button>`;
+  <button class="g-nav-menu-button" data-nav-menu-button type="button"><svg data-nav-menu-icon width="16" height="16"><circle cx="1.5" cy="1.5" r="1.5"/><circle data-menu-dot="edge" cx="6.5" cy="1.5" r="1.5"/></svg>Menu</button>`;
 
 test('menu button opens and closes the panel and backdrop up to 991px', async ({ page }) => {
   const errors = await setup(page, nav, { width: 800 });
@@ -109,11 +109,15 @@ test('menu button opens and closes the panel and backdrop up to 991px', async ({
   expect(await style('[data-nav-menu]', 'opacity')(page)).toBe('1');
   expect(await style('[data-nav-overlay]', 'opacity')(page)).toBe('1');
   await expect(button).toHaveAttribute('aria-expanded', 'true');
+  // Open: the edge dots dim so the dots read as an X; corners stay full.
+  expect(await style('[data-menu-dot="edge"]', 'opacity')(page)).toBe('0.19');
+  expect(await style('[data-nav-menu-icon] circle:not([data-menu-dot])', 'opacity')(page)).toBe('1');
   // The open backdrop covers the button; on the site Finsweet mirror-clicks it.
   await button.dispatchEvent('click');
   await page.waitForTimeout(1000);
   expect(await style('[data-nav-menu]', 'display')(page)).toBe('none');
   expect(await style('[data-nav-overlay]', 'display')(page)).toBe('none');
+  expect(await style('[data-menu-dot="edge"]', 'opacity')(page)).toBe('1');
   // Desktop: the panel is the link row, left as the Designer has it.
   await page.setViewportSize({ width: 1200, height: 900 });
   await page.waitForTimeout(100);

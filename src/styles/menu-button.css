@@ -1,0 +1,15 @@
+/* Mobile menu button (≤991px): a 3×3 dots icon that turns into an X while
+   the menu is open (Figma 9958-16261, 2026-11-12). The four edge dots dim to
+   19% of the dot colour, #303030 on the black button.
+   repo-css: js-state — aria-expanded is set by menu-motion.ts. */
+.g-nav-menu-button [data-menu-dot="edge"] {
+  transition: opacity 0.3s cubic-bezier(0.64, 0.05, 0, 1);
+}
+.g-nav-menu-button[aria-expanded="true"] [data-menu-dot="edge"] {
+  opacity: 0.19;
+}
+@media (prefers-reduced-motion: reduce) {
+  .g-nav-menu-button [data-menu-dot="edge"] {
+    transition: none;
+  }
+}

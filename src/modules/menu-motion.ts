@@ -2,12 +2,13 @@ import { gsap, EASE_IX2, MQ } from './animation';
 
 // Mobile and tablet menu (≤991px; replaces the Webflow IX2 interactions
 // "G Nav | Menu Open/Close"). The menu button opens the link panel (fades
-// in, scale 0.9 → 1), turns its dots icon 45° and shows the dimmed
-// backdrop; a second click (or a click on the backdrop, which Finsweet
-// mirror-clicks to the button) closes it again.
+// in, scale 0.9 → 1) and shows the dimmed backdrop; a second click (or a
+// click on the backdrop, which Finsweet mirror-clicks to the button) closes
+// it again. The button's 3×3 dots icon turns into an X while open: its four
+// edge dots ([data-menu-dot="edge"]) dim, keyed to aria-expanded in
+// styles/menu-button.css (Figma 9958-16261, 2026-11-12; it used to turn 45°).
 //
 //   [data-nav-menu-button]   G Nav Menu Button (also gets aria-expanded)
-//   [data-nav-menu-icon]     its dots icon (svg)
 //   [data-nav-menu]          the link panel (G Nav Block is-center)
 //   [data-nav-overlay]       the backdrop (G Nav Overlay)
 //
@@ -17,14 +18,12 @@ export function initMenuMotion() {
   const button = document.querySelector<HTMLElement>('[data-nav-menu-button]');
   const menu = document.querySelector<HTMLElement>('[data-nav-menu]');
   if (!button || !menu) return;
-  const icon = button.querySelector('[data-nav-menu-icon]');
   const overlay = document.querySelector('[data-nav-overlay]');
   gsap.matchMedia().add(MQ.tabletDown, () => {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let open = false;
     let tl: gsap.core.Timeline | null = null;
     gsap.set(menu, { display: 'none', scale: 0.9, opacity: 0 });
-    if (icon) gsap.set(icon, { rotation: 0 });
     if (overlay) gsap.set(overlay, { display: 'none', opacity: 0 });
     button.setAttribute('aria-expanded', 'false');
 
@@ -37,11 +36,9 @@ export function initMenuMotion() {
         tl.set(menu, { display: 'block' }, 0);
         if (overlay) tl.set(overlay, { display: 'block' }, 0);
         tl.to(menu, { scale: 1, opacity: 1 }, 0);
-        if (icon) tl.to(icon, { rotation: 45 }, 0);
         if (overlay) tl.to(overlay, { opacity: 1, duration: 0.4 }, 0);
       } else {
         tl.to(menu, { scale: 0.9, opacity: 0 }, 0);
-        if (icon) tl.to(icon, { rotation: 0 }, 0);
         if (overlay) tl.to(overlay, { opacity: 0, duration: 0.4 }, 0);
         if (overlay) tl.set(overlay, { display: 'none' });
         tl.set(menu, { display: 'none' });
