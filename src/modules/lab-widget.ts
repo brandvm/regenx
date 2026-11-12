@@ -1,13 +1,15 @@
 import { gsap, EASE, MQ } from './animation';
 
-// Lab result widgets (Peptide, Enclomiphene heroes): an inline SVG exported
-// from Figma with live text, sitting on the Webflow glass div
-// (Service Hero | Widget W). When the widget first comes into view, the range
-// bars fill from the left, each ▼ marker slides in while its value counts up,
-// and the copy fades in. Reduced motion: shown as is.
+// Lab result widgets (Peptide, Enclomiphene heroes; Home case studies): an
+// inline SVG built from Figma with live text, sitting on a Webflow glass div
+// (Service Hero | Widget W, Case Card | Widget). When the widget first comes
+// into view, the range bars fill from the left, chart columns grow from the
+// bottom, each ▼ marker slides in while its value counts up, and the copy
+// fades in. Reduced motion: shown as is.
 //
 //   [data-lab-widget]   the SVG (or a wrapper of it)
 //     .lw-bar           a range bar segment (fills left → right)
+//     .lw-col           a chart column (grows bottom → top)
 //     .lw-mark          a marker group: the ▼ and its value text
 //     .lw-fade          text that fades in
 
@@ -46,6 +48,14 @@ function play(root: Element) {
     stagger: 0.08,
     ease: EASE,
   });
+  gsap.from(root.querySelectorAll<SVGElement>('.lw-col'), {
+    scaleY: 0,
+    transformOrigin: '50% 100%',
+    duration: 0.7,
+    delay: start + 0.1,
+    stagger: 0.08,
+    ease: EASE,
+  });
   marks.forEach((mark, i) => {
     const d = start + 0.45 + i * 0.12;
     gsap.from(mark, { opacity: 0, x: -14, duration: 0.6, delay: d, ease: EASE });
@@ -57,7 +67,7 @@ export function initLabWidget() {
   const roots = [...document.querySelectorAll(ROOT)];
   if (!roots.length) return;
   // SVG transforms need the element's own box as reference.
-  roots.forEach((r) => r.querySelectorAll<SVGElement>('.lw-bar').forEach((b) => {
+  roots.forEach((r) => r.querySelectorAll<SVGElement>('.lw-bar, .lw-col').forEach((b) => {
     b.style.transformBox = 'fill-box';
   }));
   gsap.matchMedia().add(MQ.motion, () => {
