@@ -30,7 +30,7 @@ harvested across all client repos to improve `brandvm/wf-template`.
 - Scope: template-candidate
 - Symptom: The Home hero card carousel (CSS `loopX`, transform only) was "not smooth" on the client's phone and on desktop.
 - Cause: each card had a frosted frame (`backdrop-filter: blur`) and glass pin dots (`backdrop-filter`), about 28 per copy and 3 copies on the page. A backdrop blur on a moving layer is re-rendered on the GPU every frame. Headless Chromium can't show it: its frame rate and trace looked fine. Script work was under 15ms in 3s.
-- Fix: blur the photo under the frame with a plain `filter: blur` (drawn once, then just moved; `scale(1.1)` hides the soft edges) and drop the frame's backdrop blur (Webflow `Rx Card Frame`, `HHCG | Image`). Pin dots and badges inside `.loop-animate-x` get a flat tint (pins.css). Avoid `backdrop-filter` on anything that animates.
+- Fix: the frost is baked into the images. Each card's photo under the frame is a pre-blurred, 20%-darkened WebP (about 10 KB: blur radius 9.6% of the width, mirrored edges), and `Rx Card Frame` has no blur and no tint. Pin dots and badges inside `.loop-animate-x` get a flat tint (pins.css). A plain CSS `filter: blur` on the photo was tried first and works, but a flattened image costs nothing. Avoid `backdrop-filter` on anything that animates.
 - Status: fixed 2026-11-13 (needs deploy + publish)
 - Found by: human
 
