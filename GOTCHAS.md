@@ -25,6 +25,15 @@ harvested across all client repos to improve `brandvm/wf-template`.
 
 ## This project
 
+### 2026-11-13 · Backdrop blur inside a moving carousel stutters
+- Area: css
+- Scope: template-candidate
+- Symptom: The Home hero card carousel (CSS `loopX`, transform only) was "not smooth" on the client's phone and on desktop.
+- Cause: each card had a frosted frame (`backdrop-filter: blur`) and glass pin dots (`backdrop-filter`), about 28 per copy and 3 copies on the page. A backdrop blur on a moving layer is re-rendered on the GPU every frame. Headless Chromium can't show it: its frame rate and trace looked fine. Script work was under 15ms in 3s.
+- Fix: blur the photo under the frame with a plain `filter: blur` (drawn once, then just moved; `scale(1.1)` hides the soft edges) and drop the frame's backdrop blur (Webflow `Rx Card Frame`, `HHCG | Image`). Pin dots and badges inside `.loop-animate-x` get a flat tint (pins.css). Avoid `backdrop-filter` on anything that animates.
+- Status: fixed 2026-11-13 (needs deploy + publish)
+- Found by: human
+
 ### 2026-11-10 · Catalog category lists filter on Extra Categories, not Category
 - Area: cms
 - Scope: project
