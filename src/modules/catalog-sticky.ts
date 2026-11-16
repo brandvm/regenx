@@ -27,7 +27,11 @@ export function initCatalogSticky() {
     navBottom = nav && !nav.classList.contains('is-rx-hidden') ? nav.offsetHeight : 0;
     stickyTop = Math.round(navBottom + GAP - offset);
     block.style.setProperty('--mc-sticky-top', `${stickyTop}px`);
-    if (section) block.style.setProperty('--mc-sticky-bg', getComputedStyle(section).backgroundColor);
+    if (section) {
+      const bg = getComputedStyle(section).backgroundColor;
+      block.style.setProperty('--mc-sticky-bg', bg);
+      nav?.style.setProperty('--mc-sticky-bg', bg);
+    }
     clip();
   };
 
@@ -42,7 +46,12 @@ export function initCatalogSticky() {
     const top = block.getBoundingClientRect().top;
     const above = compact ? Math.max(0, Math.round(navBottom - top)) : 0;
     block.style.clipPath = above ? `inset(${above}px 0 0 0)` : '';
-    block.toggleAttribute('data-mc-stuck', compact && top <= stickyTop + 1);
+    const stuck = compact && top <= stickyTop + 1;
+    block.toggleAttribute('data-mc-stuck', stuck);
+    // While the tabs are pinned under a showing nav, the list scrolled
+    // through the nav band around the rounded bar (client, 2026-11-16): fill
+    // that band with the page colour too.
+    if (nav) nav.toggleAttribute('data-mc-fill', stuck && navBottom > 0);
   };
   window.addEventListener('scroll', () => {
     if (ticking) return;

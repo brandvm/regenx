@@ -377,6 +377,12 @@
 [data-catalog-compact] .product-block-list-filter-w[data-mc-stuck] .services-main-nav-list.is-catalog {
   box-shadow: 0 -12px 0 var(--mc-sticky-bg, transparent);
 }
+/* Pinned under a showing nav: the nav band around the rounded bar gets the
+   page colour too, or the list shows through it (data-mc-fill, set by
+   catalog-sticky.ts only while the tabs are pinned on phones). */
+.g-nav-w[data-mc-fill] {
+  background-color: var(--mc-sticky-bg, transparent);
+}
 
 /* repo-css: js-state — an open row shows its product picture (client and
    Mari chose the "with image" version): title across the top, the image
