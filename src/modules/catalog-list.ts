@@ -192,6 +192,7 @@ export function initCatalogList() {
 
   function update() {
     const compact = section.hasAttribute(COMPACT);
+    const searching = !!(search?.value ?? '').trim();
     const seen = new Set<string | HTMLElement>();
     groups.forEach((g) => {
       if (isRetired(g)) return;
@@ -201,15 +202,19 @@ export function initCatalogList() {
       itemsOf(g).filter(isShown).forEach((item) => {
         seen.add(productOf(item));
       });
-      const hide = compact && n === 0;
+      // A group with no match hides with its sidebar link: on phones always,
+      // and on desktop while a search is on (client, 2026-11-16: the empty
+      // categories pushed the results below the fold).
+      const hide = n === 0 && (compact || searching);
       g.block.classList.toggle(HIDDEN, hide);
       g.links.forEach((link) => link.classList.toggle(HIDDEN, hide));
     });
-    const anyShown = groups.some((g) => !isRetired(g) && !g.block.classList.contains(HIDDEN));
+    // The sliders step aside on desktop while searching: they don't count.
+    const anyShown = groups.some((g) => !isRetired(g) && !g.block.classList.contains(HIDDEN) && !g.block.hasAttribute(SEARCH_ASIDE));
     const shown = seen.size;
     total.textContent = `${shown} medication${shown === 1 ? '' : 's'}`;
     const q = (search?.value ?? '').trim();
-    empty.hidden = !compact || anyShown;
+    empty.hidden = !(compact || searching) || anyShown;
     const title = empty.querySelector('.catalog-empty-title');
     if (title) title.textContent = q ? `No medications match “${q}”` : 'No medications match these filters';
 
