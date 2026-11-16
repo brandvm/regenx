@@ -7,10 +7,9 @@
 //                               answer in this browser and closes
 //   [data-disclaimer-cancel]    leaves the page (back, or home)
 //
-// It opens on load until accepted, and it is a gate (client, 2026-11-16): the
-// dialog is locked (data-modal-locked: Escape and the backdrop do nothing) and
-// any × button is hidden, so the only ways out are Continue (after ticking
-// the box) and Cancel (leaves the page).
+// It opens on load until accepted. Closing it another way (×, Escape, the
+// backdrop) dismisses it for this visit only. (Made a locked gate without
+// the × on 2026-11-16, then the client asked for the × back the same day.)
 const NAME = 'peptide-disclaimer';
 const KEY = 'rgx-peptide-disclaimer';
 
@@ -24,10 +23,6 @@ export function initPeptideDisclaimer() {
   const agree = root.querySelector<HTMLInputElement>('[data-disclaimer-agree]');
   const cont = root.querySelector<HTMLButtonElement>('[data-disclaimer-continue]');
   const cancel = root.querySelector<HTMLElement>('[data-disclaimer-cancel]');
-
-  root.setAttribute('data-modal-locked', '');
-  // Inline: the × class sets display flex, which beats the hidden attribute.
-  root.querySelectorAll<HTMLElement>('[data-modal-close]').forEach((el) => { el.style.display = 'none'; });
 
   const sync = () => { if (cont) cont.disabled = !agree?.checked; };
   agree?.addEventListener('change', sync);

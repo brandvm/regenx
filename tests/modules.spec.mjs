@@ -99,17 +99,28 @@ test('peptide disclaimer opens on load, needs consent, and is remembered once ac
   expect(errors).toEqual([]);
 });
 
-// A gate since 2026-11-16 (client): no × and no way past the checkbox.
-test('the disclaimer cannot be closed without consent', async ({ page }) => {
-  const errors = await setup(page, disclaimer);
-  const overlay = page.locator('[data-modal="peptide-disclaimer"]');
+test('closing the disclaimer without consent only dismisses it for this visit', async ({ page }) => {
+  await setup(page, disclaimer);
   await expect(page.getByRole('dialog', { name: 'Important Disclaimer' })).toBeVisible();
-  await expect(overlay).toHaveAttribute('data-modal-locked', '');
-  await expect(page.locator('[data-modal-close]')).toBeHidden();
-  await page.keyboard.press('Escape');
-  await page.mouse.click(5, 5); // the backdrop
-  await expect(overlay).toBeVisible();
+  await expect(page.locator('[data-modal-close]')).toBeVisible();
+  await page.locator('[data-modal-close]').click();
+  await expect(page.locator('[data-modal="peptide-disclaimer"]')).toBeHidden();
   expect(await page.evaluate(() => localStorage.getItem('rgx-peptide-disclaimer'))).toBeNull();
+});
+
+// A modal marked data-modal-locked ignores Escape and the backdrop and
+// closes only through a "modal:close" event (modal.ts; not used on the
+// disclaimer since the client asked for its × back).
+test('a locked modal closes only through modal:close', async ({ page }) => {
+  const errors = await setup(page, disclaimer.replace('data-modal="peptide-disclaimer"', 'data-modal="peptide-disclaimer" data-modal-locked'));
+  const overlay = page.locator('[data-modal="peptide-disclaimer"]');
+  await expect(overlay).toBeVisible();
+  await page.keyboard.press('Escape');
+  await page.mouse.click(5, 5);
+  await page.locator('[data-modal-close]').click();
+  await expect(overlay).toBeVisible();
+  await overlay.evaluate((el) => el.dispatchEvent(new Event('modal:close')));
+  await expect(overlay).toBeHidden();
   expect(errors).toEqual([]);
 });
 
