@@ -364,24 +364,46 @@
    repo-css: js-state — [data-catalog-compact] (catalog-list.ts, ≤767px).
    Sticky tabs: the filter block sticks with a negative top
    (--mc-sticky-top, from catalog-sticky.ts) so only its tab row stays in
-   view, under the nav or at the top while the nav is hidden. */
+   view, under the nav or at the top while the nav is hidden. The move when
+   the nav hides or shows is a transform animation in catalog-sticky.ts (in
+   step with the nav), not a transition on top. */
 [data-catalog-compact] .product-block-list-filter-w {
   position: sticky;
   top: var(--mc-sticky-top, 0px);
   z-index: 5;
   background-color: var(--mc-sticky-bg, transparent);
-  transition: top .6s cubic-bezier(.64, .05, 0, 1);
 }
 /* Pinned: a page-coloured band fills the gap above the tabs (the toolbar
-   ends only 7px above them). */
+   ends only 7px above them). 14px = the 12px gap + 2px that tucks under the
+   nav (OVERLAP in catalog-sticky.ts), so no seam shows between them. */
 [data-catalog-compact] .product-block-list-filter-w[data-mc-stuck] .services-main-nav-list.is-catalog {
-  box-shadow: 0 -12px 0 var(--mc-sticky-bg, transparent);
+  box-shadow: 0 -14px 0 var(--mc-sticky-bg, transparent);
 }
-/* Pinned under a showing nav: the nav band around the rounded bar gets the
-   page colour too, or the list shows through it (data-mc-fill, set by
-   catalog-sticky.ts only while the tabs are pinned on phones). */
+/* Pinned: the block is the content width (14.5px margins at 390) and the
+   list rows under it are a fraction wider, so a 1px sliver of them showed at
+   each side of the tab row. The block's colour reaches out 16px each side
+   (the clip in catalog-sticky.ts leaves room for it). */
+[data-catalog-compact] .product-block-list-filter-w[data-mc-stuck] {
+  box-shadow: -16px 0 0 var(--mc-sticky-bg, transparent), 16px 0 0 var(--mc-sticky-bg, transparent);
+}
+/* Pinned tabs: the nav band around the rounded bar gets the page colour, or
+   the list shows through it (data-mc-fill, set by catalog-sticky.ts while
+   the tabs are pinned on phones). The ::after hangs 12px under the nav and
+   moves with it, so the gap down to the tabs stays covered at every frame
+   while the nav and the tabs ease in or out together (same curve and
+   duration); the tabs' 14px band covers the last fraction of a pixel. */
 .g-nav-w[data-mc-fill] {
   background-color: var(--mc-sticky-bg, transparent);
+}
+.g-nav-w[data-mc-fill]::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background-color: var(--mc-sticky-bg, transparent);
+  pointer-events: none;
 }
 
 /* repo-css: js-state — an open row shows its product picture (client and
