@@ -99,12 +99,18 @@ test('peptide disclaimer opens on load, needs consent, and is remembered once ac
   expect(errors).toEqual([]);
 });
 
-test('closing the disclaimer without consent only dismisses it for this visit', async ({ page }) => {
-  await setup(page, disclaimer);
+// A gate since 2026-11-16 (client): no × and no way past the checkbox.
+test('the disclaimer cannot be closed without consent', async ({ page }) => {
+  const errors = await setup(page, disclaimer);
+  const overlay = page.locator('[data-modal="peptide-disclaimer"]');
   await expect(page.getByRole('dialog', { name: 'Important Disclaimer' })).toBeVisible();
+  await expect(overlay).toHaveAttribute('data-modal-locked', '');
+  await expect(page.locator('[data-modal-close]')).toBeHidden();
   await page.keyboard.press('Escape');
-  await expect(page.locator('[data-modal="peptide-disclaimer"]')).toBeHidden();
+  await page.mouse.click(5, 5); // the backdrop
+  await expect(overlay).toBeVisible();
   expect(await page.evaluate(() => localStorage.getItem('rgx-peptide-disclaimer'))).toBeNull();
+  expect(errors).toEqual([]);
 });
 
 // The Medical Catalog sidebar.
