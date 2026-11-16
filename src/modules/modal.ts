@@ -11,6 +11,10 @@
 // Opened by any link to "#<name>" on the same page, by a button with
 // data-modal-open="<name>", and by loading the page with #<name> in the URL
 // (a modal can be linked to from an e-mail).
+//   [data-modal-locked]        on the overlay: Escape, a click outside the
+//                              panel and [data-modal-close] do nothing; only
+//                              a "modal:close" event on the overlay closes it
+//                              (a consent gate: peptide-disclaimer.ts).
 //
 // - Portalled to <body>, so no transform or overflow on an ancestor can
 //   clip or re-anchor a fixed overlay.
@@ -63,6 +67,10 @@ export function initModals(lenis?: Scroller | null): (() => void) | void {
     document.body.appendChild(root);
     root.classList.remove('is-open');
     root.style.display = 'none';
+    // The one way to close a locked modal (and works for any other).
+    root.addEventListener('modal:close', () => {
+      if (active?.root === root) close();
+    });
     modals.set(name, { root, panel, display });
   }
 
@@ -157,6 +165,7 @@ export function initModals(lenis?: Scroller | null): (() => void) | void {
       return;
     }
     if (!active) return;
+    if (active.root.hasAttribute('data-modal-locked')) return;
     if (target.closest('[data-modal-close]') && active.root.contains(target)) {
       e.preventDefault();
       close();
@@ -167,7 +176,7 @@ export function initModals(lenis?: Scroller | null): (() => void) | void {
     if (!active) return;
     if (e.key === 'Escape') {
       e.preventDefault();
-      close();
+      if (!active.root.hasAttribute('data-modal-locked')) close();
       return;
     }
     if (e.key !== 'Tab') return;
