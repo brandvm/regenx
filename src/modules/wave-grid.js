@@ -373,6 +373,23 @@ export function initWaveGrid() {
   /* ----------------------------------------------------------------------- *
    *  Public API
    * ----------------------------------------------------------------------- */
+  // A section that shows its content on a dark panel (S | FAQs › Panel Mode,
+  // Services) gets the grid inside the panel, as in Figma (Clean Up
+  // 9164-14189), not on the light page behind it. The section keeps the
+  // attribute, set by the component's Background Grid prop; the panel has
+  // its own radius and background, so the canvas sits within it.
+  var PANEL_HOSTS = [
+    ['[data-wf--s-faqs--variant="panel-mode"]', ":scope > .sw-faqs"],
+  ];
+  function panelHost(el) {
+    for (var i = 0; i < PANEL_HOSTS.length; i++) {
+      if (!el.matches(PANEL_HOSTS[i][0])) continue;
+      var panel = el.querySelector(PANEL_HOSTS[i][1]);
+      if (panel) return panel;
+    }
+    return el;
+  }
+
   var WaveGrid = {
     defaults: DEFAULTS,
     init: function (target, options) {
@@ -383,8 +400,10 @@ export function initWaveGrid() {
     initAll: function (selector, options) {
       var els = document.querySelectorAll(selector || "[data-wave-grid]");
       var out = [];
-      for (var i = 0; i < els.length; i++)
-        if (!els[i].__waveGrid) out.push(createInstance(els[i], options));
+      for (var i = 0; i < els.length; i++) {
+        var host = panelHost(els[i]);
+        if (!host.__waveGrid) out.push(createInstance(host, options));
+      }
       return out;
     },
   };
