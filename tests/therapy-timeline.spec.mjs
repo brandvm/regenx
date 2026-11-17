@@ -200,7 +200,7 @@ test('mobile portrait fills the view with each stage and scales the ruler per st
 test('responsive edge masks preserve the week scale and leave navigation unmasked', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   const errors = await setup(page);
-  for (const [width, fadeEm, rulerFadeEm = fadeEm] of [[1440, 6], [991, 4], [600, 1.5], [390, 0, 1.5]]) {
+  for (const [width, fadeEm, rulerFadeEm = fadeEm] of [[1440, 6], [991, 4], [600, 0, 1.5], [390, 0, 1.5]]) {
     await page.setViewportSize({ width, height: 900 });
     await expectButtons(page, { previous: false, following: width <= 767 });
     await settled(page);
@@ -250,6 +250,9 @@ test('responsive edge masks preserve the week scale and leave navigation unmaske
     expect(g.stages[0].left).toBeCloseTo(g.left, 0);
     expect(g.tick6).toBeCloseTo(g.stages[1].left, 0);
     if (width <= 767) {
+      // Phones, portrait or landscape: one stage fills the view.
+      expect(g.stages[0].width).toBeGreaterThanOrEqual(g.width - 0.5);
+      expect(g.stages[1].left).toBeGreaterThanOrEqual(g.left + g.width - 0.5);
       await next(page).nth(1).click();
       await settled(page);
       await expectButtons(page, { previous: true, following: false });

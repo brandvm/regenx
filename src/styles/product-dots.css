@@ -1,31 +1,60 @@
 /* Home › service tabs: the dots under each product fan (smart-swiper.js,
    windowDots). Webflow owns the row (class Rx Product Dots, attribute
-   data-product-dots); the buttons are built by the script.
+   data-product-dots); the window, track and buttons are built by the script.
 
-   repo-css: js-state — the buttons and their aria-current exist only after
-   the script runs. Figma (Clean Up 9691-17979): 10px dots 10px apart in
-   #929292, the current one a 30 × 10 black pill. currentColor at 43% gives
-   that grey on the light section and follows the theme. */
+   repo-css: js-state — the buttons, their aria-current and the track's
+   transform exist only after the script runs. Figma (Clean Up 9691-17979):
+   10px dots 10px apart in #929292, the current one a 30 × 10 black pill.
+   currentColor at 43% gives that grey on the light card and follows the
+   theme. One dot per product, seen through a window of five; the pill moves
+   with every slide and the row slides under it once it reaches the middle. */
+.rx-product-dots-window {
+  --rx-dot: .625em;
+  --rx-dot-gap: .625em;
+  --rx-dot-step: calc(var(--rx-dot) + var(--rx-dot-gap));
+  display: flex;
+  justify-content: center;
+}
+
+/* Five dots wide: four dots, the pill (three dots' width) and four gaps. */
+.rx-product-dots-window.is-windowed {
+  justify-content: flex-start;
+  width: calc(var(--rx-dot) * 7 + var(--rx-dot-gap) * 4);
+  overflow: hidden;
+  /* Room for the focus ring inside the clipped window. */
+  padding: 5px;
+  margin: -5px;
+  box-sizing: content-box;
+}
+
+.rx-product-dots-track {
+  display: flex;
+  flex: none;
+  gap: var(--rx-dot-gap);
+  transition: transform 400ms cubic-bezier(.64, .05, 0, 1);
+}
+
 .rx-product-dot {
   position: relative;
   flex: none;
-  width: .625em;
-  height: .625em;
+  width: var(--rx-dot);
+  height: var(--rx-dot);
   padding: 0;
   border: 0;
   border-radius: 1em;
   background-color: currentColor;
   opacity: .43;
   cursor: pointer;
-  transition: opacity 240ms cubic-bezier(.64, .05, 0, 1);
+  transition:
+    width 400ms cubic-bezier(.64, .05, 0, 1),
+    opacity 240ms cubic-bezier(.64, .05, 0, 1);
 }
 
-/* A larger hit area without spreading the dots (24 × 20px at 16px). */
+/* A larger hit area without spreading the dots (20px tall at 16px). */
 .rx-product-dot::before {
   content: "";
   position: absolute;
   inset: -.3125em -.3125em;
-  inset-block: -.4375em;
 }
 
 .rx-product-dot:hover {
@@ -33,12 +62,19 @@
 }
 
 .rx-product-dot[aria-current="true"] {
-  width: 1.875em;
+  width: calc(var(--rx-dot) * 3);
   opacity: 1;
   cursor: default;
 }
 
 .rx-product-dot:focus-visible {
   outline: 2px solid currentColor;
-  outline-offset: 3px;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rx-product-dots-track,
+  .rx-product-dot {
+    transition: none;
+  }
 }

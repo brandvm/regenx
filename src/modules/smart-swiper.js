@@ -96,8 +96,9 @@ export const SmartSwiper = (function () {
       wrapper: ".service-tab-product-carousel",
       navPrev: ".swiper-prev",
       navNext: ".swiper-next",
-      // Figma (Clean Up 9691-17979): five dots under the fan, the active one a
-      // wide pill in the middle; no arrows (client 2026-06-29, Canva 223).
+      // Figma (Clean Up 9691-17979): dots under the fan, the current one a
+      // wide pill; no arrows (client 2026-06-29, Canva 223). They follow
+      // every slide change (client 2026-11-17).
       windowDots: "[data-product-dots]",
 
       // Coverflow stretch pulls each slide 100px toward centre, so roughly
@@ -302,10 +303,13 @@ export const SmartSwiper = (function () {
     return over;
   }
 
-  // Window dots: a fixed row of up to five buttons with the current slide in
-  // the middle. The others step 1 or 2 slides back or ahead, wrapping round,
-  // so the row reads the same at every position, as in Figma. Webflow owns
-  // the (empty) row; the buttons are built here.
+  // Window dots: one dot per slide, the current one a wide pill, shown
+  // through a window of five (Figma Clean Up 9691-17979). Each slide change
+  // moves the pill, and once it reaches the middle the row slides under it,
+  // so every swipe shows on the dots (client 2026-11-17). Near either end
+  // the window stops and the pill walks to the edge. Webflow owns the
+  // (empty) row; the window, track and buttons are built here.
+  var WINDOW_DOTS = 5;
   function attachWindowDots(el, cfg, swiper) {
     if (!cfg.windowDots) return;
     var host = resolveScopedEl(el, cfg, cfg.windowDots);
@@ -313,31 +317,55 @@ export const SmartSwiper = (function () {
     var total = el.querySelectorAll(".swiper-slide").length;
     if (total < 2) return;
     host.dataset.dotsBound = "1";
-    var count = Math.min(5, total);
-    var mid = Math.floor(count / 2);
-    var labels = { "-2": "2 products back", "-1": "Previous product", "1": "Next product", "2": "2 products ahead" };
     host.setAttribute("role", "group");
     host.setAttribute("aria-label", "Products");
     host.textContent = "";
-    for (var i = 0; i < count; i++) {
-      var offset = i - mid;
+    var win = document.createElement("div");
+    win.className = "rx-product-dots-window";
+    var track = document.createElement("div");
+    track.className = "rx-product-dots-track";
+    if (total > WINDOW_DOTS) win.classList.add("is-windowed");
+    var dots = [];
+    for (var i = 0; i < total; i++) {
       var b = document.createElement("button");
       b.type = "button";
       b.className = "rx-product-dot";
-      if (offset === 0) {
-        b.setAttribute("aria-current", "true");
-        b.setAttribute("aria-label", "Current product");
-      } else {
-        b.setAttribute("aria-label", labels[String(offset)]);
-        b.dataset.offset = String(offset);
-      }
-      host.appendChild(b);
+      b.dataset.index = String(i);
+      b.setAttribute("aria-label", "Product " + (i + 1) + " of " + total);
+      track.appendChild(b);
+      dots.push(b);
     }
+    win.appendChild(track);
+    host.appendChild(win);
+
+    var current = function () {
+      return typeof swiper.realIndex === "number" ? swiper.realIndex : swiper.activeIndex;
+    };
+    var render = function () {
+      var idx = Math.max(0, Math.min(total - 1, current()));
+      for (var j = 0; j < dots.length; j++) {
+        if (j === idx) dots[j].setAttribute("aria-current", "true");
+        else dots[j].removeAttribute("aria-current");
+        // Dots outside the window can't be reached by keyboard either.
+        dots[j].tabIndex = -1;
+      }
+      var start = 0;
+      if (total > WINDOW_DOTS) {
+        var half = Math.floor(WINDOW_DOTS / 2);
+        start = Math.max(0, Math.min(total - WINDOW_DOTS, idx - half));
+      }
+      for (var k = start; k < Math.min(total, start + WINDOW_DOTS); k++) dots[k].tabIndex = 0;
+      // One step = a dot plus the gap (both in em, set in product-dots.css).
+      track.style.transform = "translateX(calc(var(--rx-dot-step) * " + -start + "))";
+    };
+    render();
+    swiper.on("slideChange", render);
+    swiper.on("realIndexChange", render);
+
     host.addEventListener("click", function (e) {
-      var b = e.target.closest(".rx-product-dot[data-offset]");
+      var b = e.target.closest(".rx-product-dot");
       if (!b || swiper.destroyed) return;
-      var cur = typeof swiper.realIndex === "number" ? swiper.realIndex : swiper.activeIndex;
-      var to = (((cur + Number(b.dataset.offset)) % total) + total) % total;
+      var to = Number(b.dataset.index);
       if (swiper.params.loop) swiper.slideToLoop(to);
       else swiper.slideTo(to);
     });

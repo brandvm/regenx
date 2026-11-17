@@ -116,16 +116,23 @@ export function createTherapyTimeline(el) {
     const width = el.clientWidth - (parseInt(computed.paddingLeft, 10) || 0) -
       (parseInt(computed.paddingRight, 10) || 0);
     if (width <= 0) return;
-    // Equal stages: mobile portrait always shows one stage at full width (no
-    // peek); a timeline with data-timeline-stages shows that many per view
-    // (at most two below 992px) instead of sizing stages by their weeks.
+    // Equal stages: on phones (Webflow's ≤767 breakpoints, portrait and
+    // landscape) every timeline shows one stage at full width with no peek
+    // (client 2026-11-17: TRT and Peptide timelines); a timeline with
+    // data-timeline-stages shows that many per view (at most two below
+    // 992px) instead of sizing stages by their weeks.
     const stagesAttr = number(root.getAttribute("data-timeline-stages"), 0);
-    const perView = window.innerWidth <= 479
+    const perView = window.innerWidth <= 767
       ? 1
       : stagesAttr >= 1
         ? Math.min(Math.floor(stagesAttr), window.innerWidth <= 991 ? 2 : Infinity, slides.length)
         : 0;
-    const stagePx = perView ? width / perView : 0;
+    // One stage per view: round up to a whole pixel. The slider box is often a
+    // fraction wider than clientWidth, which let the first pixel of the next
+    // stage's text show at the right edge.
+    const exact = el.getBoundingClientRect().width -
+      (parseFloat(computed.paddingLeft) || 0) - (parseFloat(computed.paddingRight) || 0);
+    const stagePx = perView === 1 ? Math.ceil(Math.max(width, exact)) : perView ? width / perView : 0;
     const unit = width / visibleWeeks;
     root.style.setProperty("--timeline-week-width", `${unit}px`);
     slides.forEach((slide, index) => {
