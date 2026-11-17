@@ -11,6 +11,7 @@ import { initCatalogList } from './modules/catalog-list';
 import { initCatalogSearchFocus } from './modules/catalog-search-focus';
 import { initFaqSchema } from './modules/faq-schema';
 import { initLabTests } from './modules/lab-tests';
+import { initLabSticky } from './modules/lab-sticky';
 import { initMcCatalog } from './modules/mc-catalog';
 import { initBackToTop } from './modules/back-to-top';
 import { initDropdownMotion } from './modules/dropdown-motion';
@@ -94,6 +95,8 @@ async function boot() {
     // Nav search icon lands here: focus the catalog search (?search[=term]).
     await run('catalog-search-focus', initCatalogSearchFocus);
     await run('lab-tests', initLabTests);
+    // Lab Panel phones: the pinned biomarker bar rises while the nav hides.
+    await run('lab-sticky', initLabSticky);
     // Phone catalog: the category tabs stay in view under the nav.
     await run('catalog-sticky', initCatalogSticky);
     // Dialogs built in Webflow ([data-modal], wf-template recipe), then the
