@@ -1,10 +1,12 @@
 /* "As Seen In" logo rows (/services hero, /about). From wf-template
    recipes/snippets/marquee.css; src/modules/marquee.ts drives it. */
-/* repo-css: js-state — marquee.ts (recipes/snippets) clones the items, sets
-   --marquee-distance (one set, gap included) and --marquee-duration, and
-   adds .is-marquee; the row then runs on one line and loops. Without the
-   class (no script, reduced motion) the row keeps its Designer layout.
-   */
+/* repo-css: js-state — Webflow owns the structure (a one-line row with two
+   identical sets, the second aria-hidden; class Rx Marquee Set). marquee.ts
+   sets --marquee-distance (one set, gap included) and --marquee-duration
+   and adds .is-marquee, which runs the loop. Without the class (no script,
+   reduced motion, the Designer canvas) the row stays a still, clipped line.
+   The flex-wrap/width rules below only matter for a row the script still
+   has to clone (the fallback). */
 @keyframes marquee-scroll {
   to {
     transform: translate3d(var(--marquee-distance, -50%), 0, 0);

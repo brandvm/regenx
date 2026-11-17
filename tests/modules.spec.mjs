@@ -68,6 +68,36 @@ test('marquee stays a static row under reduced motion', async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
+// Since 2026-11-17 Webflow builds both sets (the second aria-hidden), so the
+// row is one clipped line even before the script runs.
+const authoredRow = `<div data-marquee-mask style="overflow:hidden;width:600px"><div data-marquee style="display:flex;flex-wrap:nowrap;width:max-content">
+  ${['', ' data-marquee-clone aria-hidden="true"'].map((attrs) => `<div data-marquee-set${attrs} style="display:flex;flex:none">
+    ${[1, 2, 3].map((n) => `<div style="flex:none;width:200px;height:100px"><img alt="Logo ${n}"><a href="#"></a></div>`).join('')}
+  </div>`).join('')}
+</div></div>`;
+
+test('marquee uses the Webflow-built copy set without cloning and loops by one set', async ({ page }) => {
+  const errors = await setup(page, authoredRow);
+  const row = page.locator('[data-marquee]');
+  await expect(row).toHaveClass(/is-marquee/);
+  await expect(row.locator(':scope > *')).toHaveCount(2);
+  await expect(row.locator('[data-marquee-clone] a[tabindex="-1"]')).toHaveCount(3);
+  await expect(row.locator(':scope > :not([data-marquee-clone]) a[tabindex]')).toHaveCount(0);
+  expect(await row.evaluate((el) => el.style.getPropertyValue('--marquee-distance'))).toBe('-600px');
+  expect(await row.evaluate((el) => getComputedStyle(el).animationName)).toBe('marquee-scroll');
+  expect(errors).toEqual([]);
+});
+
+test('Webflow-built marquee is one still line under reduced motion', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const errors = await setup(page, authoredRow);
+  const row = page.locator('[data-marquee]');
+  await expect(row).not.toHaveClass(/is-marquee/);
+  const tops = await row.locator('[data-marquee-set] > div').evaluateAll((els) => [...new Set(els.map((e) => Math.round(e.getBoundingClientRect().top)))]);
+  expect(tops).toHaveLength(1);
+  expect(errors).toEqual([]);
+});
+
 // The Peptide Therapy disclaimer, as built in Webflow.
 const disclaimer = `<main><h1>Peptide Therapy</h1><a href="/">Home</a></main>
 <div data-modal="peptide-disclaimer" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6)">
