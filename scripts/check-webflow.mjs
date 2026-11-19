@@ -12,7 +12,7 @@ const part = name => loader.match(new RegExp(`<!-- START ${name}:[\\s\\S]*?-->([
 const site = 'https://regen-x.webflow.io';
 const local = process.argv.includes('--local');
 const selectedPaths = process.argv.slice(2).filter(arg => arg.startsWith('/'));
-const paths = selectedPaths.length ? selectedPaths : ['/', '/services', '/about', '/contact', '/reviews', '/medical-catalog', '/testosterone-replacement-therapy', '/peptide-therapy', '/enclomiphene'];
+const paths = selectedPaths.length ? selectedPaths : ['/', '/services', '/about-us', '/contact', '/reviews', '/treatments', '/testosterone-replacement-therapy', '/peptides', '/enclomiphene'];
 // Webflow publishes the site head and footer verbatim; the embed spans two HTML Embeds.
 const snippets = { HEAD: part('HEAD'), FOOTER: part('FOOTER'), ...Object.fromEntries(
   part('EMBED').split(/(?=<script>)/).map((chunk, index) => [`EMBED ${index + 1}`, chunk.trim()])
@@ -41,7 +41,10 @@ try {
           const response = await route.fetch();
           const html = await response.text();
           assert.match(html, /data-wf-site="6a343f4bd4c8ed2f7270a980"/);
-          drift = Object.entries(snippets).filter(([, code]) => !html.includes(code)).map(([name]) => name);
+          // The installed head sets RELEASE; loader.html keeps it null (CI
+          // requires that). Compare with the release value normalised.
+          const normalised = html.replace(/var RELEASE = "[^"]+";/, 'var RELEASE = null;');
+          drift = Object.entries(snippets).filter(([, code]) => !normalised.includes(code)).map(([name]) => name);
           return route.fulfill({ response, body: html });
         }
         if (url.startsWith('https://brandvm.github.io/regenx/')) {
