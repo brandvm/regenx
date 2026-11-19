@@ -58,7 +58,7 @@ harvested across all client repos to improve `brandvm/wf-template`.
 - Symptom: a staging run sat in `deployment_queued`, was cancelled twice on GitHub's side, and the test-browser install hung 9 minutes; staging served the old bundle.
 - Cause: GitHub Pages outage; staging has no release to fall back to while `RELEASE = null`.
 - Fix: emergency only: in the Head code set `var STAG = "https://cdn.jsdelivr.net/gh/brandvm/regenx@<full-sha>/dist/"` (keep `loader.html` matching), then revert. Don't publish Webflow after removing old interactions until the new bundle is live. Long term: cut a release (MANUAL-TODO AC).
-- Status: open until a release exists
+- Status: release v0.1.0 cut 2026-11-19; resolved once the head code with RELEASE is pasted
 - Found by: claude
 
 ### 2026-11-06 · `auto: Mac` commits in history

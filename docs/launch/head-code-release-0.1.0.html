@@ -1,0 +1,89 @@
+<meta name="theme-color" content="#000000" />
+<script src="https://analytics.ahrefs.com/analytics.js" data-key="PtqjupbG4bujq85ZdpJCOA" async></script>
+<script async type="module" src="https://cdn.jsdelivr.net/npm/@finsweet/attributes@2/attributes.js" fs-mirrorclick fs-list fs-socialshare fs-toc></script>
+<style>
+  html.is-loading { overflow: hidden; }
+  html.is-loading .preloader { display: flex !important; }
+  html.rgx-ready .preloader, html.rgx-load-failed .preloader { display: none !important; }
+</style>
+<script>
+  (function () {
+    if (window.BV && window.BV.site === "regenx") return;
+    var RELEASE = "0.1.0";
+    var STAG = "https://brandvm.github.io/regenx/";
+    var DEV = "http://localhost:3000/";
+    // *.canvas.webflow.com is the Designer's custom-code preview: a separate
+    // origin, with its own URL flag and localStorage.
+    var staging = /\.webflow\.io$|\.canvas\.webflow\.com$/.test(location.hostname);
+    var local = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+    var q = new URLSearchParams(location.search);
+    var flag = q.has("bv-dev") ? q.get("bv-dev") === "1" : false;
+    try {
+      if (staging && q.has("bv-dev")) localStorage.setItem("bv-dev", flag ? "1" : "0");
+      if (staging && !q.has("bv-dev")) flag = localStorage.getItem("bv-dev") === "1";
+    } catch (e) { /* URL flags also work when browser storage is blocked. */ }
+    var dev = local || (staging && flag);
+    var prod = RELEASE ? "https://cdn.jsdelivr.net/gh/brandvm/regenx@" + RELEASE + "/dist/" : null;
+    // Warm the connection to wherever the bundle comes from. Two links on
+    // purpose: the stylesheet and its font fetches are CORS-different.
+    var from = dev ? DEV : staging ? STAG : prod;
+    if (from) [false, true].forEach(function (cors) {
+      var warm = document.createElement("link");
+      warm.rel = "preconnect";
+      warm.href = new URL(from).origin;
+      if (cors) warm.crossOrigin = "";
+      document.head.appendChild(warm);
+    });
+    // Release domain (wf-template 0.8.0 piece-1 fix): the Embed's static
+    // bv-css link points at the staging sheet for the Designer. Here the
+    // pinned release sheet is written into <head> instead: a parser-inserted
+    // head stylesheet holds first paint, so the page never paints unstyled
+    // or at the wrong scale. The Embed's link is then re-pointed at the same
+    // file as the parser inserts it (one request; runs before the Embed
+    // script, whose swap becomes a no-op). document.write is deliberate: it
+    // writes a stylesheet, never a script. If the release sheet fails
+    // (jsDelivr down or blocked), the Embed link goes back to staging.
+    var releaseCSSFailed;
+    if (!dev && !staging && RELEASE) {
+      var want = prod + "styles.css";
+      var embed, embedHref, failed = false;
+      releaseCSSFailed = function () {
+        failed = true;
+        if (embed && embed.href === want) embed.href = embedHref;
+      };
+      document.write('<link rel="stylesheet" href="' + want + '" onerror="BV.releaseCSSFailed()">');
+      if (window.MutationObserver) {
+        var watch = new MutationObserver(function () {
+          var link = document.getElementById("bv-css");
+          if (!link) return;
+          watch.disconnect();
+          embed = link;
+          embedHref = link.href;
+          if (!failed && link.href !== want) link.href = want;
+        });
+        watch.observe(document.documentElement, { childList: true, subtree: true });
+        document.addEventListener("DOMContentLoaded", function () { watch.disconnect(); });
+      }
+    }
+    var root = document.documentElement;
+    var timer;
+    var C = window.BV = {
+      site: "regenx",
+      staging: staging,
+      dev: dev,
+      devBase: DEV,
+      stag: STAG,
+      prod: prod,
+      releaseCSSFailed: releaseCSSFailed,
+      stamp: Date.now(),
+      release: function (failed) {
+        clearTimeout(timer);
+        root.classList.remove("is-loading");
+        root.classList.add(failed ? "rgx-load-failed" : "rgx-ready");
+      }
+    };
+    root.classList.add("is-loading");
+    // Independent of window.load: even a hanging external request cannot lock scrolling.
+    timer = setTimeout(function () { C.release(true); }, 8000);
+  })();
+</script>
