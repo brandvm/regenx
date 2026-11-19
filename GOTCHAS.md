@@ -521,7 +521,7 @@ harvested across all client repos to improve `brandvm/wf-template`.
 - Fix: none. Hiding the element breaks submissions if reCAPTCHA
   validation is on in Site settings › Forms. On 2026-10-28 the user chose
   to keep reCAPTCHA, so the space stays. Don't hide it.
-- Status: won't fix (keep reCAPTCHA, user decision 2026-10-28)
+- Status: superseded 2026-11-19: the form posts to HubSpot (hubspot-form.ts), so the user switched reCAPTCHA off in Site settings › Forms and the element was removed; its script had loaded render-blocking on every page.
 - Found by: claude
 
 ### 2026-10-28 · Component variant styles lose to the base style's breakpoints
@@ -833,4 +833,13 @@ they are not rediscovered. Status refers to the template.
 - Cause: the API exposes neither the image Load setting nor CMS bindings for Open Graph images.
 - Fix: `loading="eager"` + `fetchpriority="high"` as custom attributes on the hero images (check the published HTML: Webflow may keep its own `lazy`); bind template OG images in the Designer. Static pages take `openGraph.imageAssetId`.
 - Status: open (check published output after the next publish)
+- Found by: claude
+
+### 2026-11-19 · Figma text in FFF Acid Grotesk can't be edited through the MCP
+- Area: mcp
+- Scope: template-candidate
+- Symptom: Fixing typos in Figma text layers (`use_figma` → `loadFontAsync`) failed for every node: "The font family FFF Acid Grotesk does not exist."
+- Cause: the font is installed locally on the designer's machine, not in Figma's font service, so the plugin runtime can't load it, and text edits need the font loaded.
+- Fix: fix the text in Figma desktop where the font is installed, or (done here) patch the exported image: cover the word with the sampled background and redraw it on a canvas with the site's own font files (size fitted to the original ink width, OCR boxes from macOS Vision), then upload and swap with `set_image_asset`. SVG exports with outlined text: regenerate the outline with opentype.js.
+- Status: documented
 - Found by: claude
