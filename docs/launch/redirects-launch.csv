@@ -2,19 +2,19 @@ Old path,New path,Status,Notes
 /testosterone-replacement-for-low-t,/testosterone-replacement-therapy,Ready,
 /contact-regenx-health,/contact,Ready,
 /arimidex-guide,/treatments/arimidex-guide,Ready,Guide now a product page
-/avanafil-stendra,/treatments,Client to confirm,ED meds not in staging catalog. Confirm target
-/cialis-tadalafil,/treatments/tadalafil-odt-tablet,Client to confirm,Suggested: ED/PE/HGH product now published (/treatments/tadalafil-odt-tablet). Was /treatments. ED meds not in staging catalog. Confirm target
+/avanafil-stendra,/treatments,Ready,Destination decided by Brand Vision 2026-11-19. ED meds not in staging catalog. Confirm target
+/cialis-tadalafil,/treatments/tadalafil-odt-tablet,Ready,Destination decided by Brand Vision 2026-11-19. Suggested: ED/PE/HGH product now published (/treatments/tadalafil-odt-tablet). Was /treatments. ED meds not in staging catalog. Confirm target
 /clomid-guide,/treatments/clomid-guide,Ready,Guide now a product page
-/getting-started-on-ed-meds,/treatments,Client to confirm,"Wix already 301s this to /ed-treatment, which 404s (broken today). ED meds not in staging catalog. Confirm target"
+/getting-started-on-ed-meds,/treatments,Ready,"Destination decided by Brand Vision 2026-11-19. Wix already 301s this to /ed-treatment, which 404s (broken today). ED meds not in staging catalog. Confirm target"
 /hcg-guide,/treatments/hcg-guide,Ready,Guide now a product page
-/how-it-works,/services,Client to confirm,No How It Works page; process is on Services/Home. Confirm target
-/human-growth-hormone-therapy,/treatments/mk-677-ibutamoren,Client to confirm,Suggested: ED/PE/HGH product now published (/treatments/mk-677-ibutamoren). Was /treatments/ibutamoren-mesylate-capsule. Live page is an Ibutamoren (MK-677) guide; closest is the Ibutamoren product. Alt: /peptides. Confirm target
-/levitra-vardenafil,/treatments/vardenafil-troche,Client to confirm,Suggested: ED/PE/HGH product now published (/treatments/vardenafil-troche). Was /treatments. ED meds not in staging catalog. Confirm target
-/penile-shockwave-therapy-for-ed,/services,Client to confirm,"Wix already 301s this to /ed-shockwave-therapy, which 404s (broken today). No shockwave page on staging. Confirm target"
-/premature-ejaculaton-treatment,/treatments/endurapro-paroxetine-tadalafil-l-theanine-tablet,Client to confirm,Suggested: ED/PE/HGH product now published (/treatments/endurapro-paroxetine-tadalafil-l-theanine-tablet). Was /treatments. No PE page on staging. Confirm target
-/testosterone-guide,/treatments/testosterone-injections,Client to confirm,Closest product page. Confirm target
-/viagra-sildenafil,/treatments/sildenafil-capsule,Client to confirm,Suggested: ED/PE/HGH product now published (/treatments/sildenafil-capsule). Was /treatments. Hidden Wix page: not in sitemap but linked from every footer (Sildenafil). ED meds not in staging catalog. Confirm target
-/weight-loss-injections,/treatments/lipotropic-injections,Client to confirm,Live page is about Semaglutide (GLP-1); not offered on staging. Closest is Lipotropic Injections. Confirm target
+/how-it-works,/about-us,Ready,Destination decided by Brand Vision 2026-11-19. How It Works section is on About (#how-it-works); was /services. No How It Works page; process is on Services/Home. Confirm target
+/human-growth-hormone-therapy,/treatments/mk-677-ibutamoren,Ready,Destination decided by Brand Vision 2026-11-19. Suggested: ED/PE/HGH product now published (/treatments/mk-677-ibutamoren). Was /treatments/ibutamoren-mesylate-capsule. Live page is an Ibutamoren (MK-677) guide; closest is the Ibutamoren product. Alt: /peptides. Confirm target
+/levitra-vardenafil,/treatments/vardenafil-troche,Ready,Destination decided by Brand Vision 2026-11-19. Suggested: ED/PE/HGH product now published (/treatments/vardenafil-troche). Was /treatments. ED meds not in staging catalog. Confirm target
+/penile-shockwave-therapy-for-ed,/services,Ready,"Destination decided by Brand Vision 2026-11-19. Wix already 301s this to /ed-shockwave-therapy, which 404s (broken today). No shockwave page on staging. Confirm target"
+/premature-ejaculaton-treatment,/treatments/endurapro-paroxetine-tadalafil-l-theanine-tablet,Ready,Destination decided by Brand Vision 2026-11-19. Suggested: ED/PE/HGH product now published (/treatments/endurapro-paroxetine-tadalafil-l-theanine-tablet). Was /treatments. No PE page on staging. Confirm target
+/testosterone-guide,/treatments/testosterone-injections,Ready,Destination decided by Brand Vision 2026-11-19. Closest product page. Confirm target
+/viagra-sildenafil,/treatments/sildenafil-capsule,Ready,Destination decided by Brand Vision 2026-11-19. Suggested: ED/PE/HGH product now published (/treatments/sildenafil-capsule). Was /treatments. Hidden Wix page: not in sitemap but linked from every footer (Sildenafil). ED meds not in staging catalog. Confirm target
+/weight-loss-injections,/treatments/lipotropic-injections,Ready,Destination decided by Brand Vision 2026-11-19. Live page is about Semaglutide (GLP-1); not offered on staging. Closest is Lipotropic Injections. Confirm target
 /copy-of-the-team,/about-us,Ready,Wix duplicate page; consider deleting from sitemap
 /frequently-asked-questions-low-t-an,/faqs,Ready,
 /testosterone-clinic-reviews,/reviews,Ready,
@@ -25,30 +25,30 @@ Old path,New path,Status,Notes
 /testosterone-research-and-news/categories/peptide-therapy,/scientific-articles,Ready,Category pages are not published on staging (template off); send to blog listing
 /testosterone-research-and-news/categories/testosterone-therapy-for-low-t,/scientific-articles,Ready,Category pages are not published on staging (template off); send to blog listing
 /testosterone-research-and-news/categories/weight-loss,/scientific-articles,Ready,Category pages are not published on staging (template off); send to blog listing
-/service-policies,/practice-policy,Client to confirm,No Service Policies page on staging. Confirm target (Practice Policy or Terms)
+/service-policies,/practice-policy,Ready,Destination decided by Brand Vision 2026-11-19. No Service Policies page on staging. Confirm target (Practice Policy or Terms)
 /telemedine-consent,/telemedicine-consent,Ready,Typo slug on Wix fixed on staging
-/testosterone-consent,/telemedicine-consent,Client to confirm,No Testosterone Consent page on staging. Confirm target or build page
+/testosterone-consent,/telemedicine-consent,Ready,Destination decided by Brand Vision 2026-11-19. No Testosterone Consent page on staging. Confirm target or build page
 /common-symptoms-of-low-testosterone,/testosterone-replacement-therapy,Ready,Retired article page. Live now: 404; existed in Wayback Machine
-/copy-of-how-it-works,/services,Client to confirm,Wix 301s this to /how-it-works; point at the same target as /how-it-works. Live now: 301; existed in Wayback Machine
+/copy-of-how-it-works,/about-us,Ready,Destination decided by Brand Vision 2026-11-19. How It Works section is on About (#how-it-works); was /services. Wix 301s this to /how-it-works; point at the same target as /how-it-works. Live now: 301; existed in Wayback Machine
 /does-testosterone-therapy-cause-blood-clots,/post/will-i-get-a-blood-clot-on-testosterone-therapy,Ready,Retired article; same topic as this post. Live now: 404; existed in Wayback Machine
-/education-forum,/scientific-articles,Client to confirm,Retired forum page. Live now: 404; existed in Wayback Machine
-/natural-aphrodsiacs,/scientific-articles,Client to confirm,Retired article page. Live now: 404; existed in Wayback Machine
+/education-forum,/scientific-articles,Ready,Destination decided by Brand Vision 2026-11-19. Retired forum page. Live now: 404; existed in Wayback Machine
+/natural-aphrodsiacs,/scientific-articles,Ready,Destination decided by Brand Vision 2026-11-19. Retired article page. Live now: 404; existed in Wayback Machine
 /natural-testosterone,/enclomiphene,Ready,Wix already 301s this to /enclomiphene; keep it. Live now: 301; existed in Wayback Machine
-/patient-login,/,Client to confirm,Retired page; patient portal is external (power2patient.net). Live now: 404; existed in Wayback Machine
+/patient-login,/,Ready,Destination decided by Brand Vision 2026-11-19. Retired page; patient portal is external (power2patient.net). Live now: 404; existed in Wayback Machine
 /privacy-policy,/practice-policy,Ready,Retired page. Live now: 404; existed in Wayback Machine
 /search-results,/search,Ready,Wix already 301s this to /search; keep it. Live now: 301; existed in Wayback Machine
-/services/advanced-prostate-health-screening,/lab-tests,Client to confirm,Old WordPress service page (screening). Live now: 404; existed in Wayback Machine
-/services/early-cancer-genetic-screening,/lab-tests,Client to confirm,Old WordPress service page (screening). Live now: 404; existed in Wayback Machine
-/services/erectile-dysfunction-enhancement,/treatments,Client to confirm,Old WordPress service page (ED); no ED page on staging. Live now: 404; existed in Wayback Machine
-/services/growth-hormone-therapy-houston,/peptides,Client to confirm,Old WordPress service page (growth hormone). Live now: 404; existed in Wayback Machine
-/services/male-fertility-evaluation-houston,/enclomiphene,Client to confirm,Old WordPress service page (fertility). Live now: 404; existed in Wayback Machine
-/services/mens-medical-weight-loss,/treatments/lipotropic-injections,Client to confirm,Old WordPress service page (weight loss). Live now: 404; existed in Wayback Machine
-/services/penile-shock-wave-therapy,/services,Client to confirm,Old WordPress service page; no shockwave page on staging. Live now: 404; existed in Wayback Machine
+/services/advanced-prostate-health-screening,/lab-tests,Ready,Destination decided by Brand Vision 2026-11-19. Old WordPress service page (screening). Live now: 404; existed in Wayback Machine
+/services/early-cancer-genetic-screening,/lab-tests,Ready,Destination decided by Brand Vision 2026-11-19. Old WordPress service page (screening). Live now: 404; existed in Wayback Machine
+/services/erectile-dysfunction-enhancement,/treatments,Ready,Destination decided by Brand Vision 2026-11-19. Old WordPress service page (ED); no ED page on staging. Live now: 404; existed in Wayback Machine
+/services/growth-hormone-therapy-houston,/peptides,Ready,Destination decided by Brand Vision 2026-11-19. Old WordPress service page (growth hormone). Live now: 404; existed in Wayback Machine
+/services/male-fertility-evaluation-houston,/enclomiphene,Ready,Destination decided by Brand Vision 2026-11-19. Old WordPress service page (fertility). Live now: 404; existed in Wayback Machine
+/services/mens-medical-weight-loss,/treatments/lipotropic-injections,Ready,Destination decided by Brand Vision 2026-11-19. Old WordPress service page (weight loss). Live now: 404; existed in Wayback Machine
+/services/penile-shock-wave-therapy,/services,Ready,Destination decided by Brand Vision 2026-11-19. Old WordPress service page; no shockwave page on staging. Live now: 404; existed in Wayback Machine
 /services/testosterone-replacement-therapy,/testosterone-replacement-therapy,Ready,Old WordPress service page. Live now: 404; existed in Wayback Machine
 /testosterone-injection-guide,/treatments/testosterone-injections,Ready,Retired guide page. Live now: 404; existed in Wayback Machine
 /testosterone-muscle-growth,/post/testosterone-use-and-effect-on-muscle-growth-size-strength,Ready,Retired article; same topic as this post. Live now: 404; existed in Wayback Machine
 /tos,/terms-conditions,Ready,Retired page. Live now: 404; existed in Wayback Machine
-/unique-ed-meds,/treatments,Client to confirm,Retired ED page; no ED page on staging. Live now: 404; existed in Wayback Machine
-/videos,/reviews,Client to confirm,Retired videos page; video testimonials now on Reviews. Live now: 404; existed in Wayback Machine
-/vitamin-b12-energy-performance,/treatments/methylcobalamin-1mg-ml,Client to confirm,Retired B12 page; Methylcobalamin is the B12 product. Live now: 404; existed in Wayback Machine
+/unique-ed-meds,/treatments,Ready,Destination decided by Brand Vision 2026-11-19. Retired ED page; no ED page on staging. Live now: 404; existed in Wayback Machine
+/videos,/reviews,Ready,Destination decided by Brand Vision 2026-11-19. Retired videos page; video testimonials now on Reviews. Live now: 404; existed in Wayback Machine
+/vitamin-b12-energy-performance,/treatments/methylcobalamin-1mg-ml,Ready,Destination decided by Brand Vision 2026-11-19. Retired B12 page; Methylcobalamin is the B12 product. Live now: 404; existed in Wayback Machine
 /faqs/locations,/faqs/pharmacy,Ready,FAQ category renamed (REDIRECTS.md)
