@@ -23,16 +23,20 @@
   "pages": [
     "/",
     "/testosterone-replacement-therapy",
-    "/peptide-therapy",
+    "/peptides",
     "/enclomiphene",
-    "/lab-panel",
+    "/lab-tests",
     "/services",
-    "/product/bpc-157",
-    "/medical-catalog",
-    "/about",
+    "/treatments",
+    "/treatments/testosterone-injections",
+    "/about-us",
     "/contact",
-    "/faq",
-    "/faqs/general-information"
+    "/faqs",
+    "/faqs/general-information",
+    "/reviews",
+    "/scientific-articles",
+    "/post/do-i-have-low-t",
+    "/practice-policy"
   ],
   "seo": {
     "noindexOk": [
@@ -67,5 +71,6 @@
     ],
     "tolerance": 1
   },
-  "prototypeUrl": "http://localhost:5173"
+  "prototypeUrl": "http://localhost:5173",
+  "liveUrl": "https://www.regenxhealth.com"
 }

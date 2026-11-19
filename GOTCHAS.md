@@ -825,3 +825,12 @@ they are not rediscovered. Status refers to the template.
 - Fix: judge glass effects on staging (or the localhost prototype), not on element snapshots.
 - Status: open
 - Found by: claude
+
+### 2026-11-19 · Image "Load: Eager" and CMS Open Graph images aren't in the data API
+- Area: mcp
+- Scope: template-candidate
+- Symptom: Fixing a 9–10 s phone LCP (hero images published with `loading="lazy"`): `get_settings` on an Image lists only domId, assetId, altText, visibility and attributes. Binding a template's Open Graph image through `bulk_update_pages` (`imageUrl` = `{{wf …ImageRef}}`, as the Posts template reads back) fails validation: imageUrl must be an http(s) URI.
+- Cause: the API exposes neither the image Load setting nor CMS bindings for Open Graph images.
+- Fix: `loading="eager"` + `fetchpriority="high"` as custom attributes on the hero images (check the published HTML: Webflow may keep its own `lazy`); bind template OG images in the Designer. Static pages take `openGraph.imageAssetId`.
+- Status: open (check published output after the next publish)
+- Found by: claude

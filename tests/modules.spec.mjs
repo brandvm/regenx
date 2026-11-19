@@ -421,3 +421,23 @@ test('back to top button scrolls the page to the top', async ({ page }) => {
   await expect.poll(() => page.evaluate(() => window.scrollY), { timeout: 5000 }).toBe(0);
   expect(errors).toEqual([]);
 });
+
+// Article "In this Article" box (fs-toc): as Webflow publishes it, before
+// Finsweet fills it, the template link reads "Loading".
+const tocPage = (body) => `<div class="article-body-main" fs-toc-element="contents">${body}</div>
+<div class="article-sticky"><div class="article-sticky-block"><div class="d6">Content</div>
+<div fs-toc-element="table" class="article-sticky-toc"><div class="toc-link-w"><a href="#" class="toc-link">
+<div fs-toc-element="link">Loading</div></a></div></div></div></div>`;
+
+test('an article with no headings hides its table of contents', async ({ page }) => {
+  const errors = await setup(page, tocPage('<p>Consent text with no sections.</p>'));
+  await expect(page.locator('.article-sticky-block')).toBeHidden();
+  await expect(page.getByText('Loading')).toBeHidden();
+  expect(errors).toEqual([]);
+});
+
+test('an article with headings keeps its table of contents', async ({ page }) => {
+  const errors = await setup(page, tocPage('<h2>Symptoms</h2><p>Text.</p>'));
+  await expect(page.locator('.article-sticky-block')).toBeVisible();
+  expect(errors).toEqual([]);
+});
