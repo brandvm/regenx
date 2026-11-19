@@ -53,6 +53,37 @@ existing immutable tag (e.g. "1.0.0") only when dist/ is in that release tag.
       if (cors) warm.crossOrigin = "";
       document.head.appendChild(warm);
     });
+    // Release domain (wf-template 0.8.0 piece-1 fix): the Embed's static
+    // bv-css link points at the staging sheet for the Designer. Here the
+    // pinned release sheet is written into <head> instead: a parser-inserted
+    // head stylesheet holds first paint, so the page never paints unstyled
+    // or at the wrong scale. The Embed's link is then re-pointed at the same
+    // file as the parser inserts it (one request; runs before the Embed
+    // script, whose swap becomes a no-op). document.write is deliberate: it
+    // writes a stylesheet, never a script. If the release sheet fails
+    // (jsDelivr down or blocked), the Embed link goes back to staging.
+    var releaseCSSFailed;
+    if (!dev && !staging && RELEASE) {
+      var want = prod + "styles.css";
+      var embed, embedHref, failed = false;
+      releaseCSSFailed = function () {
+        failed = true;
+        if (embed && embed.href === want) embed.href = embedHref;
+      };
+      document.write('<link rel="stylesheet" href="' + want + '" onerror="BV.releaseCSSFailed()">');
+      if (window.MutationObserver) {
+        var watch = new MutationObserver(function () {
+          var link = document.getElementById("bv-css");
+          if (!link) return;
+          watch.disconnect();
+          embed = link;
+          embedHref = link.href;
+          if (!failed && link.href !== want) link.href = want;
+        });
+        watch.observe(document.documentElement, { childList: true, subtree: true });
+        document.addEventListener("DOMContentLoaded", function () { watch.disconnect(); });
+      }
+    }
     var root = document.documentElement;
     var timer;
     var C = window.BV = {
@@ -62,6 +93,7 @@ existing immutable tag (e.g. "1.0.0") only when dist/ is in that release tag.
       devBase: DEV,
       stag: STAG,
       prod: prod,
+      releaseCSSFailed: releaseCSSFailed,
       stamp: Date.now(),
       release: function (failed) {
         clearTimeout(timer);

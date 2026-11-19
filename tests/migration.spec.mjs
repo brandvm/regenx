@@ -294,3 +294,26 @@ test('with a release set, production loads the pinned CSS and JS',async({page})=
   expect(requests.some(u=>u.startsWith(stag+'index.js'))).toBe(false);
   expect(errors).toEqual([]);
 });
+
+// wf-template 0.8.0 piece-1 fix: on a release domain the pinned sheet is
+// written into <head> (holds first paint) and the Embed's link follows it.
+test('with a release set, production writes the pinned stylesheet into head',async({page})=>{
+  const {errors}=await setup(page,{url:'https://regenx.example/',release:'1.0.0'});
+  await expect(page.locator('html')).toHaveClass(/rgx-ready/);
+  expect(await page.locator(`head link[rel=stylesheet][href="${prod}styles.css"]`).count()).toBe(1);
+  await expect(page.locator('#bv-css')).toHaveAttribute('href',prod+'styles.css');
+  expect(errors).toEqual([]);
+});
+
+test('with a release set, staging does not write a head stylesheet',async({page})=>{
+  await setup(page,{release:'1.0.0'});
+  await expect(page.locator('html')).toHaveClass(/rgx-ready/);
+  expect(await page.locator(`head link[href^="${prod}"][rel=stylesheet]`).count()).toBe(0);
+  expect(await page.evaluate(()=>window.BV.source)).toBe(stag);
+});
+
+test('with a release set, a failing jsDelivr sheet puts the Embed link back on staging',async({page})=>{
+  await setup(page,{url:'https://regenx.example/',release:'1.0.0',fail:u=>u.startsWith(prod)&&u.endsWith('styles.css')});
+  await expect(page.locator('html')).toHaveClass(/rgx-(ready|load-failed)/);
+  await expect.poll(()=>page.locator('link[rel=stylesheet][href^="'+stag+'styles.css"]').count()).toBeGreaterThan(0);
+});
