@@ -11,7 +11,7 @@ The new website is nearly ready to go live. To launch on time we need the answer
 
 2. **Phone number and address.** The current site lists **1-888-673-4369** and **7777 Southwest Freeway, Houston, TX 77074** (in the information Google reads). Are both still correct? Should the phone number also be shown on the website (footer and Contact page), or only given to Google?
 
-3. **Google Analytics.** The current site only has an old Google Analytics code that stopped collecting data in 2024, so there is nothing to carry over. Do you have a newer Google Analytics 4 property? If yes, please add brandvm as a user (or send us the Measurement ID, it starts with `G-`). If not, shall we create one for you?
+3. **Google Analytics.** Done: we found the GA4 property your current site uses (G-SDBN31SRST) and connected the new site to it, so your history continues. Please make sure someone at Brand Vision has access to it in Google Analytics, so we can check the numbers after launch.
 
 4. **Google Search Console.** Who has access to the Search Console account for regenxhealth.com? We'll keep the site verified through the switch and submit the new sitemap, so we need access too (or the owner to add us).
 

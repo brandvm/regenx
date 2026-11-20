@@ -19,6 +19,22 @@ existing immutable tag (e.g. "1.0.0") only when dist/ is in that release tag.
 <!-- START HEAD: Site settings → Custom code → Head code -->
 <meta name="theme-color" content="#000000" />
 <script src="https://analytics.ahrefs.com/analytics.js" data-key="PtqjupbG4bujq85ZdpJCOA" async></script>
+<!-- Google tag (gtag.js), GA4 G-SDBN31SRST: the property the old Wix site
+     used. Live domain only, so staging and local visits are not counted. -->
+<script>
+  (function () {
+    if (!/(^|\.)regenxhealth\.com$/.test(location.hostname)) return;
+    var id = "G-SDBN31SRST";
+    var s = document.createElement("script");
+    s.async = true;
+    s.src = "https://www.googletagmanager.com/gtag/js?id=" + id;
+    document.head.appendChild(s);
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () { dataLayer.push(arguments); };
+    gtag("js", new Date());
+    gtag("config", id);
+  })();
+</script>
 <script async type="module" src="https://cdn.jsdelivr.net/npm/@finsweet/attributes@2/attributes.js" fs-mirrorclick fs-list fs-socialshare fs-toc></script>
 <style>
   html.is-loading { overflow: hidden; }
