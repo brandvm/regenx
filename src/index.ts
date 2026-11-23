@@ -34,6 +34,7 @@ import { initCustomSelect } from './modules/custom-select';
 import { initNavSearch } from './modules/nav-search';
 import { initEmptySections } from './modules/empty-sections';
 import { initHubSpotForm } from './modules/hubspot-form';
+import { initConsent } from './modules/consent';
 
 // Each module runs in isolation: one that throws is logged and skipped,
 // and every module after it still initializes.
@@ -80,6 +81,7 @@ async function boot() {
     // Forms with data-hubspot-form post to HubSpot, not Webflow. After main:
     // FormSteps' capture-phase submit check runs first. Also loads the
     // HubSpot tracking code.
+    await run('consent', initConsent);
     await run('hubspot-form', initHubSpotForm);
     await run('hover-roll', initHoverRoll);
     await run('tooltip-hover', initTooltipHover);

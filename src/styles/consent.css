@@ -1,0 +1,7 @@
+/* repo-css: js-state — consent.ts opens the cookie banner ([data-open]) when
+   no choice is stored or "Cookie settings" is clicked. Its look (position,
+   colours, spacing) is Webflow's: classes Rx Cookie Banner and friends.
+   The Designer canvas (html.w-editor) keeps showing it so it can be edited. */
+html:not(.w-editor) [data-cookie-banner]:not([data-open]) {
+  display: none;
+}

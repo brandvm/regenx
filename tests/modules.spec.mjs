@@ -441,3 +441,48 @@ test('an article with headings keeps its table of contents', async ({ page }) =>
   await expect(page.locator('.article-sticky-block')).toBeVisible();
   expect(errors).toEqual([]);
 });
+
+// Cookie banner (consent.ts): opt-in, GA (window.RXGA from the head code)
+// and HubSpot tracking only after Accept.
+const banner = `<div data-cookie-banner><p>We use cookies.</p>
+<button data-consent="decline">Decline</button><button data-consent="accept">Accept</button></div>
+<a href="#" data-cookie-settings>Cookie settings</a>
+<script>window.__ga=0;window.RXGA=function(){window.__ga++;};</script>`;
+
+test('cookie banner opens on a first visit; Accept stores the choice and loads GA', async ({ page }) => {
+  const errors = await setup(page, banner);
+  const box = page.locator('[data-cookie-banner]');
+  await expect(box).toBeVisible();
+  await expect(box).toHaveAttribute('role', 'region');
+  expect(await page.evaluate(() => window.__ga)).toBe(0);
+  await page.getByRole('button', { name: 'Accept' }).click();
+  await expect(box).toBeHidden();
+  expect(await page.evaluate(() => window.__ga)).toBe(1);
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('rx-consent')).v)).toBe('granted');
+  expect(errors).toEqual([]);
+});
+
+test('Decline stores the choice and loads nothing; Cookie settings reopens the banner', async ({ page }) => {
+  await setup(page, banner);
+  await page.getByRole('button', { name: 'Decline' }).click();
+  await expect(page.locator('[data-cookie-banner]')).toBeHidden();
+  expect(await page.evaluate(() => window.__ga)).toBe(0);
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('rx-consent')).v)).toBe('denied');
+  await page.getByRole('link', { name: 'Cookie settings' }).click();
+  await expect(page.locator('[data-cookie-banner]')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Accept' })).toBeFocused();
+});
+
+test('a returning visitor who accepted gets GA and no banner', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('rx-consent', JSON.stringify({ v: 'granted', t: Date.now() })));
+  await setup(page, banner);
+  await expect(page.locator('[data-cookie-banner]')).toBeHidden();
+  expect(await page.evaluate(() => window.__ga)).toBe(1);
+});
+
+test('a choice older than 12 months asks again', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('rx-consent', JSON.stringify({ v: 'granted', t: Date.now() - 400 * 864e5 })));
+  await setup(page, banner);
+  await expect(page.locator('[data-cookie-banner]')).toBeVisible();
+  expect(await page.evaluate(() => window.__ga)).toBe(0);
+});

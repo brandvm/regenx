@@ -18,9 +18,12 @@
 //   (delegated) handler, so nothing is posted to Webflow.
 //
 //   HubSpot account: REGENX Health, portal 248037195 (na2). Its tracking
-//   code loads on every page so submissions link to the visitor's pages
-//   and traffic source (hubspotutk cookie).
+//   code loads on every page once the visitor accepts cookies (consent.ts),
+//   so submissions link to the visitor's pages and traffic source
+//   (hubspotutk cookie).
 // ============================================
+import { onConsent } from './consent';
+
 const PORTAL = '248037195';
 const TRACKING_SRC = `https://js-na2.hs-scripts.com/${PORTAL}.js`;
 const ENDPOINT = 'https://api.hsforms.com/submissions/v3/integration/submit';
@@ -161,5 +164,8 @@ function initOne(form: HTMLFormElement) {
 export function initHubSpotForm() {
   const forms = document.querySelectorAll<HTMLFormElement>('form[data-hubspot-form]');
   forms.forEach(initOne);
-  loadTracking();
+  // HubSpot's tracking code sets cookies: only after the cookie banner's
+  // Accept (consent.ts). Without it the form still submits, just without
+  // the hutk visitor link.
+  onConsent(loadTracking);
 }
