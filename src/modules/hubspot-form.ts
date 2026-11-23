@@ -10,8 +10,15 @@
 //   FIELD_MAP by the Webflow field name. Checkboxes with the same property
 //   are sent as one multiple-checkbox value ("A;B"), each option being the
 //   checkbox's data-hs-value or its Webflow display name (data-name).
-//   Inputs with data-hs-skip, or with neither, are not sent. A filled
-//   [data-hs-honeypot] field drops the submission silently.
+//   Inputs with data-hs-skip, or with neither, are not sent.
+//
+//   Bot checks (no server, so a script posting straight to HubSpot can
+//   still skip them; HubSpot's own filtering is the last line):
+//   - a filled [data-hs-honeypot] field drops the submission silently;
+//   - a submit under MIN_FILL_MS after the form loaded is dropped silently;
+//   - Webflow's invisible Turnstile must have issued a token
+//     (cf-turnstile-response) — waited for up to TOKEN_WAIT_MS, then the
+//     error pane. Forms without the Turnstile field skip this check.
 //
 //   Runs after FormSteps' capture-phase submit check, which stops invalid
 //   or early submits before this sees them; this then stops Webflow's own
@@ -27,6 +34,8 @@ import { onConsent } from './consent';
 const PORTAL = '248037195';
 const TRACKING_SRC = `https://js-na2.hs-scripts.com/${PORTAL}.js`;
 const ENDPOINT = 'https://api.hsforms.com/submissions/v3/integration/submit';
+const MIN_FILL_MS = 3000;
+const TOKEN_WAIT_MS = 8000;
 
 const FIELD_MAP: Record<string, string> = {
   'First-Name': 'firstname',
@@ -103,12 +112,25 @@ function setPane(wrap: Element | null, form: HTMLFormElement, state: 'form' | 'd
   if (fail) fail.style.display = state === 'fail' ? 'block' : 'none';
 }
 
+// Webflow's Turnstile runs invisibly and writes its token into a hidden
+// input in the form. null: the form has no Turnstile, so nothing to wait for.
+async function turnstileToken(form: HTMLFormElement): Promise<string | null> {
+  const field = () => form.querySelector<HTMLInputElement>('input[name="cf-turnstile-response"]');
+  if (!field()) return null;
+  const started = performance.now();
+  while (!field()?.value && performance.now() - started < TOKEN_WAIT_MS) {
+    await new Promise(r => setTimeout(r, 250));
+  }
+  return field()?.value ?? '';
+}
+
 function initOne(form: HTMLFormElement) {
   const guid = form.dataset.hubspotForm?.trim();
   if (!guid || form.dataset.hubspotReady) return;
   form.dataset.hubspotReady = '';
   const portal = form.dataset.hubspotPortal?.trim() || PORTAL;
   const wrap = form.closest('.w-form') ?? form.parentElement;
+  const loadedAt = performance.now();
   let sending = false;
 
   form.addEventListener('submit', async e => {
@@ -118,7 +140,8 @@ function initOne(form: HTMLFormElement) {
     if (sending) return;
 
     const honeypot = form.querySelector<HTMLInputElement>('[data-hs-honeypot]');
-    if (honeypot?.value) {
+    // Bots: pretend it worked, send nothing.
+    if (honeypot?.value || performance.now() - loadedAt < MIN_FILL_MS) {
       setPane(wrap, form, 'done');
       return;
     }
@@ -128,6 +151,16 @@ function initOne(form: HTMLFormElement) {
     form.setAttribute('aria-busy', 'true');
     buttons.forEach(b => { b.disabled = true; });
     setPane(wrap, form, 'form');
+
+    const token = await turnstileToken(form);
+    if (token === '') {
+      console.warn('[RegenX] Form not sent: Turnstile gave no token');
+      sending = false;
+      form.removeAttribute('aria-busy');
+      buttons.forEach(b => { b.disabled = false; });
+      setPane(wrap, form, 'fail');
+      return;
+    }
 
     const hutk = cookie('hubspotutk');
     const body = {

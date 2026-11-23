@@ -25,6 +25,15 @@ harvested across all client repos to improve `brandvm/wf-template`.
 
 ## This project
 
+### 2026-11-23 · An MCP-built form text input is required by default
+- Area: mcp
+- Scope: template-candidate
+- Symptom: The Contact form honeypot input, built with `data_element_builder` › FormTextInput, read back `required: true`, name "Field", id "field". Published like that, every real submission would fail validation on a field nobody can see.
+- Cause: the builder's default for a new text input is required.
+- Fix: right after creating an input, `set_settings` › `required` false (plus `name` and `domId`), and read the settings back before publishing.
+- Status: documented
+- Found by: claude
+
 ### 2026-11-23 · Staging changes don't reach the release domain
 - Area: release
 - Scope: template-candidate

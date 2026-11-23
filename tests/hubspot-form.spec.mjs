@@ -7,7 +7,7 @@ const URL_RE = /api\.hsforms\.com\/submissions\/v3\/integration\/submit\/2480371
 
 // The Contact form as Webflow publishes it (trimmed): two steps, Webflow
 // field names, the state option with Webflow's leading space, a honeypot.
-const fixture = (attrs = `data-hubspot-form="${GUID}"`) => `
+const fixture = (attrs = `data-hubspot-form="${GUID}"`, extra = '') => `
 <div class="w-form"><div data-form-steps><form id="wf-form-Consultation-Form" ${attrs}>
   <span data-step-label></span><p data-step-err hidden>Select one</p>
   <div data-step="1"><div data-step-required>
@@ -25,6 +25,7 @@ const fixture = (attrs = `data-hubspot-form="${GUID}"`) => `
     <input aria-label="Date of Birth" name="Date-of-Birth">
     <input aria-label="Message" name="Message">
     <input aria-label="Website" name="website" data-hs-honeypot data-hs-skip tabindex="-1">
+    ${extra}
     <button type="button" data-step-back>Back</button><button type="submit">Submit</button>
   </div>
 </form>
@@ -34,6 +35,8 @@ const fixture = (attrs = `data-hubspot-form="${GUID}"`) => `
 async function setup(page, markup = fixture()) {
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
+  // Time runs normally; fill() jumps it past the minimum fill time.
+  await page.clock.install();
   await page.setContent(markup);
   await page.evaluate(() => {
     window.Webflow = { env: () => false, push: fn => fn() };
@@ -46,7 +49,7 @@ async function setup(page, markup = fixture()) {
   return errors;
 }
 
-async function fill(page) {
+async function fill(page, { wait = true } = {}) {
   await page.getByLabel('TRT').check();
   await page.getByLabel('Other', { exact: true }).check();
   await page.getByRole('button', { name: 'Next' }).click();
@@ -56,7 +59,11 @@ async function fill(page) {
   await page.getByLabel('Email').fill('ann@example.invalid');
   await page.getByLabel('State').selectOption(' Texas');
   await page.getByLabel('Date of Birth').fill('01/02/1980');
+  if (wait) await page.clock.fastForward(4000);
 }
+
+// Webflow's invisible Turnstile writes its token into this hidden input.
+const TURNSTILE = (value = '') => `<input type="hidden" name="cf-turnstile-response" value="${value}">`;
 
 test('sends mapped fields to HubSpot and shows the success pane', async ({ page }) => {
   let body;
@@ -123,5 +130,57 @@ test('without data-hubspot-form the form still posts to Webflow', async ({ page 
   await fill(page);
   await page.getByRole('button', { name: 'Submit' }).click();
   expect(await page.evaluate(() => window.__webflowPosts)).toBe(1);
+  expect(calls).toBe(0);
+});
+
+test('a submit within 3 seconds of load sends nothing', async ({ page }) => {
+  let calls = 0;
+  await page.route(URL_RE, route => { calls++; return route.fulfill({ status: 200, body: '{}' }); });
+  await setup(page);
+  // Pause time: everything below happens "instantly" after load.
+  await page.clock.pauseAt(Date.now() + 1);
+  await fill(page, { wait: false });
+  await page.getByRole('button', { name: 'Submit' }).click();
+  await expect(page.locator('.w-form-done')).toBeVisible();
+  expect(calls).toBe(0);
+});
+
+test('with a Turnstile token it sends, without the token field', async ({ page }) => {
+  let body;
+  await page.route(URL_RE, async route => {
+    body = route.request().postDataJSON();
+    await route.fulfill({ status: 200, body: '{}' });
+  });
+  await setup(page, fixture(undefined, TURNSTILE('tok-123')));
+  await fill(page);
+  await page.getByRole('button', { name: 'Submit' }).click();
+  await expect(page.locator('.w-form-done')).toBeVisible();
+  expect(body.fields.some(f => /turnstile/.test(f.name) || f.value === 'tok-123')).toBe(false);
+});
+
+test('waits for a late Turnstile token, then sends', async ({ page }) => {
+  let calls = 0;
+  await page.route(URL_RE, route => { calls++; return route.fulfill({ status: 200, body: '{}' }); });
+  await setup(page, fixture(undefined, TURNSTILE()));
+  await fill(page);
+  await page.getByRole('button', { name: 'Submit' }).click();
+  await page.clock.runFor(1000);
+  expect(calls).toBe(0);
+  await page.locator('[name="cf-turnstile-response"]').evaluate(el => { el.value = 'late'; });
+  await page.clock.runFor(500);
+  await expect(page.locator('.w-form-done')).toBeVisible();
+  expect(calls).toBe(1);
+});
+
+test('no Turnstile token after 8 seconds: error pane, nothing sent', async ({ page }) => {
+  let calls = 0;
+  await page.route(URL_RE, route => { calls++; return route.fulfill({ status: 200, body: '{}' }); });
+  await setup(page, fixture(undefined, TURNSTILE()));
+  await fill(page);
+  await page.getByRole('button', { name: 'Submit' }).click();
+  await page.clock.runFor(9000);
+  await expect(page.locator('.w-form-fail')).toBeVisible();
+  await expect(page.getByLabel('Email')).toHaveValue('ann@example.invalid');
+  await expect(page.getByRole('button', { name: 'Submit' })).toBeEnabled();
   expect(calls).toBe(0);
 });
