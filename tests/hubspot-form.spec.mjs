@@ -138,7 +138,9 @@ test('a submit within 3 seconds of load sends nothing', async ({ page }) => {
   await page.route(URL_RE, route => { calls++; return route.fulfill({ status: 200, body: '{}' }); });
   await setup(page);
   // Pause time: everything below happens "instantly" after load.
-  await page.clock.pauseAt(Date.now() + 1);
+  // The page's own clock, with a margin so pauseAt never lands in the past.
+  const now = await page.evaluate(() => Date.now());
+  await page.clock.pauseAt(now + 500);
   await fill(page, { wait: false });
   await page.getByRole('button', { name: 'Submit' }).click();
   await expect(page.locator('.w-form-done')).toBeVisible();
