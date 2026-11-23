@@ -21,7 +21,7 @@ The new website is nearly ready to go live. To launch on time we need the answer
 
 6. **Health data and HIPAA.** The consultation form now goes to HubSpot. Your HubSpot plan (Starter) doesn't include HubSpot's HIPAA option or a signed BAA. We've added the line "Please do not include any personal health information in this message." under the message box. Please confirm with your compliance contact whether that is acceptable for now, or whether you want to move to HubSpot's HIPAA-ready plan.
 
-7. **Cookie / tracking consent.** Once analytics is added, do you want a cookie consent banner? For a health website this is recommended (Washington's My Health My Data Act and federal guidance on tracking on health pages). Your legal contact's view is welcome.
+7. **Cookie / tracking consent.** Done: the new site shows a cookie banner. Google Analytics and HubSpot tracking only start after a visitor clicks Accept, and a "Cookie Settings" link in the footer lets them change their choice. If your legal contact wants different wording, send it over.
 
 8. **Reviews page photo.** The top photo on the Reviews page is still a placeholder. Please send the photo you'd like there (or let us choose one from your library).
 
