@@ -16,7 +16,7 @@ source of agent rules — edit this file, never a copy of it.
   once `RELEASE` is set
 - Production domain: `https://www.regenxhealth.com` (www, decided 2026-11-09 for canonicals; the old Wix site is still live there, and
   production hosting stays unconfigured during development)
-- Production release: `v0.1.0` (tag on 1b306da, 2026-11-19). The installed HEAD snippet sets `RELEASE = "0.1.0"` (`docs/launch/head-code-release-0.1.0.html`); `loader.html` keeps `RELEASE = null` (CI requires it)
+- Production release: `v0.2.0` (tag on 2455f08, 2026-11-23: opt-in cookie banner; previous `v0.1.0` on 1b306da). The installed HEAD snippet sets `RELEASE = "0.2.0"` (`docs/launch/head-code-release-0.2.0.html`). Any change to `src/` reaches the live domain only through a new tag + RELEASE bump; `loader.html` keeps `RELEASE = null` (CI requires it)
 - Webflow MCP server: `webflow-regen-x` (`.mcp.json`, `https://mcp.webflow.com/mcp`). Use this one: the Brand Vision workspace connector can't reach RegenX.
 - Designer with the MCP companion app open: `https://regen-x.design.webflow.com?app=dc8209c65e3ec02254d15275ca056539c89f6d15741893a0adf29ad6f381eb99`
 - Origin: CodeSandbox `regenx-main.css`, `regenx-wave.js`, `regenx-main.js`

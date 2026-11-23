@@ -25,6 +25,15 @@ harvested across all client repos to improve `brandvm/wf-template`.
 
 ## This project
 
+### 2026-11-23 · Staging changes don't reach the release domain
+- Area: release
+- Scope: template-candidate
+- Symptom: The cookie banner passed every check on staging, but on a simulated live domain it stayed on screen, Accept did nothing and HubSpot tracking loaded without consent.
+- Cause: with `RELEASE` set, the live domain loads the pinned jsDelivr tag (v0.1.0), which predated the consent module; staging always loads the latest GitHub Pages build. The head code (installed, unversioned) already expected the new bundle.
+- Fix: cut v0.2.0 and set RELEASE to it. After any `src/` change that must ship, tag a release and bump RELEASE; test the live behaviour by routing `www.regenxhealth.com` to the staging HTML in Playwright.
+- Status: fixed v0.2.0
+- Found by: claude
+
 ### 2026-11-13 · Backdrop blur inside a moving carousel stutters
 - Area: css
 - Scope: template-candidate
