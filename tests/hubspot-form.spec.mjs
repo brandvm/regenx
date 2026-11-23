@@ -186,3 +186,35 @@ test('no Turnstile token after 8 seconds: error pane, nothing sent', async ({ pa
   await expect(page.getByRole('button', { name: 'Submit' })).toBeEnabled();
   expect(calls).toBe(0);
 });
+
+test('off the live domain a staging form GUID wins', async ({ page }) => {
+  let url;
+  await page.route(/api\.hsforms\.com/, async route => {
+    url = route.request().url();
+    await route.fulfill({ status: 200, body: '{}' });
+  });
+  await setup(page, fixture(`data-hubspot-form="${GUID}" data-hubspot-form-staging="test-guid-0000"`));
+  await fill(page);
+  await page.getByRole('button', { name: 'Submit' }).click();
+  await expect(page.locator('.w-form-done')).toBeVisible();
+  expect(url).toMatch(/\/248037195\/test-guid-0000$/);
+});
+
+test('on the live domain the live form GUID is used', async ({ page }) => {
+  let url;
+  await page.route(/api\.hsforms\.com/, async route => {
+    url = route.request().url();
+    await route.fulfill({ status: 200, body: '{}' });
+  });
+  await page.route('https://www.regenxhealth.com/contact', route =>
+    route.fulfill({ contentType: 'text/html', body: fixture(`data-hubspot-form="${GUID}" data-hubspot-form-staging="test-guid-0000"`) }));
+  await page.clock.install();
+  await page.goto('https://www.regenxhealth.com/contact');
+  await page.evaluate(() => { window.Webflow = { env: () => false, push: fn => fn() }; });
+  await page.addScriptTag({ content: js });
+  await expect(page.locator('[data-step-label]')).toHaveText('Step 1 of 2');
+  await fill(page);
+  await page.getByRole('button', { name: 'Submit' }).click();
+  await expect(page.locator('.w-form-done')).toBeVisible();
+  expect(url).toMatch(new RegExp(`/248037195/${GUID}$`));
+});

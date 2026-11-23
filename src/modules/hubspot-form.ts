@@ -1,7 +1,11 @@
 // ============================================
 // HubSpotForm — a Webflow form posts to HubSpot instead of Webflow
 //   Webflow: add data-hubspot-form="<form GUID>" to the Form element
-//   (optional data-hubspot-portal, default below). Without it the form
+//   (optional data-hubspot-portal, default below). Optional
+//   data-hubspot-form-staging="<test form GUID>": used everywhere except
+//   the live domain (regenxhealth.com), so staging and local tests land in
+//   a HubSpot test form without the client's notification emails. Without
+//   data-hubspot-form the form
 //   posts to Webflow as before: removing the attribute is the rollback.
 //   The form keeps its Webflow markup, validation, steps and the Webflow
 //   success / error panes; only the destination changes.
@@ -125,8 +129,10 @@ async function turnstileToken(form: HTMLFormElement): Promise<string | null> {
 }
 
 function initOne(form: HTMLFormElement) {
-  const guid = form.dataset.hubspotForm?.trim();
-  if (!guid || form.dataset.hubspotReady) return;
+  const liveGuid = form.dataset.hubspotForm?.trim();
+  if (!liveGuid || form.dataset.hubspotReady) return;
+  const live = /(^|\.)regenxhealth\.com$/.test(location.hostname);
+  const guid = (!live && form.dataset.hubspotFormStaging?.trim()) || liveGuid;
   form.dataset.hubspotReady = '';
   const portal = form.dataset.hubspotPortal?.trim() || PORTAL;
   const wrap = form.closest('.w-form') ?? form.parentElement;
