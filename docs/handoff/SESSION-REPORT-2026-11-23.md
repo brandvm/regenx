@@ -1,10 +1,9 @@
 # Session report: 2026-11-23
 
-The Claude Code sessions listed below were archived on 2026-11-23 to keep the Claude app responsive. This file records where each one left off, so a new session can pick up the work.
+The Claude Code sessions listed below were archived and then deleted on 2026-11-23 to keep the Claude app responsive. This file records where each one left off, so a new session can pick up the work.
 
 Read this with `HANDOFF.md` (the project brief and its Status section). If something here conflicts with `HANDOFF.md`, `HANDOFF.md` and the git history are more current.
 
-To reopen a session, go to the Claude app's sidebar → Archived, or use the session link while the app is installed.
 
 ## Open items
 
@@ -40,7 +39,7 @@ Open pull requests:
 ### 00 Master
 
 - **Active:** 2026-11-09 → 2026-11-23 10:46
-- **Session:** [local_961a5f91-5c64-4dba-a6ce-9f0dab16d9ca](claude://claude.ai/epitaxy/local_961a5f91-5c64-4dba-a6ce-9f0dab16d9ca) (archived)
+- **Session:** `local_961a5f91-5c64-4dba-a6ce-9f0dab16d9ca` (deleted 2026-11-23)
 - **Started with:** "check all session in a way that we can delete other session after that."
 - **Where it ended:** Release v0.2.0 is tagged, the head code now loads it, and the site is published to staging.
 - **Recent progress:**
@@ -51,7 +50,7 @@ Open pull requests:
 ### btw: someone asked me "hey what analytics code do you need to co...
 
 - **Active:** 2026-11-20 → 2026-11-20 17:25
-- **Session:** [local_f010757d-8af7-4302-8fb2-e37c14ea89e4](claude://claude.ai/epitaxy/local_f010757d-8af7-4302-8fb2-e37c14ea89e4) (archived)
+- **Session:** `local_f010757d-8af7-4302-8fb2-e37c14ea89e4` (deleted 2026-11-23)
 - **Started with:** "check all session in a way that we can delete other session after that."
 - **Status:** live site uses UA-109212131-1 (retired); GA4 ID needed
 - **Recent progress:**
@@ -62,7 +61,7 @@ Open pull requests:
 ### OG image previewer + RegenX social share check
 
 - **Active:** 2026-11-20 → 2026-11-20 14:49
-- **Session:** [local_b9cc62b2-24f4-4d2c-9de2-d8b36acb639f](claude://claude.ai/epitaxy/local_b9cc62b2-24f4-4d2c-9de2-d8b36acb639f) (archived)
+- **Session:** `local_b9cc62b2-24f4-4d2c-9de2-d8b36acb639f` (deleted 2026-11-23)
 - **Started with:** "can you give me all preview as pdf?"
 - **Where it ended:** I've made RegenX-OG-previews.pdf (7 pages, A4 landscape) with the checks, the crop map and all nine platform previews of the designer's image.
 - **Recent progress:**
@@ -73,7 +72,7 @@ Open pull requests:
 ### REGENX privacy policy and FAQ to Webflow
 
 - **Active:** 2026-11-16 → 2026-11-17 17:20
-- **Session:** [local_8ef838c7-2dc0-4564-9197-a935ad688248](claude://claude.ai/epitaxy/local_8ef838c7-2dc0-4564-9197-a935ad688248) (archived)
+- **Session:** `local_8ef838c7-2dc0-4564-9197-a935ad688248` (deleted 2026-11-23)
 - **Started with:** "@"/Users/Work/Downloads/REGENX_WA_Privacy_Policy_and_Peptide_FAQ_Review_v3.docx" can you add this to webflow?"
 - **Where it ended:** Your FAQ doc has all four paragraphs under "How do I know if I have low testosterone?", so I left that answer as it is.
 - **Recent progress:**
